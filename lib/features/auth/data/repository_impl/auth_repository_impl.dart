@@ -1,4 +1,4 @@
-import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
+ import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
 
 import '../../domain/repository/auth_repository.dart';
 import '../data_source/local/AuthLocalDataSource.dart';

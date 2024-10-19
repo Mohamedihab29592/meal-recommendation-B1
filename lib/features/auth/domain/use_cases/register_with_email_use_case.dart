@@ -1,4 +1,5 @@
-import '../repository/auth_repository.dart';
+
+ import '../repository/auth_repository.dart';
 
 class RegisterWithEmailUseCase {
   final AuthRepository repository;

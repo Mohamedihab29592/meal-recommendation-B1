@@ -1,3 +1,4 @@
+
 class Assets {
   static const String authLayoutFoodImage = 'assets/auth_layout_food_image.png';
   static const String icAccount = 'assets/ic_account.svg';

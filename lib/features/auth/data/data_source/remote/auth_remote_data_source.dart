@@ -1,4 +1,4 @@
-import '../../../domain/entity/user_entity.dart';
+ import '../../../domain/entity/user_entity.dart';
 
 abstract class AuthRemoteDataSource {
   Future<Map<String, dynamic>?> loginWithEmailAndPassword(String email, String password);
