@@ -1,4 +1,5 @@
-abstract class AuthEvent {}
+
+ abstract class AuthEvent {}
 
 class LoginWithEmailEvent extends AuthEvent {
   final String email;

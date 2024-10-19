@@ -1,4 +1,5 @@
-import '../../domain/entity/user_entity.dart';
+
+ import '../../domain/entity/user_entity.dart';
 
 abstract class AuthState {}
 

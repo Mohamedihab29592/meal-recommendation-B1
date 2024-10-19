@@ -11,5 +11,5 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MealApp());
+  runApp(const MealApp()); 
 }
