@@ -77,7 +77,7 @@ flutter:
 
   # Assets Section
   assets:
-    - images/
+    - assets/images/
 
 
   # Fonts Section

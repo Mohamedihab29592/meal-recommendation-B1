@@ -3,8 +3,10 @@ import 'package:flutter/material.dart';
 import '../../features/auth/persentation/screens/login/login_screen.dart';
 import '../../features/auth/persentation/screens/register/register_screen.dart';
   import '../../features/on_boarding/screens/on_boarding_screen.dart';
+import '../../features/splash/splash_screen.dart';
 
 class AppRoutes {
+  static const String splash = '/';
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String register = '/register';
@@ -18,6 +20,8 @@ class AppRoutes {
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case splash:
+        return MaterialPageRoute(builder: (_) => const SplashScreen());
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnBoardingScreen());
       case login:
