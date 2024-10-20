@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meal_recommendation_b1/core/utiles/Assets.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 
 import '../../core/routes/app_routes.dart';
@@ -42,7 +44,7 @@ class SplashScreenState extends State<SplashScreen>
         .animate(_animationController);
 
     // Define rotation animation (spins 180 degrees)
-    _rotateAnimation = Tween<double>(begin: 0.0, end: 3.14159) // Half rotation
+    _rotateAnimation = Tween<double>(begin: 0.0, end: 6.28270) // Half rotation
         .chain(CurveTween(curve: Curves.easeInOut))
         .animate(_animationController);
 
@@ -95,18 +97,10 @@ class SplashScreenState extends State<SplashScreen>
                   angle: _rotateAnimation.value, // Rotate the icon
                   child: Transform.scale(
                     scale: _scaleAnimation.value, // Scale up and down
-                    child: Container(
+                    child: SizedBox(
                       width: 120.w,
                       height: 120.h,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.restaurant_menu, // Replace with your chef icon
-                        size: 80,
-                        color: Color(0xFF0A1226), // Navy blue icon color
-                      ),
+                      child: Image.asset(Assets.icSplash),
                     ),
                   ),
                 ),

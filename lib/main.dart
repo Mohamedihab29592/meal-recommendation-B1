@@ -17,7 +17,7 @@ class MealApp extends StatelessWidget {
         title: 'Meal - Recommendation',
         debugShowCheckedModeBanner: false,
         theme: AppThemes.lightTheme,
-        initialRoute: AppRoutes.home,
+        initialRoute: AppRoutes.splash,
         onGenerateRoute: AppRoutes.generateRoute,
       ),
     );
