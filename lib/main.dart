@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
-import 'features/splash/splash_screen.dart';
 
-
+main(){
+  runApp(MealApp());
+}
 class MealApp extends StatelessWidget {
   const MealApp({super.key});
 
@@ -18,6 +19,7 @@ class MealApp extends StatelessWidget {
         title: 'Meal - Recommendation',
         debugShowCheckedModeBanner: false,
         theme: AppThemes.lightTheme,
+        initialRoute: AppRoutes.splash,
         onGenerateRoute: AppRoutes.generateRoute,
       ),
     );

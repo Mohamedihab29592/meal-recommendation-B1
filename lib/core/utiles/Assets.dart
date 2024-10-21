@@ -18,5 +18,10 @@ class Assets {
   static const String icProfileHumburger = 'assets/ic_profile_humburger.svg';
   static const String icSend = 'assets/ic_send.svg';
   static const String icSettings = 'assets/ic_settings.svg';
-  static const String icSplash = 'assets/ic_splash.svg';
+  static const String icSplash = 'assets/images/splash_logo.png';
+  static const String firstOnbordingLogo = 'assets/images/first onboarding.png';
+  static const String secoundtOnbordingLogo = 'assets/images/secound onboarding.png';
+  static const String thirdOnbordingLogo = 'assets/images/third onboarding.png';
+
+
 }
