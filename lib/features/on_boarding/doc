@@ -1,0 +1,8 @@
+Onboarding Screen :
+ This screen is welcome page that define some information about app and images about meals
+
+that consist of :
+    - stack include three component
+                                  - first include (paint circle border & welcome text & small brief about app & Trasactions widgets)
+                                  - secound include (oval shape)
+                                  - third (logo & images of some foods)

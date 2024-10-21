@@ -64,7 +64,7 @@ class SplashScreenState extends State<SplashScreen>
     final authRepository = getIt<AuthRepository>();
     final user = await authRepository.getSavedUser();
 
-    await Future.delayed(const Duration(seconds: 4)); // Splash delay
+    await Future.delayed(const Duration(seconds: 2)); // Splash delay
 
     if (user != null) {
       // User is logged in
