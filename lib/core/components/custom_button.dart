@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
  import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -18,15 +19,20 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
+          foregroundColor:  AppColors.primary,
+          backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.r),
+            borderRadius: BorderRadius.circular(30.r), // More rounded corners (pill shape)
           ),
+          padding: EdgeInsets.symmetric(vertical: 16.h), // Padding for better touch area
+          shadowColor: Colors.black.withOpacity(0.2), // Subtle shadow for depth
+          elevation: 3, // Slight elevation for a modern look
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Text(
-            text,
-            style:  TextStyle(fontSize: 16.sp),
+        child: Text(
+          text,
+          style: TextStyle(
+            fontSize: 18.sp, // Adaptive font size for better readability
+            fontWeight: FontWeight.w600, // Slightly bolder text for emphasis
           ),
         ),
       ),
