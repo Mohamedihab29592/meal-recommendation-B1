@@ -1,0 +1,53 @@
+
+### Login Feature
+
+#### Data Layer
+- **Data source
+   -Local
+        -save user , get user , clear user by sharedprefences
+   -Remote
+         Login with email and password , login by google => by fire base
+
+- **Repository Implementation:**
+  - Implements all functions of the abstract repository class from the domain layer.
+
+  - **Login Function:**
+    - Uses Firebase's `signInWithEmailAndPassword` method.
+    - Accepts `email` and `password` as input.
+    - Returns the authenticated user from Firebase.
+
+  - **Logout Function:**
+    - Uses Firebase's `signOut` method to log the user out.
+
+  - ** Get saved user Function**
+     -get user that saved in local
+
+  -** Login with Google Function**
+    -login with google by firbase and return entity
+
+- **Mappers
+   - convert data from a Map<String, dynamic>into a UserEntity object
+
+#### Domain Layer
+- **Entity:**
+  - Represents the user data used in the UI, fetched from Firebase.
+
+- **Repository:**
+  - Defines the interface (abstraction) for Login functions.
+  - Includes methods like `loginWithEmailAndPassword`, `loginWithGoogle`,'getSavedUser'
+
+- **Use Case:**
+  - Business logic related to Login include LoginWithEmailUseCase and LoginWithGoogle
+
+### Presentation layer
+- **bloc**
+  - bloc
+     handle logic of feature depended on event and state
+  - event
+     user action for feature like 'login with email' and 'login with google'
+  - state
+      handle state of feature like success , failure , or loading
+
+-ui
+  - display screen that user using widget tree of flutter
+  - and use shared preferences package to save data of user
