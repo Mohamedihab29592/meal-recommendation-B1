@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 import '../../features/auth/persentation/screens/login/login_screen.dart';
 import '../../features/auth/persentation/screens/register/register_screen.dart';
-  import '../../features/on_boarding/screens/on_boarding_screen.dart';
+  import '../../features/home/persentation/screen.dart';
+import '../../features/on_boarding/screens/on_boarding_screen.dart';
 import '../../features/splash/splash_screen.dart';
 
 class AppRoutes {
@@ -25,13 +26,13 @@ class AppRoutes {
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnBoardingScreen());
       case login:
-        return MaterialPageRoute(builder: (_) => const LoginScreen());
+        return MaterialPageRoute(builder: (_) =>  const LoginScreen());
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case verification:
         //return MaterialPageRoute(builder: (_) => VerificationScreen());
       case home:
-        //return MaterialPageRoute(builder: (_) => HomeScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case favorites:
         //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:

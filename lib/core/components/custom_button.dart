@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
  import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
@@ -26,7 +27,7 @@ class CustomButton extends StatelessWidget {
           padding: const EdgeInsets.all(16),
           child: Text(
             text,
-            style:  TextStyle(fontSize: 16.sp),
+            style:  TextStyle(fontSize: 16.sp,color: AppColors.primary),
           ),
         ),
       ),

@@ -10,10 +10,10 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
 
   @override
   Future<void> saveUser(UserEntity user) async {
-    await sharedPreferences.setString('uid', user.uid);
-    await sharedPreferences.setString('name', user.name);
-    await sharedPreferences.setString('email', user.email);
-    await sharedPreferences.setString('phone', user.phone);
+    await sharedPreferences.setString('uid', user.uid!);
+    await sharedPreferences.setString('name', user.name!);
+    await sharedPreferences.setString('email', user.email!);
+    await sharedPreferences.setString('phone', user.phone!);
   }
 
   @override
