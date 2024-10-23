@@ -13,6 +13,7 @@ import '../../features/auth/domain/use_cases/get_saved_user_use_case.dart';
 import '../../features/auth/domain/use_cases/login_with_email_use_case.dart';
 import '../../features/auth/domain/use_cases/login_with_google_use_case.dart';
 import '../../features/auth/domain/use_cases/logout_use_case.dart';
+import '../../features/auth/domain/use_cases/phone_authentication_use_case.dart';
 import '../../features/auth/domain/use_cases/register_with_email_use_case.dart';
 import '../../features/auth/persentation/bloc/auth_bloc.dart';
 
@@ -33,6 +34,9 @@ Future<void> setup() async {
 
   getIt.registerLazySingleton<AuthRepository>(
           () => AuthRepositoryImpl(getIt(), getIt()));
+
+  getIt.registerLazySingleton<PhoneAuthenticationUseCase>(
+          () => PhoneAuthenticationUseCase(getIt()));
 
 
   getIt.registerFactory(() => AuthBloc(

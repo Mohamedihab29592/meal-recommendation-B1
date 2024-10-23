@@ -1,5 +1,10 @@
- import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
+import 'package:dartz/dartz.dart';
+import 'package:firebase_auth_platform_interface/src/firebase_auth_exception.dart';
+import 'package:firebase_auth_platform_interface/src/providers/phone_auth.dart';
+import 'package:meal_recommendation_b1/features/auth/domain/entity/phone_number_entities.dart';
+import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
 
+import '../../../../core/failure/failure.dart';
 import '../../domain/repository/auth_repository.dart';
 import '../data_source/local/AuthLocalDataSource.dart';
 import '../data_source/remote/auth_remote_data_source.dart';
@@ -7,11 +12,14 @@ import '../data_source/remote/auth_remote_data_source.dart';
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
   final AuthLocalDataSource authLocalDataSource;
+
   AuthRepositoryImpl(this.authRemoteDataSource, this.authLocalDataSource);
 
   @override
-  Future<UserEntity?> loginWithEmailAndPassword(String email, String password) async {
-    final result = await authRemoteDataSource.loginWithEmailAndPassword(email, password);
+  Future<UserEntity?> loginWithEmailAndPassword(
+      String email, String password) async {
+    final result =
+        await authRemoteDataSource.loginWithEmailAndPassword(email, password);
     if (result != null) {
       return UserEntity(
         uid: result['uid'],
@@ -64,5 +72,27 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<UserEntity?> getSavedUser() async {
     return await authLocalDataSource.getUser();
+  }
+
+  @override
+  Future<Either<Failure, void>> signInWithCredential(
+      PhoneAuthCredential credential) async {
+    try {
+      await authRemoteDataSource.signInWithCredential(credential);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> verifyPhoneNumber(
+      PhoneNumberEntities phoneData) async {
+    try {
+      await authRemoteDataSource.verifyPhoneNumber(phoneData);
+      return const Right(null);
+    } catch (e) {
+      return Left(ServerFailure());
+    }
   }
 }

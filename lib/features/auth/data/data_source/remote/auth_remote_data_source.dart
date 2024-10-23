@@ -1,4 +1,7 @@
- import '../../../domain/entity/user_entity.dart';
+ import 'package:firebase_auth/firebase_auth.dart';
+
+import '../../../domain/entity/phone_number_entities.dart';
+import '../../../domain/entity/user_entity.dart';
 
 abstract class AuthRemoteDataSource {
   Future<Map<String, dynamic>?> loginWithEmailAndPassword(String email, String password);
@@ -11,6 +14,10 @@ abstract class AuthRemoteDataSource {
   Future<Map<String, dynamic>?> loginWithGoogle();
   Future<void> logout();
   Future<UserEntity?> getSavedUser();
+
+  Future<void> verifyPhoneNumber(PhoneNumberEntities phoneNumberEntities);
+
+  Future<void> signInWithCredential(PhoneAuthCredential credential);
 
 
 }

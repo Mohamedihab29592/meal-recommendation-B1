@@ -1,12 +1,23 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
+import 'core/services/di.dart';
 import 'core/utiles/app_themes.dart';
+import 'firebase_options.dart';
 
-main(){
-  runApp(MealApp());
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await ScreenUtil.ensureScreenSize();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await setup();
+  runApp(const MealApp());
 }
+
 class MealApp extends StatelessWidget {
   const MealApp({super.key});
 
@@ -19,7 +30,7 @@ class MealApp extends StatelessWidget {
         title: 'Meal - Recommendation',
         debugShowCheckedModeBanner: false,
         theme: AppThemes.lightTheme,
-        initialRoute: AppRoutes.splash,
+        initialRoute: AppRoutes.otp,
         onGenerateRoute: AppRoutes.generateRoute,
       ),
     );

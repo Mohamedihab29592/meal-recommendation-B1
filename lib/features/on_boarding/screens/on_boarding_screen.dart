@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';  
 import 'package:flutter/material.dart';  
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil  
-import '../../../core/utiles/assets.dart';
+import '../../../core/utiles/Assets.dart';  
 import '../../../core/utiles/app_colors.dart';  
 
 class OnBoardingScreen extends StatefulWidget {  

@@ -37,7 +37,11 @@ dependencies:
   pin_code_fields: ^7.3.0 # OTP verification_code
   flutter_screenutil: ^5.9.3 # Responsiveness
   smooth_page_indicator: ^1.0.0+2 # on boarding pagination
+<<<<<<< HEAD
   cloud_firestore: ^5.4.4 # Firebase Firestore (optional if using Firestore for user data)
+=======
+  #cloud_firestore: ^5.4.4 # Firebase Firestore (optional if using Firestore for user data)
+>>>>>>> 3629235 (data OTP)
   flutter_bloc: ^8.1.6 # Bloc pattern for state management
   get_it: ^8.0.0 # GetIt for dependency injection
   lottie: ^3.1.3 # Lottie animations
@@ -50,6 +54,10 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
+<<<<<<< HEAD
+=======
+  dartz: ^0.10.1
+>>>>>>> 3629235 (data OTP)
 
 
 dev_dependencies:
