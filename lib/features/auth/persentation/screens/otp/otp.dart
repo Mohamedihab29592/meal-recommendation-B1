@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/services/di.dart';
+import 'package:meal_recommendation_b1/features/auth/persentation/bloc/phone_bloc/phone_event.dart';
 
 import '../../../../../core/components/custom_button.dart';
 import '../../../../../core/utiles/Assets.dart';
 import '../../../../../core/utiles/app_colors.dart';
 import '../../../../../core/utiles/app_strings.dart';
+import '../../bloc/phone_bloc/phone_bloc.dart';
+import '../../bloc/phone_bloc/phone_state.dart';
 import '../../widgets/my_loading_dialog.dart';
 import '../../widgets/pin_code_fields.dart';
 
@@ -27,12 +32,26 @@ class _OTPViewState extends State<OTPView> {
   }
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.primary,
-      body: bodyContent(context),
+    return BlocProvider(
+      create: (context) => getIt<PhoneAuthBloc>(),
+      child: BlocConsumer<PhoneAuthBloc,PhoneAuthState>(
+        listener: (context,state){
+          if(state is Loading){
+            MyLoadingDialog.show(context);
+          }
+          else if(state is ErrorOccurred){
+            MyLoadingDialog.hide(context);
+          }
+        },
+        builder: (context,state) {
+          return Scaffold(
+            backgroundColor: AppColors.primary,
+            body: bodyContent(context),
+          );
+        }
+      ),
     );
   }
-
   Widget bodyContent(BuildContext context) {
     return Stack(
       children: [
@@ -71,7 +90,8 @@ class _OTPViewState extends State<OTPView> {
                     height: 33.h,
                   ),
                   CustomButton(onPressed: () {
-                    MyLoadingDialog.show(context);
+                    BlocProvider.of<PhoneAuthBloc>(context).add(SubmittedPhoneNumber(phoneNumber: '010'));
+                    //BlocProvider.of<SignIn>(context).add((phoneNumber: '010'));
                   },text: AppStrings.continueBtn)
                 ],
               ),

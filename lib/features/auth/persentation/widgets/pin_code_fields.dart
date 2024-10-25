@@ -5,7 +5,7 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 
 Widget buildPinCodeFields(BuildContext context, String code) {
   return PinCodeTextField(
-    length: 4,
+    length: 6,
     autoFocus: true,
     cursorColor: AppColors.black,
     keyboardType: TextInputType.number,
@@ -14,8 +14,8 @@ Widget buildPinCodeFields(BuildContext context, String code) {
     pinTheme: PinTheme(
       shape: PinCodeFieldShape.box,
       borderRadius: BorderRadius.circular(6.r),
-      fieldHeight: 75.h,
-      fieldWidth: 75.w,
+      fieldHeight: 50.h,
+      fieldWidth: 50.w,
       activeFillColor: AppColors.white,
       borderWidth: 1,
       activeColor: AppColors.gray,
@@ -27,10 +27,10 @@ Widget buildPinCodeFields(BuildContext context, String code) {
     animationDuration: const Duration(milliseconds: 300),
     backgroundColor: AppColors.primary,
     enableActiveFill: true,
-    textStyle: TextStyle(fontSize: 40.sp,fontWeight: FontWeight.bold),
+    textStyle: TextStyle(fontSize: 30.sp,fontWeight: FontWeight.bold),
     onCompleted: (code) {
       code = code;
       print("Completed");
-    }, appContext: context, onChanged: (String value) {  },
+    }, appContext: context, onChanged: (String value) { },
   );
 }

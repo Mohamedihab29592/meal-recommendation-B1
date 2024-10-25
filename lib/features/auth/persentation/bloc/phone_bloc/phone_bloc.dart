@@ -11,18 +11,17 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   late String verificationId;
 
   PhoneAuthBloc() : super(PhoneAuthInitial()) {
-    on<SubmittedPhoneNumber>(_onPhoneNumberSubmitted);
-    on<SignIn>(_onSignIn);
+    on<SubmittedPhoneNumber>(onPhoneNumberSubmitted);
+    on<SignIn>(onSignIn);
   }
 
   // Handler for Phone Number Submission
-  Future<void> _onPhoneNumberSubmitted(
+  Future<void> onPhoneNumberSubmitted(
       SubmittedPhoneNumber event, Emitter<PhoneAuthState> emit) async {
     emit(Loading());
-
     final phoneAuthenticationUseCase = getIt<PhoneAuthenticationUseCase>();
     final result = await phoneAuthenticationUseCase.call(PhoneNumberEntities(
-      phoneNumber: "+201014818287",
+      phoneNumber: "+2010208820832",
       codeAutoRetrievalTimeout: _codeAutoRetrievalTimeout,
       codeSent: _codeSent,
       verificationCompleted: _verificationCompleted,
@@ -39,9 +38,8 @@ class PhoneAuthBloc extends Bloc<PhoneAuthEvent, PhoneAuthState> {
   }
 
   // Handler for OTP SignIn
-  Future<void> _onSignIn(SignIn event, Emitter<PhoneAuthState> emit) async {
+  Future<void> onSignIn(SignIn event, Emitter<PhoneAuthState> emit) async {
     emit(Loading());
-
     final submitOTPUseCase = getIt<SubmitOTPUseCase>();
     final result = await submitOTPUseCase.call(event.otpCode, verificationId);
 

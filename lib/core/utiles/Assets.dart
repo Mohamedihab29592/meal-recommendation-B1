@@ -1,7 +1,7 @@
 
 class Assets {
   static const String authLayoutFoodImage = 'assets/images/auth_layout_food_image.png';
-  static const String logo = 'assets/images/logo.png';
+  static const String logo = 'assets/images/logo.jpeg';
   static const String icAccount = 'assets/ic_account.svg';
   static const String icBack = 'assets/ic_back.svg';
   static const String icEdit = 'assets/ic_edit.svg';

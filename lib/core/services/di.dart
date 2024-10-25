@@ -1,9 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
- import 'package:google_sign_in/google_sign_in.dart';
-  import 'package:shared_preferences/shared_preferences.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:meal_recommendation_b1/features/auth/persentation/bloc/phone_bloc/phone_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
- import '../../features/auth/data/data_source/local/AuthLocalDataSource.dart';
+import '../../features/auth/data/data_source/local/AuthLocalDataSource.dart';
 import '../../features/auth/data/data_source/remote/auth_remote_data_source.dart';
 import '../../features/auth/data/data_source_impl/local_impl/auth_local_data_source_impl.dart';
 import '../../features/auth/data/data_source_impl/remote_impl/auth_remote_data_source_Impl.dart';
@@ -27,24 +28,23 @@ Future<void> setup() async {
   getIt.registerLazySingleton(() => sharedPreferences);
 
   getIt.registerLazySingleton<AuthRemoteDataSource>(
-          () => AuthRemoteDataSourceImpl(getIt(), getIt()));
+      () => AuthRemoteDataSourceImpl(getIt(), getIt()));
 
   getIt.registerLazySingleton<AuthLocalDataSource>(
-          () => AuthLocalDataSourceImpl(getIt()));
+      () => AuthLocalDataSourceImpl(getIt()));
 
   getIt.registerLazySingleton<AuthRepository>(
-          () => AuthRepositoryImpl(getIt(), getIt()));
+      () => AuthRepositoryImpl(getIt(), getIt()));
 
   getIt.registerLazySingleton<PhoneAuthenticationUseCase>(
-          () => PhoneAuthenticationUseCase(getIt()));
-
+      () => PhoneAuthenticationUseCase(getIt()));
+  getIt.registerFactory(() => PhoneAuthBloc());
 
   getIt.registerFactory(() => AuthBloc(
-    loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
-    registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
-    loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
-    getSavedUserUseCase: getIt<GetSavedUserUseCase>(),
-    logoutUseCase: getIt<LogoutUseCase>(),
-  ));
-
+        loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
+        registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
+        loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
+        getSavedUserUseCase: getIt<GetSavedUserUseCase>(),
+        logoutUseCase: getIt<LogoutUseCase>(),
+      ));
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
+import 'package:meal_recommendation_b1/features/auth/persentation/screens/otp/otp.dart';
 import 'core/services/di.dart';
 import 'core/utiles/app_themes.dart';
 import 'firebase_options.dart';
@@ -30,8 +31,9 @@ class MealApp extends StatelessWidget {
         title: 'Meal - Recommendation',
         debugShowCheckedModeBanner: false,
         theme: AppThemes.lightTheme,
-        initialRoute: AppRoutes.otp,
-        onGenerateRoute: AppRoutes.generateRoute,
+        home: OTPView(),
+        // initialRoute: AppRoutes.otp,
+        // onGenerateRoute: AppRoutes.generateRoute,
       ),
     );
   }
