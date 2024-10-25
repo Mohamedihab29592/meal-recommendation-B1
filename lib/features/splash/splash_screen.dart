@@ -71,7 +71,8 @@ class SplashScreenState extends State<SplashScreen>
       context.replaceWith(AppRoutes.home);
     } else {
       // User is not logged in
-      context.replaceWith(AppRoutes.login);
+      context.replaceWith(
+          AppRoutes.login); // i test here 'naviagting to onBorading'
     }
   }
 

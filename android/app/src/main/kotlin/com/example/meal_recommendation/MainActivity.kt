@@ -1,4 +1,4 @@
-package com.example.meal_recommendation
+package com.example.meal_recommendations
 
 import io.flutter.embedding.android.FlutterActivity
 

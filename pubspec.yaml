@@ -28,35 +28,30 @@ environment:
 # the latest version available on pub.dev. To see which dependencies have newer
 # versions available, run `flutter pub outdated`.
 dependencies:
+  cloud_firestore: ^5.4.4
+  cupertino_icons: ^1.0.8
+  fading_edge_scrollview: ^4.1.1
+  firebase_auth: ^5.3.1
+  firebase_core: ^3.6.0
   flutter:
     sdk: flutter
+  flutter_bloc: ^8.1.6
+  flutter_screenutil: ^5.9.3
+  flutter_secure_storage: ^9.2.2
+  flutter_svg: ^2.0.10+1
+  geolocator: ^13.0.1
+  get_it: ^8.0.0
   google_fonts: ^6.2.1
-  firebase_core: ^3.6.0 # Firebase core initialization
-  firebase_auth: ^5.3.1 # Firebase Authentication
-  google_sign_in: ^6.2.1 # Google OAuth login
-  pin_code_fields: ^7.3.0 # OTP verification_code
-  flutter_screenutil: ^5.9.3 # Responsiveness
-  smooth_page_indicator: ^1.0.0+2 # on boarding pagination
-  cloud_firestore: ^5.4.4 # Firebase Firestore (optional if using Firestore for user data)
-  flutter_bloc: ^8.1.6 # Bloc pattern for state management
-  get_it: ^8.0.0 # GetIt for dependency injection
-  lottie: ^3.1.3 # Lottie animations
-  flutter_svg: ^2.0.10+1 # loading svg icons
-  shared_preferences: ^2.3.2 # Shared Preferences for caching data
-  flutter_secure_storage: ^9.2.2 # Secure storage (optional for saving tokens securely)
-  geolocator: ^13.0.1 # Location services
-  google_maps_flutter: ^2.9.0 # Google Maps integration (if needed)
-
-  # The following adds the Cupertino Icons font to your application.
-  # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^1.0.8
-
+  google_maps_flutter: ^2.9.0
+  google_sign_in: ^6.2.1
+  loading_indicator: ^3.1.1
+  lottie: ^3.1.3
+  pin_code_fields: ^7.3.0
+  shared_preferences: ^2.3.2
+  smooth_page_indicator: ^1.0.0+2
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   bloc_test: ^9.0.3 # Unit testing for Bloc
-  mockito: ^5.4.4 # Mocking for testing
   build_runner: ^2.4.5 # For generating code (optional)
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -65,10 +60,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+  mockito: ^5.4.4 # Mocking for testing
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter packages.
 flutter:
 
@@ -78,21 +75,17 @@ flutter:
   # Assets Section
   assets:
     - assets/images/
-
-
   # Fonts Section
-#  fonts:
-#    - family: Inter        # Inter font family
-#      fonts:
-#        - asset: assets/fonts/Inter-Regular.ttf   # Regular weight (400)
-#          weight: 400
-#        - asset: assets/fonts/Inter-Bold.ttf      # Bold weight (700)
-#          weight: 700
-#        - asset: assets/fonts/Inter-Medium.ttf    # Medium weight (500)
-#          weight: 500
-
+  #  fonts:
+  #    - family: Inter        # Inter font family
+  #      fonts:
+  #        - asset: assets/fonts/Inter-Regular.ttf   # Regular weight (400)
+  #          weight: 400
+  #        - asset: assets/fonts/Inter-Bold.ttf      # Bold weight (700)
+  #          weight: 700
+  #        - asset: assets/fonts/Inter-Medium.ttf    # Medium weight (500)
+  #          weight: 500
   # For more details regarding adding assets from package dependencies,
   # check out https://flutter.dev/to/asset-from-package
-
   # For more details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
