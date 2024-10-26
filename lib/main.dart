@@ -4,9 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
 
-main(){
-  runApp(MealApp());
-}
 class MealApp extends StatelessWidget {
   const MealApp({super.key});
 

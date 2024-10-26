@@ -5,7 +5,7 @@ import '../../../core/utiles/assets.dart';
 import '../../../core/utiles/app_colors.dart';  
 
 class OnBoardingScreen extends StatefulWidget {  
-  OnBoardingScreen({super.key});  
+  const OnBoardingScreen({super.key});
   
   @override  
   State<OnBoardingScreen> createState() => _OnBoardingScreenState();  
