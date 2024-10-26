@@ -56,7 +56,7 @@ class SplashScreenState extends State<SplashScreen>
     _animationController.forward();
 
     // Navigate to the next screen after a delay
-    _navigateAfterSplash();
+    // _navigateAfterSplash();
   }
 
   void _navigateAfterSplash() async {

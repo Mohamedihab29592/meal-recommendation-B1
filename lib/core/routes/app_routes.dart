@@ -32,7 +32,7 @@ class AppRoutes {
       case verification:
         //return MaterialPageRoute(builder: (_) => VerificationScreen());
       case home:
-        return MaterialPageRoute(builder: (_) => HomeScreen());
+        return MaterialPageRoute(builder: (_) => const HomeScreen());
       case favorites:
         //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:

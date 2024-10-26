@@ -2,12 +2,15 @@
 class Assets {
   static const String authLayoutFoodImage = 'assets/images/auth_layout_food_image.png';
   static const String icAccount = 'assets/images/ic_account.png';
+  static const String icAccountWhite = 'assets/images/ic_account_white.png';
   static const String icBack = 'assets/images/ic_back.png';
   static const String icEdit = 'assets/images/ic_edit.png';
   static const String icFavorite = 'assets/images/ic_favorite.png';
+  static const String icFavoriteWhite = 'assets/images/ic_favorite_white.png';
   static const String icFilter = 'assets/images/ic_filter.png';
   static const String icGoogle = 'assets/images/ic_google.png';
   static const String icHome = 'assets/images/ic_home.png';
+  static const String icHomeWhite = 'assets/images/ic_home_white.png';
   static const String icLoading = 'assets/images/ic_loading.png';
   static const String icNotification = 'assets/images/ic_notification.png';
   static const String icProfileMenu = 'assets/images/ic_profile_menu.png';
