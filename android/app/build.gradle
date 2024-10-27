@@ -9,7 +9,7 @@ plugins {
 }
 
 android {
-    namespace = "com.example.meal_recommendation"
+    namespace = "com.example.meal_recommendations"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -23,7 +23,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.meal_recommendation"
+        applicationId = "com.example.meal_recommendations"
         minSdk 23
         targetSdk flutter.targetSdkVersion
         versionCode = 1
