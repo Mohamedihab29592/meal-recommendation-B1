@@ -17,4 +17,5 @@ class Assets {
   static const String firstOnbordingLogo = 'assets/images/first onboarding.png';
   static const String secoundtOnbordingLogo = 'assets/images/secound onboarding.png';
   static const String thirdOnbordingLogo = 'assets/images/third onboarding.png';
+  static const String icSearch = 'assets/images/Search.png';
 }
