@@ -20,4 +20,5 @@ class Assets {
   static const String firstOnbordingLogo = 'assets/images/first onboarding.png';
   static const String secoundtOnbordingLogo = 'assets/images/secound onboarding.png';
   static const String thirdOnbordingLogo = 'assets/images/third onboarding.png';
+  static const String icFilledHeart= 'assets/images/ic_fillled_heart.png';
 }
