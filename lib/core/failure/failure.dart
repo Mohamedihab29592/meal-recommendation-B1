@@ -5,13 +5,13 @@ abstract class Failure {
 }
 
 class ServerFailure extends Failure {
-  ServerFailure() : super(message: "Server error occurred");
+  ServerFailure({super.message = "Server failure"});
 }
 
 class NetworkFailure extends Failure {
   NetworkFailure() : super(message: "No Internet connection");
 }
 
-class CacheFailure extends Failure {
-  CacheFailure() : super(message: "Cache error occurred");
+class AuthFailure extends Failure {
+  AuthFailure({super.message = "Authentication failure"});
 }

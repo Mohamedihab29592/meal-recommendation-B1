@@ -13,8 +13,6 @@ class RemoteDataSource implements BaseOTPRemoteDataSource {
       await FirebaseAuth.instance.signInWithCredential(credential);
     } on FirebaseAuthException catch (e) {
       throw handleSignInwWithCredentialException(e);
-    }catch(e){
-      throw AuthFailure(message: e.toString());
     }
   }
 
@@ -30,8 +28,6 @@ class RemoteDataSource implements BaseOTPRemoteDataSource {
       );
     } on FirebaseAuthException catch (e) {
       throw handleFirebasePhoneException(e);
-    }catch(e){
-      throw AuthFailure(message: e.toString());
     }
   }
 }

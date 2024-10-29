@@ -7,4 +7,7 @@ class AppStrings {
   static const String enter4Digits = "Enter 4 digits verification code. We just sent you on";
   static const String continueBtn = "continue";
   static const String pleaseWait = "please wait";
+  static const String errorTitle = "Error";
+  static const String dismiss = "Dismiss";
+
 }

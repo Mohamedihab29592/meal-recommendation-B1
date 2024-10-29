@@ -72,19 +72,4 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     throw UnimplementedError();
   }
 
-  @override
-  Future<void> signInWithCredential(PhoneAuthCredential credential) async {
-    await FirebaseAuth.instance.signInWithCredential(credential);
-  }
-
-  @override
-  Future<void> verifyPhoneNumber(PhoneNumberEntities phoneData) async {
-    await FirebaseAuth.instance.verifyPhoneNumber(
-      phoneNumber: phoneData.phoneNumber,
-      verificationCompleted: phoneData.verificationCompleted,
-      verificationFailed: phoneData.verificationFailed,
-      codeSent: phoneData.codeSent,
-      codeAutoRetrievalTimeout: phoneData.codeAutoRetrievalTimeout,
-    );
-  }
 }

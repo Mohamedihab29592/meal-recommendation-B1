@@ -74,25 +74,5 @@ class AuthRepositoryImpl implements AuthRepository {
     return await authLocalDataSource.getUser();
   }
 
-  @override
-  Future<Either<Failure, void>> signInWithCredential(
-      PhoneAuthCredential credential) async {
-    try {
-      await authRemoteDataSource.signInWithCredential(credential);
-      return const Right(null);
-    } catch (e) {
-      return Left(ServerFailure());
-    }
-  }
 
-  @override
-  Future<Either<Failure, void>> verifyPhoneNumber(
-      PhoneNumberEntities phoneData) async {
-    try {
-      await authRemoteDataSource.verifyPhoneNumber(phoneData);
-      return const Right(null);
-    } catch (e) {
-      return Left(ServerFailure());
-    }
-  }
 }

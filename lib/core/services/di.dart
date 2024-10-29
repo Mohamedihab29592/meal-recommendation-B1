@@ -1,9 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:meal_recommendation_b1/features/auth/persentation/bloc/phone_bloc/phone_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../features/auth/OTP/data/data_source/base_remote_data_source.dart';
+import '../../features/auth/OTP/data/data_source/remote_data_source.dart';
+import '../../features/auth/OTP/data/repository/repository.dart';
+import '../../features/auth/OTP/domin/use_case/phone_authentication_use_case.dart';
+import '../../features/auth/OTP/domin/use_case/submit_otp_use_case.dart';
+import '../../features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
 import '../../features/auth/data/data_source/local/AuthLocalDataSource.dart';
 import '../../features/auth/data/data_source/remote/auth_remote_data_source.dart';
 import '../../features/auth/data/data_source_impl/local_impl/auth_local_data_source_impl.dart';
@@ -14,7 +19,6 @@ import '../../features/auth/domain/use_cases/get_saved_user_use_case.dart';
 import '../../features/auth/domain/use_cases/login_with_email_use_case.dart';
 import '../../features/auth/domain/use_cases/login_with_google_use_case.dart';
 import '../../features/auth/domain/use_cases/logout_use_case.dart';
-import '../../features/auth/domain/use_cases/phone_authentication_use_case.dart';
 import '../../features/auth/domain/use_cases/register_with_email_use_case.dart';
 import '../../features/auth/persentation/bloc/auth_bloc.dart';
 
@@ -36,15 +40,29 @@ Future<void> setup() async {
   getIt.registerLazySingleton<AuthRepository>(
       () => AuthRepositoryImpl(getIt(), getIt()));
 
-  getIt.registerLazySingleton<PhoneAuthenticationUseCase>(
-      () => PhoneAuthenticationUseCase(getIt()));
-  getIt.registerFactory(() => PhoneAuthBloc());
-
   getIt.registerFactory(() => AuthBloc(
         loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
         registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
         loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
         getSavedUserUseCase: getIt<GetSavedUserUseCase>(),
         logoutUseCase: getIt<LogoutUseCase>(),
+      ));
+
+  //OTP features
+
+  getIt.registerLazySingleton<OTPRepository>(() => OTPRepository(getIt()));
+
+  getIt
+      .registerLazySingleton<BaseOTPRemoteDataSource>(() => RemoteDataSource());
+
+  getIt.registerLazySingleton<PhoneAuthenticationUseCase>(
+      () => PhoneAuthenticationUseCase(getIt()));
+
+  getIt
+      .registerLazySingleton<SubmitOTPUseCase>(() => SubmitOTPUseCase(getIt()));
+
+  getIt.registerFactory(() => PhoneAuthBloc(
+        phoneAuthenticationUseCase: getIt<PhoneAuthenticationUseCase>(),
+        submitOTPUseCase: getIt<SubmitOTPUseCase>(),
       ));
 }

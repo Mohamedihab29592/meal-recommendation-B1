@@ -31,15 +31,15 @@ class _OTPViewState extends State<OTPView> {
       create: (context) => getIt<PhoneAuthBloc>(),
       child: BlocConsumer<PhoneAuthBloc, PhoneAuthState>(
           listener: (context, state) {
-        if (state is Loading) {
-          MyLoadingDialog.show(context);
-        } else if (state is PhoneOTPVerified) {
-          MyLoadingDialog.hide(context);
-        }else if (state is ErrorOccurred){
-          MyLoadingDialog.hide(context);
-          MyLoadingDialog.showError(context, state.errorMsg);
-        }
-      }, builder: (context, state) {
+            if (state is Loading) {
+              MyLoadingDialog.show(context);
+            } else if (state is PhoneOTPVerified) {
+              MyLoadingDialog.hide(context);
+            }else if (state is ErrorOccurred){
+              MyLoadingDialog.hide(context);
+              MyLoadingDialog.showError(context, state.errorMsg);
+            }
+          }, builder: (context, state) {
         return Scaffold(
           backgroundColor: AppColors.primary,
           body: bodyContent(context),

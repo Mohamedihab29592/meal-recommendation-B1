@@ -22,9 +22,4 @@ abstract class AuthRepository {
 
   Future<UserEntity?> getSavedUser();
 
-  Future<Either<Failure, void>> verifyPhoneNumber(
-      PhoneNumberEntities phoneData);
-
-  Future<Either<Failure, void>> signInWithCredential(
-      PhoneAuthCredential credential);
 }

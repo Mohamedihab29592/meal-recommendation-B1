@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/persentation/screens/login/login_screen.dart';
-import '../../features/auth/persentation/screens/otp/otp.dart';
 import '../../features/auth/persentation/screens/register/register_screen.dart';
   import '../../features/on_boarding/screens/on_boarding_screen.dart';
 import '../../features/splash/splash_screen.dart';

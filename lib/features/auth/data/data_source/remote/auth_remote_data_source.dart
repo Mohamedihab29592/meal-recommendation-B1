@@ -15,9 +15,6 @@ abstract class AuthRemoteDataSource {
   Future<void> logout();
   Future<UserEntity?> getSavedUser();
 
-  Future<void> verifyPhoneNumber(PhoneNumberEntities phoneNumberEntities);
-
-  Future<void> signInWithCredential(PhoneAuthCredential credential);
 
 
 }
