@@ -1,12 +1,12 @@
  import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
 
 import '../../domain/repository/auth_repository.dart';
-import '../data_source/local/AuthLocalDataSource.dart';
-import '../data_source/remote/auth_remote_data_source.dart';
+import '../data_source_impl/local_impl/auth_local_data_source_impl.dart';
+import '../data_source_impl/remote_impl/auth_remote_data_source_Impl.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource authRemoteDataSource;
-  final AuthLocalDataSource authLocalDataSource;
+  final AuthRemoteDataSourceImpl authRemoteDataSource;
+  final AuthLocalDataSourceImpl authLocalDataSource;
   AuthRepositoryImpl(this.authRemoteDataSource, this.authLocalDataSource);
 
   @override
@@ -17,7 +17,7 @@ class AuthRepositoryImpl implements AuthRepository {
         uid: result['uid'],
         name: result['name'],
         email: result['email'],
-        phone: result['phone'],
+        phone: result['phone']??'',
       );
     }
     return null;
@@ -44,14 +44,16 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<UserEntity?> loginWithGoogle() async {
+print(' rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     final result = await authRemoteDataSource.loginWithGoogle();
     if (result != null) {
       return UserEntity(
         uid: result['uid'],
         name: result['name'],
         email: result['email'],
-        phone: result['phone'],
+        phone: result['phone']??'',
       );
+
     }
     return null;
   }
@@ -65,4 +67,20 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<UserEntity?> getSavedUser() async {
     return await authLocalDataSource.getUser();
   }
+
+  @override
+  Future<void> saveUser(UserEntity user, bool rememberMe) async {
+    await authLocalDataSource.saveUser(user, rememberMe);
+  }
+
+  @override
+  Future<UserEntity?> getUser() async {
+    return await authLocalDataSource.getUser();
+  }
+
+  @override
+  Future<void> clearUser() async {
+    await authLocalDataSource.clearUser();
+  }
+
 }

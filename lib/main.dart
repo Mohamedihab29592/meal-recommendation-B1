@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/services/di.dart';
+import 'features/auth/persentation/bloc/auth_bloc.dart';
 import 'firebase_options.dart';
 
 
@@ -13,7 +16,7 @@ void main() async {
   await ScreenUtil.ensureScreenSize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,);
-
+await setup();
   runApp(const MealApp());
 }
 
@@ -25,12 +28,18 @@ class MealApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
-      child: MaterialApp(
-        title: 'Meal - Recommendation',
-        debugShowCheckedModeBanner: false,
-        theme: AppThemes.lightTheme,
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
+      child: MultiBlocProvider(
+          providers: [
+          BlocProvider(
+          create: (_) => getIt<AuthBloc>(),
+    ),],
+        child: MaterialApp(
+          title: 'Meal - Recommendation',
+          debugShowCheckedModeBanner: false,
+          theme: AppThemes.lightTheme,
+          initialRoute: AppRoutes.splash,
+          onGenerateRoute: AppRoutes.generateRoute,
+        ),
       ),
     );
   }

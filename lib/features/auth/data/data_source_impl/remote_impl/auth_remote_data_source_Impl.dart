@@ -2,21 +2,18 @@
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
 
-import '../../data_source/remote/auth_remote_data_source.dart';
 
-class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
+class AuthRemoteDataSourceImpl{
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
 
   AuthRemoteDataSourceImpl(this._firebaseAuth, this._googleSignIn);
 
-  @override
   Future<Map<String, dynamic>?> loginWithEmailAndPassword(String email, String password) async {
     UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
     return _getUserData(userCredential.user);
   }
 
-  @override
   Future<void> registerWithEmail({
     required String name,
     required String email,
@@ -28,7 +25,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     // Add phone if needed
   }
 
-  @override
+
   Future<Map<String, dynamic>?> loginWithGoogle() async {
     final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
     final GoogleSignInAuthentication googleAuth = await googleUser!.authentication;
@@ -59,7 +56,7 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
     return null;
   }
 
-  @override
+
   Future<UserEntity?> getSavedUser() {
     // TODO: implement getSavedUser
     throw UnimplementedError();
