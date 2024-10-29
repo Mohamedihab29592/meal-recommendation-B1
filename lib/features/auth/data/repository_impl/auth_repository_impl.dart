@@ -1,4 +1,4 @@
- import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
+import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
 
 import '../../domain/repository/auth_repository.dart';
 import '../data_source/local/AuthLocalDataSource.dart';
@@ -10,14 +10,16 @@ class AuthRepositoryImpl implements AuthRepository {
   AuthRepositoryImpl(this.authRemoteDataSource, this.authLocalDataSource);
 
   @override
-  Future<UserEntity?> loginWithEmailAndPassword(String email, String password) async {
-    final result = await authRemoteDataSource.loginWithEmailAndPassword(email, password);
+  Future<UserEntity?> loginWithEmailAndPassword(
+      String email, String password) async {
+    final result =
+        await authRemoteDataSource.loginWithEmailAndPassword(email, password);
     if (result != null) {
       return UserEntity(
         uid: result['uid'],
         name: result['name'],
         email: result['email'],
-        phone: result['phone'],
+        phone: result['phone'] ?? '',
       );
     }
     return null;
@@ -50,7 +52,7 @@ class AuthRepositoryImpl implements AuthRepository {
         uid: result['uid'],
         name: result['name'],
         email: result['email'],
-        phone: result['phone'],
+        phone: result['phone'] ?? '',
       );
     }
     return null;

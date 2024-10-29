@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 
-class CustomButton extends StatelessWidget {
+class ProfileButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
 
-  const CustomButton({
+  const ProfileButton({
     super.key,
     required this.text,
     required this.onPressed,
@@ -19,19 +19,20 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          backgroundColor: Colors.white,
+          foregroundColor: Colors.white,
+          backgroundColor: AppColors.primary,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(66.r),
+            borderRadius: BorderRadius.circular(10.r), // Slightly rounded corners
           ),
-          padding: EdgeInsets.symmetric(
-              vertical: 16.h), // Padding for better touch area
-          shadowColor: Colors.black.withOpacity(0.2), // Subtle shadow for depth
-          elevation: 3, // Slight elevation for a modern look
+          padding: EdgeInsets.symmetric(vertical: 14.h), // Good vertical padding
+          elevation: 2, // Slight elevation for a flat button look
         ),
         child: Text(
           text,
-          style: Theme.of(context).textTheme.headlineLarge,
+          style: TextStyle(
+            fontSize: 16.sp, // Font size matching the button size
+            fontWeight: FontWeight.w600, // Medium bold for visibility
+          ),
         ),
       ),
     );

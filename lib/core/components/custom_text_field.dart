@@ -54,6 +54,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                   widget.prefixIcon,
                   height: 30.sp,
                   width: 30.sp,
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -66,7 +67,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                       child: IconButton(
                         icon: Image(
                           image: AssetImage(
-                            _isObscure ? Assets.visibleOn : Assets.visibleOff,
+                            _isObscure ? Assets.icEye : Assets.visibleOff,
                           ),
                           color: Colors.white,
                         ),
