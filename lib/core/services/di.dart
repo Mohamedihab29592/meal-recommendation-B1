@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../../features/auth/login/data/data_source_impl/local_impl/auth_local_data_source_impl.dart';
-import '../../features/auth/login/data/data_source_impl/remote_impl/auth_remote_data_source_Impl.dart';
+import '../../features/auth/login/data/data_source/local/auth_local_data_source.dart';
+import '../../features/auth/login/data/data_source/remote/auth_remote_data_source.dart';
 import '../../features/auth/login/data/repository_impl/auth_repository_impl.dart';
 import '../../features/auth/login/domain/repository/auth_repository.dart';
 import '../../features/auth/login/domain/use_cases/get_saved_user_use_case.dart';
@@ -15,16 +15,16 @@ import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 final getIt = GetIt.instance;
 
 Future<void> setup() async {
-  final secureFlutter = await FlutterSecureStorage();
+  const secureFlutter =  FlutterSecureStorage();
 
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
   getIt.registerLazySingleton(() => GoogleSignIn());
   getIt.registerLazySingleton(() => secureFlutter);
 // Data Sources
-  getIt.registerLazySingleton<AuthRemoteDataSourceImpl>(
-          () => AuthRemoteDataSourceImpl(getIt(), getIt()));
-  getIt.registerLazySingleton<AuthLocalDataSourceImpl>(
-          () => AuthLocalDataSourceImpl(getIt()));
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+          () => AuthRemoteDataSource(getIt(), getIt()));
+  getIt.registerLazySingleton<AuthLocalDataSource>(
+          () => AuthLocalDataSource(getIt()));
 
   // Repository
   getIt.registerLazySingleton<AuthRepository>(
@@ -46,6 +46,6 @@ Future<void> setup() async {
     loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
     getSavedUserUseCase: getIt<GetSavedUserUseCase>(),
     logoutUseCase: getIt<LogoutUseCase>(),
-    authLocalDataSource: getIt<AuthLocalDataSourceImpl>(),
+    authLocalDataSource: getIt<AuthLocalDataSource>(),
   ));
 }

@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _rememberMe = false;
 
   // Initialize Flutter Secure Storage
-  final FlutterSecureStorage _secureStorage = FlutterSecureStorage();
+  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
 
   @override
   void initState() {

@@ -1,10 +1,10 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../../../domain/entity/user_entity.dart';
 
-class AuthLocalDataSourceImpl {
+class AuthLocalDataSource {
   final FlutterSecureStorage flutterSecureStorage;
 
-  AuthLocalDataSourceImpl(this.flutterSecureStorage);
+  AuthLocalDataSource(this.flutterSecureStorage);
 
   Future<void> saveUser(UserEntity user, bool rememberMe) async {
     await flutterSecureStorage.write(key: 'uid', value: user.uid);

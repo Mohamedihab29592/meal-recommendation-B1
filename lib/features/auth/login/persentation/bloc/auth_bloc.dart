@@ -1,6 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/data_source_impl/local_impl/auth_local_data_source_impl.dart';
+import '../../data/data_source/local/auth_local_data_source.dart';
 import '../../domain/use_cases/get_saved_user_use_case.dart';
 import '../../domain/use_cases/login_with_email_use_case.dart';
 import '../../domain/use_cases/login_with_google_use_case.dart';
@@ -13,7 +13,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginWithGoogleUseCase loginWithGoogleUseCase;
   final GetSavedUserUseCase getSavedUserUseCase;
   final LogoutUseCase logoutUseCase;
-  final AuthLocalDataSourceImpl authLocalDataSource; // Add local data source
+  final AuthLocalDataSource authLocalDataSource;
 
   AuthBloc({
     required this.loginWithEmailUseCase,

@@ -1,29 +1,29 @@
-
 import '../../domain/entity/user_entity.dart';
 import '../../domain/repository/auth_repository.dart';
-import '../data_source_impl/local_impl/auth_local_data_source_impl.dart';
-import '../data_source_impl/remote_impl/auth_remote_data_source_Impl.dart';
+import '../data_source/local/auth_local_data_source.dart';
+import '../data_source/remote/auth_remote_data_source.dart';
+
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSourceImpl authRemoteDataSource;
-  final AuthLocalDataSourceImpl authLocalDataSource;
+  final AuthRemoteDataSource authRemoteDataSource;
+  final AuthLocalDataSource authLocalDataSource;
   AuthRepositoryImpl(this.authRemoteDataSource, this.authLocalDataSource);
 
   @override
-  Future<UserEntity?> loginWithEmailAndPassword(String email, String password) async {
-    final result = await authRemoteDataSource.loginWithEmailAndPassword(email, password);
+  Future<UserEntity?> loginWithEmailAndPassword(
+      String email, String password) async {
+    final result =
+        await authRemoteDataSource.loginWithEmailAndPassword(email, password);
     if (result != null) {
       return UserEntity(
         uid: result['uid'],
         name: result['name'],
         email: result['email'],
-        phone: result['phone']??'',
+        phone: result['phone'] ?? '',
       );
     }
     return null;
   }
-
-
 
   @override
   Future<UserEntity?> loginWithGoogle() async {
@@ -33,9 +33,8 @@ class AuthRepositoryImpl implements AuthRepository {
         uid: result['uid'],
         name: result['name'],
         email: result['email'],
-        phone: result['phone']??'',
+        phone: result['phone'] ?? '',
       );
-
     }
     return null;
   }
@@ -55,10 +54,8 @@ class AuthRepositoryImpl implements AuthRepository {
     await authLocalDataSource.saveUser(user, rememberMe);
   }
 
-
   @override
   Future<void> clearUser() async {
     await authLocalDataSource.clearUser();
   }
-
 }

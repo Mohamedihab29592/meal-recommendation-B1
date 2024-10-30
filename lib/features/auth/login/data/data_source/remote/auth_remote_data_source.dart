@@ -1,14 +1,13 @@
  import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-import '../../../domain/entity/user_entity.dart';
 
 
-class AuthRemoteDataSourceImpl{
+class AuthRemoteDataSource{
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
 
-  AuthRemoteDataSourceImpl(this._firebaseAuth, this._googleSignIn);
+  AuthRemoteDataSource(this._firebaseAuth, this._googleSignIn);
 
   Future<Map<String, dynamic>?> loginWithEmailAndPassword(String email, String password) async {
     UserCredential userCredential = await _firebaseAuth.signInWithEmailAndPassword(email: email, password: password);
@@ -29,7 +28,6 @@ class AuthRemoteDataSourceImpl{
     return _getUserData(userCredential.user);
   }
 
-  @override
   Future<void> logout() async {
     await _firebaseAuth.signOut();
     await _googleSignIn.signOut();

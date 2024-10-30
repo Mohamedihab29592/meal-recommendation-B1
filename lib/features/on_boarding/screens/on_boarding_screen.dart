@@ -74,7 +74,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   children: [
                     // Skip
                     TextButton(
-                      onPressed: () {},
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context,AppRoutes.login);
+                      },
                       child: Text(
                         "Skip",
                         style: TextStyle(
