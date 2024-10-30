@@ -3,21 +3,12 @@
 abstract class AuthRepository {
   Future<UserEntity?> loginWithEmailAndPassword(String email, String password);
 
-  Future<void> registerWithEmail({
-    required String name,
-    required String email,
-    required String phone,
-    required String password,
-    required String confirmPassword,
-  });
-
   Future<UserEntity?> loginWithGoogle();
 
   Future<void> logout();
 
   Future<UserEntity?> getSavedUser();
   Future<void> saveUser(UserEntity user, bool rememberMe);
-  Future<UserEntity?> getUser();
   Future<void> clearUser();
 
 

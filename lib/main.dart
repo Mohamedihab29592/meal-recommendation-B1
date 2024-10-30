@@ -3,7 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
-import 'features/auth/persentation/bloc/auth_bloc.dart';
+import 'features/auth/login/persentation/bloc/auth_bloc.dart';
 import 'firebase_options.dart';
 
 

@@ -1,5 +1,5 @@
- import 'package:meal_recommendation_b1/features/auth/domain/entity/user_entity.dart';
 
+import '../../domain/entity/user_entity.dart';
 import '../../domain/repository/auth_repository.dart';
 import '../data_source_impl/local_impl/auth_local_data_source_impl.dart';
 import '../data_source_impl/remote_impl/auth_remote_data_source_Impl.dart';
@@ -23,28 +23,10 @@ class AuthRepositoryImpl implements AuthRepository {
     return null;
   }
 
-  @override
-  Future<void> registerWithEmail({
-    required String name,
-    required String email,
-    required String phone,
-    required String password,
-    required String confirmPassword,
-  }) async {
-    if (password != confirmPassword) {
-      throw Exception("Passwords do not match.");
-    }
-    await authRemoteDataSource.registerWithEmail(
-      name: name,
-      email: email,
-      phone: phone,
-      password: password,
-    );
-  }
+
 
   @override
   Future<UserEntity?> loginWithGoogle() async {
-print(' rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     final result = await authRemoteDataSource.loginWithGoogle();
     if (result != null) {
       return UserEntity(
@@ -73,10 +55,6 @@ print(' rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr');
     await authLocalDataSource.saveUser(user, rememberMe);
   }
 
-  @override
-  Future<UserEntity?> getUser() async {
-    return await authLocalDataSource.getUser();
-  }
 
   @override
   Future<void> clearUser() async {

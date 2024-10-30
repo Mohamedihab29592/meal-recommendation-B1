@@ -9,23 +9,6 @@ class LoginWithEmailEvent extends AuthEvent {
 
   LoginWithEmailEvent(this.email, this.password);
 }
-
-class RegisterWithEmailEvent extends AuthEvent {
-  final String name;
-  final String email;
-  final String phone;
-  final String password;
-  final String confirmPassword;
-
-  RegisterWithEmailEvent({
-    required this.name,
-    required this.email,
-    required this.phone,
-    required this.password,
-    required this.confirmPassword,
-  });
-}
-
 class LoginWithGoogleEvent extends AuthEvent {}
 
 class GetSavedUserEvent extends AuthEvent {}
