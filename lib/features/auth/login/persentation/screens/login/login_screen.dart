@@ -143,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _saveUserData();
                               },
                               child: const Text(
-                                'Remember me and keep me logged in',
+                                'Remember me and keep me loggin',
                                 style: TextStyle(
                                   color: AppColors.white,
                                   fontSize: 13,
