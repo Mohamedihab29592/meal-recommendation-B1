@@ -12,15 +12,19 @@ class RegisterFirebaseDataSourceImpl implements FirebaseFirestoreDataSource {
       {required UserEntity user}) async {
     CollectionReference users = getIt<FirebaseFirestore>().collection('users');
     try {
-      await users.add(
-        {
-          'name': user.name,
-          'email': user.email,
-          'phoneNumber': user.phone,
-          'profile_pic':
-              '', // at first time it will be empty string after that user can update the default image
-        },
-      );
+      QuerySnapshot searchForThatEmail =
+          await users.where('email', isEqualTo: user.email).get();
+      if (searchForThatEmail.docs.isEmpty) {
+        await users.add(
+          {
+            'name': user.name,
+            'email': user.email,
+            'phoneNumber': user.phone,
+            'profile_pic':
+                '', // at first time it will be empty string after that user can update the default image
+          },
+        );
+      }
       return const Right(unit);
     } catch (e) {
       return Left(
