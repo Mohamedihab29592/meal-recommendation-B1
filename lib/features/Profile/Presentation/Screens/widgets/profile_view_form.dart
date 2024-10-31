@@ -27,6 +27,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
   TextEditingController imageController = TextEditingController(text: '');
 
   String imageUrl = '';
+  String oldImage = '';
   GlobalKey<FormState> formKey = GlobalKey();
   @override
   void initState() {
@@ -52,6 +53,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
             emailTextEditingController.text = state.user.email;
             nameTextEditingController.text = state.user.name;
             phoneTextEditingController.text = state.user.phone;
+            oldImage = state.user.profilePhotoUrl ?? '';
           } else if (state is UserProfileError) {
           } else if (state is UploadUserImageSuccess) {
             imageUrl = state.imageUrl;
@@ -106,6 +108,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
                           null) {
                         BlocProvider.of<UserProfileBloc>(context).add(
                           UpdateUserProfileImage(
+                              oldImageFile: oldImage,
                               newImageFile:
                                   BlocProvider.of<UserProfileBloc>(context)
                                       .saveLocallyProfileImage!),
@@ -128,6 +131,9 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
   }
 
   void updateBlocProvider(BuildContext context) {
+    BlocProvider.of<UserProfileBloc>(context).add(
+      LoadUserProfile('KEzYRBL0AWKuYjl1ht4F'),
+    );
     BlocProvider.of<UserProfileBloc>(context).add(
       UpdateUserProfile(
         User(

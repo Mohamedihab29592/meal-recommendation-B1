@@ -45,8 +45,9 @@ class FirebaseUserRepository implements UserRepository {
       final imageUrl =
           await FirebaseStorage.instance.ref(filePath).putFile(image);
       String downlownUrl = await imageUrl.ref.getDownloadURL();
-      if (oldImage != null) {
-        await FirebaseStorage.instance.ref(oldImage).delete();
+      if (oldImage!.isNotEmpty) {
+        final ref = FirebaseStorage.instance.refFromURL(oldImage);
+        await ref.delete();
       }
       return Right(downlownUrl);
     } on FirebaseException catch (e) {

@@ -58,8 +58,8 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   ) async {
     emit(UserProfileUpdating());
     try {
-      Either<Unit, String> result =
-          await uploadUserImage(newImage: event.newImageFile);
+      Either<Unit, String> result = await uploadUserImage(
+          newImage: event.newImageFile, oldImage: event.oldImageFile);
       result.fold((fail) {
         emit(
           UploadUserImageFailure(message: "Can't Upload Your Image "),
