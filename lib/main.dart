@@ -1,19 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/services/di.dart';
+import 'package:meal_recommendation_b1/core/simple_bloc_observer.dart';
 import 'firebase_options.dart';
-
 
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScreenUtil.ensureScreenSize();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,);
-
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+  await setup();
+  Bloc.observer = SimpleBlocObserver();
   runApp(const MealApp());
 }
 
@@ -35,5 +38,3 @@ class MealApp extends StatelessWidget {
     );
   }
 }
-
-

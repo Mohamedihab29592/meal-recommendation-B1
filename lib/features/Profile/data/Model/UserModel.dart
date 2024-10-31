@@ -6,7 +6,7 @@ class UserModel extends User {
     required super.name,
     required super.email,
     required super.phone,
-     super.profilePhotoUrl,
+    super.profilePhotoUrl,
   });
 
   factory UserModel.fromFirestore(Map<String, dynamic> json, String id) {
@@ -14,8 +14,8 @@ class UserModel extends User {
       id: id,
       name: json['name'],
       email: json['email'],
-      phone: json['phone'],
-      profilePhotoUrl: json['profilePhotoUrl']??'',
+      phone: json['phoneNumber'],
+      profilePhotoUrl: json['profile_pic'] ?? '',
     );
   }
 
@@ -23,8 +23,8 @@ class UserModel extends User {
     return {
       'name': name,
       'email': email,
-      'phone': phone,
-      'profilePhotoUrl': profilePhotoUrl,
+      'phoneNumber': phone,
+      'profile_pic': profilePhotoUrl,
     };
   }
 }

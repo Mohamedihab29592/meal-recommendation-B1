@@ -3,8 +3,15 @@ import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/wid
 import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/widgets/profile_view_header.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/widgets/profile_view_picture.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  TextEditingController imageController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {

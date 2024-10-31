@@ -1,3 +1,4 @@
+import 'dart:io';
 
 import '../../domain/entity/entity.dart';
 
@@ -13,4 +14,13 @@ class UpdateUserProfile extends UserProfileEvent {
   final User updatedUser;
 
   UpdateUserProfile(this.updatedUser);
+}
+
+class UpdateUserProfileImage extends UserProfileEvent {
+  final File newImageFile;
+  String? oldImageFile;
+  UpdateUserProfileImage({
+    this.oldImageFile,
+    required this.newImageFile,
+  });
 }

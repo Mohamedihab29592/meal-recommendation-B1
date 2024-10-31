@@ -1,4 +1,3 @@
-
 import '../../domain/entity/entity.dart';
 
 abstract class UserProfileState {}
@@ -22,3 +21,15 @@ class UserProfileError extends UserProfileState {
 class UserProfileUpdating extends UserProfileState {}
 
 class UserProfileUpdated extends UserProfileState {}
+
+class UploadUserImageSuccess extends UserProfileState {
+  final String imageUrl;
+
+  UploadUserImageSuccess({required this.imageUrl});
+}
+
+class UploadUserImageFailure extends UserProfileState {
+  final String message;
+
+  UploadUserImageFailure({required this.message});
+}

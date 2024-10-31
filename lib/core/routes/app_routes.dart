@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/profile_screen.dart';
-
 import '../../features/auth/persentation/screens/login/login_screen.dart';
 import '../../features/auth/persentation/screens/register/register_screen.dart';
 import '../../features/on_boarding/screens/on_boarding_screen.dart';
@@ -36,7 +34,15 @@ class AppRoutes {
       case favorites:
       //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:
-      //return MaterialPageRoute(builder: (_) => ProfileScreen());
+      // return MaterialPageRoute(
+      //     builder: (_) => BlocProvider(
+      //           create: (context) => UserProfileBloc(
+      //             getIt(),
+      //             updateUserProfile: getIt(),
+      //             getUserProfile: getIt(),
+      //           ),
+      //           child: ProfileScreen(),
+      //         ));
       case details:
       // return MaterialPageRoute(builder: (_) => DetailsScreen());
       case seeAll:
