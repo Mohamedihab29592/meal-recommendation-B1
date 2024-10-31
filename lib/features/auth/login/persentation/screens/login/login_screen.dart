@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart'; // Import Flutter Secure Storage
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
-import '../../../../../../core/components/custom_text_field.dart';
-import '../../../../../../core/utiles/app_colors.dart';
-import '../../../../../../core/utiles/assets.dart';
+import 'package:meal_recommendation_b1/core/components/custom_text_field.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+import 'package:meal_recommendation_b1/core/utiles/assets.dart';
+import '../../../data/data_source/local/secure_local_data.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_event.dart';
 import '../../bloc/auth_state.dart';
@@ -23,9 +23,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController _passwordController = TextEditingController();
   bool _rememberMe = false;
 
-  // Initialize Flutter Secure Storage
-  final FlutterSecureStorage _secureStorage = const FlutterSecureStorage();
-
   @override
   void initState() {
     super.initState();
@@ -39,28 +36,21 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  // Load saved email and password
   Future<void> _loadSavedUserData() async {
-    final rememberMeValue = await _secureStorage.read(key: 'remember_me');
-    if (rememberMeValue == 'true') {
-      setState(() {
-        _rememberMe = true;
-      });
-      _emailController.text = await _secureStorage.read(key: 'email') ?? '';
-      _passwordController.text = await _secureStorage.read(key: 'password') ?? '';
-    }
+    final userData = await SecureStorageLoginHelper.loadUserData();
+    setState(() {
+      _rememberMe = userData['rememberMe'] == 'true';
+      _emailController.text = userData['email'] ?? '';
+      _passwordController.text = userData['password'] ?? '';
+    });
   }
 
   Future<void> _saveUserData() async {
-    if (_rememberMe) {
-      await _secureStorage.write(key: 'remember_me', value: 'true');
-      await _secureStorage.write(key: 'email', value: _emailController.text);
-      await _secureStorage.write(key: 'password', value: _passwordController.text);
-    } else {
-      await _secureStorage.write(key: 'remember_me', value: 'false');
-      await _secureStorage.delete(key: 'email');
-      await _secureStorage.delete(key: 'password');
-    }
+    await SecureStorageLoginHelper.saveUserData(
+      rememberMe: _rememberMe,
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
   }
 
   @override
@@ -143,7 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 _saveUserData();
                               },
                               child: const Text(
-                                'Remember me and keep me loggin',
+                                'Remember me and keep me logged in',
                                 style: TextStyle(
                                   color: AppColors.white,
                                   fontSize: 13,

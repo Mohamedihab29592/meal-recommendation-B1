@@ -1,13 +1,11 @@
 import '../../domain/entity/user_entity.dart';
 import '../../domain/repository/auth_repository.dart';
-import '../data_source/local/auth_local_data_source.dart';
 import '../data_source/remote/auth_remote_data_source.dart';
 
 
 class AuthRepositoryImpl implements AuthRepository {
   final AuthRemoteDataSource authRemoteDataSource;
-  final AuthLocalDataSource authLocalDataSource;
-  AuthRepositoryImpl(this.authRemoteDataSource, this.authLocalDataSource);
+  AuthRepositoryImpl(this.authRemoteDataSource);
 
   @override
   Future<UserEntity?> loginWithEmailAndPassword(
@@ -42,20 +40,5 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<void> logout() async {
     await authRemoteDataSource.logout();
-  }
-
-  @override
-  Future<UserEntity?> getSavedUser() async {
-    return await authLocalDataSource.getUser();
-  }
-
-  @override
-  Future<void> saveUser(UserEntity user, bool rememberMe) async {
-    await authLocalDataSource.saveUser(user, rememberMe);
-  }
-
-  @override
-  Future<void> clearUser() async {
-    await authLocalDataSource.clearUser();
   }
 }
