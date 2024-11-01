@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
@@ -14,13 +15,13 @@ final getIt = GetIt.instance;
 
 Future<void> setup() async {
   const secureFlutter =  FlutterSecureStorage();
-
+  getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
   getIt.registerLazySingleton(() => GoogleSignIn());
   getIt.registerLazySingleton(() => secureFlutter);
 // Data Sources
   getIt.registerLazySingleton<AuthRemoteDataSource>(
-          () => AuthRemoteDataSource(getIt(), getIt()));
+          () => AuthRemoteDataSource(getIt(), getIt(),getIt()));
 
   // Repository
   getIt.registerLazySingleton<AuthRepository>(
