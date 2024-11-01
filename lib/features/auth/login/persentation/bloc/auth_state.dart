@@ -20,3 +20,11 @@ class AuthError extends AuthState {
 
   AuthError(this.message);
 }
+
+ class SavedUserLoaded extends AuthState {
+   final UserEntity user;
+
+    SavedUserLoaded(this.user);
+
+   List<Object?> get props => [user];
+ }
