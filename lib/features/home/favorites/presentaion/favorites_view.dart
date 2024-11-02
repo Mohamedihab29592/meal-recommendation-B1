@@ -3,7 +3,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/my_loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
-
 import '../../../../core/components/Custome_recipes_card.dart';
 import '../data/models/favorites.dart';
 import 'bloc/favorites_bloc.dart';
