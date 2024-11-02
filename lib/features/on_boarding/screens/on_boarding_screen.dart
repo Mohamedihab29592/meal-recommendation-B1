@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
+import '../../../core/routes/app_routes.dart';
 import '../../../core/utiles/assets.dart';
 import '../../../core/utiles/app_colors.dart';
 
@@ -11,8 +12,6 @@ class OnBoardingScreen extends StatefulWidget {
   State<OnBoardingScreen> createState() => _OnBoardingScreenState();
 }
 
-@override
-State<OnBoardingScreen> createState() => _OnBoardingScreenState();
 
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
   // Classes objects
@@ -76,7 +75,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   children: [
                     // Skip
                     TextButton(
-                      onPressed: () {},
+
+                      onPressed: () {
+                        Navigator.pushReplacementNamed(context,AppRoutes.login);
+                      },
                       child: Text(
                         "Skip",
                         style: TextStyle(
@@ -127,7 +129,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                             }, // i test "register view here" context.replaceWith(AppRoutes.register)
                             child: Text(
                               "Login", // i test "register view here" "Register"
-                              style: TextStyle(
+                 style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15.sp,
                                   color: AppColors.primary),
@@ -169,7 +171,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     padEnds: true,
                     onPageChanged: (value) {
                       setState(() {
-                        _currentpage = value!;
+
+                        _currentpage = value;
                       });
                     },
                     controller: _pageController,

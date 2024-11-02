@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/local_impl/register_local_data_source_impl.dart';
@@ -12,12 +13,19 @@ import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/r
 import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/auth/login/data/data_source/remote/auth_remote_data_source.dart';
+import '../../features/auth/login/data/repository_impl/auth_repository_impl.dart';
+import '../../features/auth/login/domain/repository/auth_repository.dart';
+import '../../features/auth/login/domain/use_cases/login_with_email_use_case.dart';
+import '../../features/auth/login/domain/use_cases/login_with_google_use_case.dart';
+import '../../features/auth/login/domain/use_cases/logout_use_case.dart';
+import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setup() async {
-  final sharedPreferences = await SharedPreferences.getInstance();
-
+  const secureFlutter =  FlutterSecureStorage();
+  getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
   getIt.registerLazySingleton(() => sharedPreferences);
 
@@ -61,4 +69,5 @@ Future<void> setup() async {
         loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
         saveUserUseCase: getIt<SaveUserDataInFirebaseUseCase>(),
       ));
+
 }

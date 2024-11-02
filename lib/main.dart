@@ -11,9 +11,9 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScreenUtil.ensureScreenSize();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
-  await setup();
+
+    options: DefaultFirebaseOptions.currentPlatform,);
+await setup();
   runApp(const MealApp());
 }
 
@@ -25,13 +25,13 @@ class MealApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
-      child: MaterialApp(
-        title: 'Meal - Recommendation',
-        debugShowCheckedModeBanner: false,
-        theme: AppThemes.lightTheme,
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
-      ),
+        child: MaterialApp(
+          title: 'Meal - Recommendation',
+          debugShowCheckedModeBanner: false,
+          theme: AppThemes.lightTheme,
+          initialRoute: AppRoutes.splash,
+          onGenerateRoute: AppRoutes.generateRoute,
+        ),
     );
   }
 }

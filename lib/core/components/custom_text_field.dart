@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/utiles/Assets.dart';
+ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
@@ -43,6 +44,7 @@ class CustomTextFieldState extends State<CustomTextField> {
           cursorColor: AppColors.white,
           obscureText: widget.isPassword ? _isObscure : false,
           keyboardType: widget.inputType,
+          style: const TextStyle(color: AppColors.white),
           onChanged: widget.onChanged,
           style: const TextStyle(color: AppColors.white),
           decoration: InputDecoration(
@@ -79,6 +81,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                       ),
                     ),
                   )
+
                 : null,
             hintText: widget.hintText,
             hintStyle: const TextStyle(color: Colors.white),
