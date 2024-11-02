@@ -152,6 +152,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               LoginWithEmailEvent(email, password),
                             );
                             _saveUserData();
+                            Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
                           },
                         ),
                         const Padding(

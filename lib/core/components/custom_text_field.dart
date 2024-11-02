@@ -11,6 +11,7 @@ class CustomTextField extends StatefulWidget {
   final String? errorText;
   final Function(String)? onChanged;
 
+
   const CustomTextField({
     super.key,
     required this.hintText,

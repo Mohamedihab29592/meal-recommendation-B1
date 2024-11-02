@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Screens/HomePage.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Screens/NavBarPage.dart';
 
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/screens/login/login_screen.dart';
@@ -20,13 +24,14 @@ class AppRoutes {
   static const String details = '/details';
   static const String seeAll = '/seeAll';
   static const String addIngredients = '/addIngredients';
+  static const String navBar = '/NavBar';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case onboarding:
-        return MaterialPageRoute(builder: (_) => const OnBoardingScreen());
+        return MaterialPageRoute(builder: (_) =>OnBoardingScreen(),);
       case login:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -37,7 +42,11 @@ class AppRoutes {
       case verification:
       //return MaterialPageRoute(builder: (_) => VerificationScreen());
       case home:
-      //return MaterialPageRoute(builder: (_) => HomeScreen());
+      return MaterialPageRoute(builder: (_) =>  BlocProvider(
+        create: (_) => getIt<HomeCubit>(),child: HomePage(),));
+      case navBar:
+      return MaterialPageRoute(builder: (_) =>  BlocProvider(
+        create: (context) => getIt<NavBarCubit>(),child: NavBarPage(),));
       case favorites:
       //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:

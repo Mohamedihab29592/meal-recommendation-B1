@@ -46,8 +46,10 @@ dependencies:
   flutter_secure_storage: ^9.2.2 # Secure storage (optional for saving tokens securely)
   geolocator: ^13.0.1 # Location services
   google_maps_flutter: ^2.9.0 # Google Maps integration (if needed)
-  flutter_native_splash: ^2.4.2 #splash
-
+  flutter_native_splash:  #splash
+  firebase_storage:
+  image_picker:
+  device_preview:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
