@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/utiles/Assets.dart';
- import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final String hintText;
-  final String prefixIcon;
+  final String? prefixIcon;
   final bool isPassword;
   final TextInputType inputType;
   final TextEditingController controller;
@@ -16,7 +15,7 @@ class CustomTextField extends StatefulWidget {
   const CustomTextField({
     super.key,
     required this.hintText,
-    required this.prefixIcon,
+     this.prefixIcon,
     this.isPassword = false,
     required this.inputType,
     required this.controller,
@@ -46,14 +45,13 @@ class CustomTextFieldState extends State<CustomTextField> {
           keyboardType: widget.inputType,
           style: const TextStyle(color: AppColors.white),
           onChanged: widget.onChanged,
-          style: const TextStyle(color: AppColors.white),
           decoration: InputDecoration(
             prefixIcon: SizedBox(
               height: 30.sp,
               width: 30.sp,
               child: Center(
                 child: Image.asset(
-                  widget.prefixIcon,
+                  widget.prefixIcon??"",
                   height: 30.sp,
                   width: 30.sp,
                   color: Colors.white,

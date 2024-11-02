@@ -1,3 +1,4 @@
+/*
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../../domain/entity/user_entity.dart';
@@ -42,3 +43,4 @@ class RegisterLocalDataSourceImpl implements AuthLocalDataSource {
     await sharedPreferences.remove('phone');
   }
 }
+*/
