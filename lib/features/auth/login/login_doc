@@ -1,0 +1,62 @@
+
+## Feature
+
+### Login Feature
+
+1. **Login with Email and Password**
+   - Users can log in using their registered email and password.
+
+2. **Secure Credential Storage**
+   - User credentials (email and password) are stored securely using `Flutter Secure Storage`.
+   - Credentials are loaded automatically on app startup if the "Remember Me" option is enabled.
+
+3. **Google Login**
+   - Users can log in using their Google account.
+
+---
+
+### Clean Architecture
+
+#### 1. Presentation Layer
+
+- **File**: `login_screen.dart`
+- **Purpose**: UI for user login.
+- **Components**:
+  - `TextField` for email input.
+  - `TextField` for password input (with obscured text).
+  - Checkbox for "Remember Me".
+  - Login button.
+
+- **Bloc**:
+  - **File**: `auth_bloc.dart`
+  - **Purpose**: Manages authentication state and events.
+  - **States**:
+    - `AuthInitial`
+    - `AuthLoading`
+    - `Authenticated`
+    - `AuthError`
+
+  - **Events**:
+    - `LoginWithEmailEvent`
+    - `RegisterEvent`
+    - `LoginWithGoogleEvent`
+
+#### 2. Domain Layer
+
+- **File**: `auth_repository.dart`
+- **Purpose**: Defines the methods for authentication.
+- **Methods**:
+  - `loginWithEmail(String email, String password)`: Authenticates user with email and password.
+  - `loginWithGoogle()`: Authenticates user with Google account.
+  - `register(String email, String password)`: Registers a new user.
+
+#### 3. Data Layer
+
+- **File**: `auth_data_source.dart`
+- **Purpose**: Implements the methods for interacting with the authentication API.
+- **Components**:
+  - `RemoteDataSource`: Handles network requests for authentication.
+  - `LocalDataSource`: Handles secure storage of user credentials.
+
+- **Storage**:
+  - Utilizes `Flutter Secure Storage` to securely store user credentials.

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
  import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 
 class CustomTextField extends StatefulWidget {
   final String hintText;
@@ -37,17 +38,19 @@ class CustomTextFieldState extends State<CustomTextField> {
           controller: widget.controller,
           obscureText: widget.isPassword ? _isObscure : false,
           keyboardType: widget.inputType,
+          style: const TextStyle(color: AppColors.white),
           onChanged: widget.onChanged,
           decoration: InputDecoration(
+            hintStyle: const TextStyle(color: AppColors.white),
             prefixIcon: Icon(
               widget.prefixIcon,
-              color: Colors.grey,
+              color: Colors.white,
             ),
             suffixIcon: widget.isPassword
                 ? IconButton(
               icon: Icon(
                 _isObscure ? Icons.visibility : Icons.visibility_off,
-                color: Colors.grey,
+                color: Colors.white,
               ),
               onPressed: () {
                 setState(() {
