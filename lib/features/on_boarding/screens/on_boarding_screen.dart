@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // Import ScreenUtil
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/utiles/assets.dart';
 import '../../../core/utiles/app_colors.dart';
@@ -11,7 +11,6 @@ class OnBoardingScreen extends StatefulWidget {
   @override
   State<OnBoardingScreen> createState() => _OnBoardingScreenState();
 }
-
 
 class _OnBoardingScreenState extends State<OnBoardingScreen> {
   // Classes objects
@@ -75,9 +74,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   children: [
                     // Skip
                     TextButton(
-
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context,AppRoutes.login);
+                        Navigator.pushReplacementNamed(
+                            context, AppRoutes.login);
                       },
                       child: Text(
                         "Skip",
@@ -125,11 +124,11 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                           )
                         : TextButton(
                             onPressed: () {
-                              //context.pushReplacementNamed(AppRoutes.register);
+                              context.pushReplacementNamed(AppRoutes.register);
                             }, // i test "register view here" context.replaceWith(AppRoutes.register)
                             child: Text(
-                              "Login", // i test "register view here" "Register"
-                 style: TextStyle(
+                              "Register", // i test "register view here" "Register"
+                              style: TextStyle(
                                   fontWeight: FontWeight.w700,
                                   fontSize: 15.sp,
                                   color: AppColors.primary),
@@ -171,7 +170,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     padEnds: true,
                     onPageChanged: (value) {
                       setState(() {
-
                         _currentpage = value;
                       });
                     },

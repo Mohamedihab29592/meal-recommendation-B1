@@ -19,8 +19,8 @@ class RegisterFirebaseDataSourceImpl implements FirebaseFirestoreDataSource {
           {
             'name': user.name,
             'email': user.email,
-            'phoneNumber': user.phone,
-            'profile_pic':
+            'phone': user.phone,
+            'profilePhoto':
                 '', // at first time it will be empty string after that user can update the default image
           },
         );
