@@ -45,6 +45,9 @@ dependencies:
   flutter_secure_storage: ^9.2.2 # Secure storage (optional for saving tokens securely)
   geolocator: ^13.0.1 # Location services
   google_maps_flutter: ^2.9.0 # Google Maps integration (if needed)
+  flutter_native_splash:  #splash
+  firebase_storage:
+  image_picker:
   device_preview: ^1.2.0
   change_app_package_name: ^1.4.0
   hive: ^2.2.3
@@ -60,6 +63,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
 
+
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -72,6 +77,8 @@ dev_dependencies:
   # activated in the `analysis_options.yaml` file located at the root of your
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
+  flutter_lints: ^4.0.0
+
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

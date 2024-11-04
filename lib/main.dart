@@ -31,7 +31,7 @@ class MealApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DevicePreview(
-      builder: (BuildContext context)=> ScreenUtilInit(
+      builder: (context) =>ScreenUtilInit(
         designSize: const Size(375, 812),
         minTextAdapt: true,
           child: MaterialApp(

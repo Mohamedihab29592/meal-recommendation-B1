@@ -3,6 +3,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
+import '../../features/auth/login/data/data_source/remote/auth_remote_data_source.dart';
+import '../../features/auth/login/data/repository_impl/auth_repository_impl.dart';
+import '../../features/auth/login/domain/repository/auth_repository.dart';
+import '../../features/auth/login/domain/use_cases/login_with_email_use_case.dart';
+import '../../features/auth/login/domain/use_cases/login_with_google_use_case.dart';
+import '../../features/auth/login/domain/use_cases/logout_use_case.dart';
+import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
+import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_firebase_data_source_impl.dart';
 import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_remote_data_source_Impl.dart';
 import 'package:meal_recommendation_b1/features/auth/register/data/repository_impl/register_repository_impl.dart';
@@ -37,9 +46,14 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
   getIt.registerLazySingleton(() => FirebaseFirestore.instance);
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
   getIt.registerLazySingleton(() => GoogleSignIn());
+
   getIt.registerLazySingleton(() => const FlutterSecureStorage());
 
   // Data Sources
+
+  getIt.registerLazySingleton(() => secureFlutter);
+// Data Sources
+
   getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
         () => RegisterRemoteDataSourceImpl(getIt(), getIt()),
   );
@@ -83,6 +97,7 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
     loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
     logoutUseCase: getIt<LogoutUseCase>(),
   ));
+
   getIt.registerFactory(() => RegisterBloc(
     registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
     registerWithGoogleUseCase: getIt<RegisterWithGoogleUseCase>(),
@@ -93,6 +108,31 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
     getIt<DeleteFavoriteUseCase>(),
     getIt<GetAllFavoritesUseCase>(),
   ));
+
+  //  HomeCubit
+  getIt.registerFactory(() => HomeCubit());
+  //  HomeCubit
+  getIt.registerFactory(() => NavBarCubit());
+        loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
+        registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
+        loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
+        getSavedUserUseCase: getIt<GetSavedUserUseCase>(),
+        logoutUseCase: getIt<LogoutUseCase>(),
+      ));
+
+  //OTP features
+
+  getIt.registerLazySingleton<OTPRepository>(() => OTPRepository(getIt()));
+
+  getIt
+      .registerLazySingleton<BaseOTPRemoteDataSource>(() => RemoteDataSource());
+
+  getIt.registerLazySingleton<PhoneAuthenticationUseCase>(
+      () => PhoneAuthenticationUseCase(getIt()));
+
+  getIt
+      .registerLazySingleton<SubmitOTPUseCase>(() => SubmitOTPUseCase(getIt()));
+
   getIt.registerFactory(() => PhoneAuthBloc(
     phoneAuthenticationUseCase: getIt<PhoneAuthenticationUseCase>(),
     submitOTPUseCase: getIt<SubmitOTPUseCase>(),

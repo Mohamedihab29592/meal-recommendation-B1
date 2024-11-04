@@ -11,7 +11,7 @@ class CustomTextField extends StatefulWidget {
   final TextEditingController controller;
   final String? errorText;
   final Function(String)? onChanged;
-  final String? Function(String?)? validator;
+
   const CustomTextField({
     super.key,
     required this.hintText,
@@ -21,7 +21,6 @@ class CustomTextField extends StatefulWidget {
     required this.controller,
     this.errorText,
     this.onChanged,
-    this.validator,
   });
 
   @override
