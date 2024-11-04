@@ -3,42 +3,58 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../../features/auth/login/data/data_source/remote/auth_remote_data_source.dart';
-import '../../features/auth/login/data/repository_impl/auth_repository_impl.dart';
-import '../../features/auth/login/domain/repository/auth_repository.dart';
-import '../../features/auth/login/domain/use_cases/login_with_email_use_case.dart';
-import '../../features/auth/login/domain/use_cases/login_with_google_use_case.dart';
-import '../../features/auth/login/domain/use_cases/logout_use_case.dart';
-import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
+import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_firebase_data_source_impl.dart';
+import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_remote_data_source_Impl.dart';
+import 'package:meal_recommendation_b1/features/auth/register/data/repository_impl/register_repository_impl.dart';
+import 'package:meal_recommendation_b1/features/auth/register/domain/repository/register_repository.dart';
+import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/login_with_google_use_case.dart';
+import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/register_with_email_use_case.dart';
+import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
+import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 
 final getIt = GetIt.instance;
 
 Future<void> setup() async {
-  const secureFlutter =  FlutterSecureStorage();
-  getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
+  const secureFlutter = FlutterSecureStorage();
+  getIt.registerLazySingleton(() => FirebaseFirestore.instance);
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
-  getIt.registerLazySingleton(() => GoogleSignIn());
-  getIt.registerLazySingleton(() => secureFlutter);
-// Data Sources
-  getIt.registerLazySingleton<AuthRemoteDataSource>(
-          () => AuthRemoteDataSource(getIt(), getIt(),getIt()));
 
+  getIt.registerLazySingleton(() => GoogleSignIn());
+// Data Sources
+  getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
+      () => RegisterRemoteDataSourceImpl(getIt(), getIt()));
+  /* getIt.registerLazySingleton<RegisterLocalDataSourceImpl>(
+      () => RegisterLocalDataSourceImpl(getIt()));*/
+  getIt.registerLazySingleton<RegisterFirebaseDataSourceImpl>(
+      () => RegisterFirebaseDataSourceImpl());
   // Repository
-  getIt.registerLazySingleton<AuthRepository>(
-          () => AuthRepositoryImpl(getIt()));
+  getIt.registerLazySingleton<RegisterRepository>(
+    () => RegisterRepositoryImpl(
+      getIt<RegisterRemoteDataSourceImpl>(),
+      getIt<RegisterFirebaseDataSourceImpl>(),
+    ),
+  );
 
   // Use Cases
   getIt.registerLazySingleton(
-          () => LoginWithEmailUseCase(getIt<AuthRepository>()));
-
+    () => RegisterWithEmailUseCase(
+      getIt<RegisterRepository>(),
+    ),
+  );
   getIt.registerLazySingleton(
-          () => LoginWithGoogleUseCase(getIt<AuthRepository>()));
-  getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
-
+    () => LoginWithGoogleUseCase(
+      getIt<RegisterRepository>(),
+    ),
+  );
+  getIt.registerLazySingleton<SaveUserDataInFirebaseUseCase>(
+    () => SaveUserDataInFirebaseUseCase(
+      getIt(),
+    ),
+  );
   // Bloc
-  getIt.registerFactory(() => AuthBloc(
-    loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
-    loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
-    logoutUseCase: getIt<LogoutUseCase>(),
-  ));
+  getIt.registerFactory(() => RegisterBloc(
+        registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
+        loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
+        saveUserUseCase: getIt<SaveUserDataInFirebaseUseCase>(),
+      ));
 }

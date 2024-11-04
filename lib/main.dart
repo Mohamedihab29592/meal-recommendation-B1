@@ -4,15 +4,14 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'firebase_options.dart';
 
-
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScreenUtil.ensureScreenSize();
   await Firebase.initializeApp(
+
     options: DefaultFirebaseOptions.currentPlatform,);
 await setup();
   runApp(const MealApp());
@@ -36,5 +35,3 @@ class MealApp extends StatelessWidget {
     );
   }
 }
-
-
