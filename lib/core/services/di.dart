@@ -15,16 +15,15 @@ import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/
 final getIt = GetIt.instance;
 
 Future<void> setup() async {
-  const secureFlutter =  FlutterSecureStorage();
-  getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
+  const secureFlutter = FlutterSecureStorage();
+  getIt.registerLazySingleton(() => FirebaseFirestore.instance);
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
-
 
   getIt.registerLazySingleton(() => GoogleSignIn());
 // Data Sources
   getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
       () => RegisterRemoteDataSourceImpl(getIt(), getIt()));
- /* getIt.registerLazySingleton<RegisterLocalDataSourceImpl>(
+  /* getIt.registerLazySingleton<RegisterLocalDataSourceImpl>(
       () => RegisterLocalDataSourceImpl(getIt()));*/
   getIt.registerLazySingleton<RegisterFirebaseDataSourceImpl>(
       () => RegisterFirebaseDataSourceImpl());
@@ -58,5 +57,4 @@ Future<void> setup() async {
         loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
         saveUserUseCase: getIt<SaveUserDataInFirebaseUseCase>(),
       ));
-
 }

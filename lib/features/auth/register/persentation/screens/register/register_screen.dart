@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/my_loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/components/show_message.dart';
+import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/screens/register/widgets/food_image_background.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/screens/register/widgets/register_screen_body.dart';
@@ -28,17 +30,11 @@ class RegisterScreen extends StatelessWidget {
                   // error occured
                   MyLoadingDialog.hide(context);
                   ShowMessage.show(context, state.message);
-                } else if (state is RegisterAuthenticatedState) {
+                } else if (state is RegisterAuthenticatedState ||
+                    state is RegisterUnauthenticatedState) {
                   // authenticated becaise user made login after registration
                   MyLoadingDialog.hide(context);
-
-                  ShowMessage.show(context, state.user.name);
-                } else if (state is RegisterUnauthenticatedState) {
-                  // Unauthenticated so user has to login after registration
-                  MyLoadingDialog.hide(context);
-
-                  ShowMessage.show(context,
-                      "Your Registration was Successfull , Please Log in now ... ");
+                  context.pushReplacementNamed(AppRoutes.home);
                 }
               },
               child: const RegisterScreenBody(),

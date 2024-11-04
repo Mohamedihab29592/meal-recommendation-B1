@@ -15,15 +15,14 @@ class RegisterFirebaseDataSourceImpl implements FirebaseFirestoreDataSource {
       QuerySnapshot searchForThatEmail =
           await users.where('email', isEqualTo: user.email).get();
       if (searchForThatEmail.docs.isEmpty) {
-        await users.add(
-          {
-            'name': user.name,
-            'email': user.email,
-            'phone': user.phone,
-            'profilePhoto':
-                '', // at first time it will be empty string after that user can update the default image
-          },
-        );
+        await users.doc(user.uid).set({
+          'name': user.name,
+          'email': user.email,
+          'phone': user.phone,
+          'profilePhoto': '',
+          'uid': user.uid
+          // at first time it will be empty string after that user can update the default image
+        }, SetOptions(merge: true));
       }
       return const Right(unit);
     } catch (e) {

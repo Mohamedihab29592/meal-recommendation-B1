@@ -141,9 +141,14 @@ class _RegisterScreenBodyState extends State<RegisterScreenBody> {
                       SocialButton(
                         logo: Assets.icGoogle,
                         onPressed: () {
-                          BlocProvider.of<RegisterBloc>(context).add(
-                            LoginWithGoogleEvent(),
-                          );
+                          if (acceptingTermsNotifier.value) {
+                            BlocProvider.of<RegisterBloc>(context).add(
+                              LoginWithGoogleEvent(),
+                            );
+                          } else {
+                            ShowMessage.show(
+                                context, "You Have To Accept Our Terms ...");
+                          }
                         },
                       )
                     ],

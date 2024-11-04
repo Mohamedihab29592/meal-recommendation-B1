@@ -60,6 +60,7 @@ class RegisterRemoteDataSourceImpl implements AuthRemoteDataSource {
         'name': user.displayName,
         'email': user.email,
         'phone': user.phoneNumber,
+        'profilePhoto': user.photoURL,
       };
     }
     return null;
