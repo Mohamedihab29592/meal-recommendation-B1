@@ -1,6 +1,7 @@
 
 class Assets {
-  static const String authLayoutFoodImage = 'assets/images/auth_layout_food_image.png';
+  static const String authLayoutFoodImage =
+      'assets/images/auth_layout_food_image.png';
   static const String icAccount = 'assets/images/ic_account.png';
   static const String icAccountWhite = 'assets/images/ic_account_white.png';
   static const String icBack = 'assets/images/ic_back.png';
@@ -18,7 +19,8 @@ class Assets {
   static const String icSettings = 'assets/images/ic_settings.png';
   static const String icSplash = 'assets/images/splash_logo.png';
   static const String firstOnbordingLogo = 'assets/images/first onboarding.png';
-  static const String secoundtOnbordingLogo = 'assets/images/secound onboarding.png';
+  static const String secoundtOnbordingLogo =
+      'assets/images/secound onboarding.png';
   static const String thirdOnbordingLogo = 'assets/images/third onboarding.png';
   static const String icFilledHeart= 'assets/images/ic_fillled_heart.png';
 

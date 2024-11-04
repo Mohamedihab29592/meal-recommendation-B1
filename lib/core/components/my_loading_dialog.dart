@@ -40,8 +40,7 @@ class MyLoadingDialogState extends State<MyLoadingDialog> {
               height: 70.h,
               child: LoadingIndicator(
                   indicatorType: Indicator.ballSpinFadeLoader,
-                  colors: _kDefaultRainbowColors
-              ),
+                  colors: _kDefaultRainbowColors),
             ),
             SizedBox(height: 20.h),
             Text(

@@ -59,6 +59,12 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.8
 
+  google_maps_flutter: ^2.9.0
+  google_sign_in: ^6.2.1
+  loading_indicator: ^3.1.1
+  lottie: ^3.1.3
+  pin_code_fields: ^7.3.0
+  smooth_page_indicator: ^1.0.0+2
 
 dev_dependencies:
   flutter_test:
@@ -73,6 +79,9 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^4.0.0
+  flutter_test:
+    sdk: flutter
+  mockito: ^5.4.4 # Mocking for testing
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -89,16 +98,15 @@ flutter:
 
 
   # Fonts Section
-#  fonts:
-#    - family: Inter        # Inter font family
-#      fonts:
-#        - asset: assets/fonts/Inter-Regular.ttf   # Regular weight (400)
-#          weight: 400
-#        - asset: assets/fonts/Inter-Bold.ttf      # Bold weight (700)
-#          weight: 700
-#        - asset: assets/fonts/Inter-Medium.ttf    # Medium weight (500)
-#          weight: 500
-
+  #  fonts:
+  #    - family: Inter        # Inter font family
+  #      fonts:
+  #        - asset: assets/fonts/Inter-Regular.ttf   # Regular weight (400)
+  #          weight: 400
+  #        - asset: assets/fonts/Inter-Bold.ttf      # Bold weight (700)
+  #          weight: 700
+  #        - asset: assets/fonts/Inter-Medium.ttf    # Medium weight (500)
+  #          weight: 500
   # For more details regarding adding assets from package dependencies,
   # check out https://flutter.dev/to/asset-from-package
 

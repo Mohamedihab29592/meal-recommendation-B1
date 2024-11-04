@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_core/firebase_core.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive/hive.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
@@ -22,7 +22,6 @@ void main() async {
   await setup(favoriteBox);
   runApp(const MealApp());
 }
-
 class MealApp extends StatelessWidget {
   const MealApp({super.key});
 
@@ -31,13 +30,15 @@ class MealApp extends StatelessWidget {
     return ScreenUtilInit(
       designSize: const Size(375, 812),
       minTextAdapt: true,
-      child: MaterialApp(
-        title: 'Meal - Recommendation',
-        debugShowCheckedModeBanner: false,
-        theme: AppThemes.lightTheme,
-        initialRoute: AppRoutes.splash,
-        onGenerateRoute: AppRoutes.generateRoute,
-      ),
+        child: MaterialApp(
+          title: 'Meal - Recommendation',
+          debugShowCheckedModeBanner: false,
+          theme: AppThemes.lightTheme,
+          initialRoute: AppRoutes.splash,
+          onGenerateRoute: AppRoutes.generateRoute,
+        ),
     );
   }
 }
+
+

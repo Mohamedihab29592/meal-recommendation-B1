@@ -1,23 +1,28 @@
- import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
-extension NavigationExtension on BuildContext {
-  // Navigate to a new route
-  void navigateTo(String routeName, {Object? arguments}) {
-    Navigator.pushNamed(this, routeName, arguments: arguments);
+extension Navigation on BuildContext {
+  Future<dynamic> pushNamed(String routeName, {Object? arguments}) {
+    return Navigator.of(this).pushNamed(routeName, arguments: arguments);
   }
 
-  // Replace current route with a new one
-  void replaceWith(String routeName, {Object? arguments}) {
-    Navigator.pushReplacementNamed(this, routeName, arguments: arguments);
+  Future<dynamic> pushReplacementNamed(String routeName, {Object? arguments}) {
+    return Navigator.of(this)
+        .pushReplacementNamed(routeName, arguments: arguments);
   }
 
-  // Pop the current route
-  void goBack<T extends Object?>([T? result]) {
-    Navigator.pop(this, result);
+  Future<dynamic> pushNamedAndRemoveUntil(String routeName,
+      {Object? arguments, required RoutePredicate predicate}) {
+    return Navigator.of(this)
+        .pushNamedAndRemoveUntil(routeName, predicate, arguments: arguments);
   }
 
-  // Push a new route and remove all previous ones
-  void navigateAndRemove(String routeName, {Object? arguments}) {
-    Navigator.pushNamedAndRemoveUntil(this, routeName, (route) => false, arguments: arguments);
-  }
+  void pop() => Navigator.of(this).pop();
+}
+
+extension StringExtension on String? {
+  bool isNullOrEmpty() => this == null || this == "";
+}
+
+extension ListExtension<T> on List<T>? {
+  bool isNullOrEmpty() => this == null || this!.isEmpty;
 }
