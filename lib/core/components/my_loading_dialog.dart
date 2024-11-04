@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:loading_indicator/loading_indicator.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_strings.dart';
 
 class MyLoadingDialog extends StatefulWidget {
-  static void show(BuildContext context) => showDialog<void>(
+  static void show(BuildContext context) =>
+      showDialog<void>(
         context: context,
         useRootNavigator: false,
         barrierDismissible: false,
@@ -42,7 +44,7 @@ class MyLoadingDialogState extends State<MyLoadingDialog> {
             ),
             SizedBox(height: 20.h),
             Text(
-              "Please Wait",
+              AppStrings.pleaseWait,
               style: TextStyle(
                 fontSize: 18.sp,
                 color: AppColors.black,

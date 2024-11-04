@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meal_recommendation_b1/features/auth/register/persentation/screens/register/register_screen.dart';
-import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
-import '../../features/auth/login/persentation/screens/login/login_screen.dart';
-import '../../features/on_boarding/screens/on_boarding_screen.dart';
+
+import '../../features/auth/persentation/screens/login/login_screen.dart';
+import '../../features/auth/persentation/screens/register/register_screen.dart';
+  import '../../features/on_boarding/screens/on_boarding_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../services/di.dart';
 
