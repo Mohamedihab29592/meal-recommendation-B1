@@ -97,17 +97,14 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(height: screenHeight * 0.05),
                         CustomTextField(
                           hintText: 'User Name',
-                        //Todo: check icon data issue
-                        //  prefixIcon: CupertinoIcons.person,
+                          prefixIcon: Assets.icAccount,
                           inputType: TextInputType.emailAddress,
                           controller: _emailController, validator: (String? value) {  },
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         CustomTextField(
                           hintText: 'Password',
-                          //Todo: check icon data issue
-
-                         // prefixIcon: Icons.lock_outline_rounded,
+                          prefixIcon: Assets.icLock,
                           inputType: TextInputType.text,
                           controller: _passwordController,
                           isPassword: true, validator: (String? value) {  },
