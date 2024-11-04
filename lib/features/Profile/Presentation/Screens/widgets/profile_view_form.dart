@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/profile_button.dart';
 import 'package:meal_recommendation_b1/core/services/form_input_validation.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/widgets/profile_text_field.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/bloc.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/event.dart';
@@ -35,15 +37,6 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
     super.initState();
   }
 
-  Future<void> _initializeTextControllers() async {
-    nameTextEditingController = TextEditingController();
-    emailTextEditingController = TextEditingController();
-    phoneTextEditingController = TextEditingController();
-    BlocProvider.of<UserProfileBloc>(context).add(
-      LoadUserProfile('KEzYRBL0AWKuYjl1ht4F'),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Expanded(
@@ -55,12 +48,18 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
             phoneTextEditingController.text = state.user.phone;
             oldImage = state.user.profilePhotoUrl ?? '';
           } else if (state is UserProfileError) {
+            customSnackBar(context, message: state.message);
+          } else if (state is UploadUserImageFailure) {
+            customSnackBar(context, message: state.message);
           } else if (state is UploadUserImageSuccess) {
             imageUrl = state.imageUrl;
             imageController.text = state.imageUrl;
             updateBlocProvider(context);
             BlocProvider.of<UserProfileBloc>(context).saveLocallyProfileImage =
                 null;
+            customSnackBar(context, message: "Changes Saved");
+          } else if (state is UserProfileUpdated) {
+            customSnackBar(context, message: "Changes Saved");
           }
         },
         builder: (context, state) {
@@ -73,6 +72,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
                   onSaved: (value) {},
                   controller: nameTextEditingController,
                   validator: FormInputValidation.emptyValueValidation,
+                  keyboardType: TextInputType.name,
                 ),
                 const SizedBox(
                   height: 22,
@@ -82,6 +82,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
                   controller: emailTextEditingController,
                   onSaved: (value) {},
                   validator: FormInputValidation.emptyValueValidation,
+                  keyboardType: TextInputType.emailAddress,
                 ),
                 const SizedBox(
                   height: 22,
@@ -91,6 +92,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
                   controller: phoneTextEditingController,
                   onSaved: (value) {},
                   validator: FormInputValidation.emptyValueValidation,
+                  keyboardType: TextInputType.phone,
                 ),
                 const SizedBox(
                   height: 22,
@@ -114,6 +116,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
                                       .saveLocallyProfileImage!),
                         );
                       }
+                      formKey.currentState!.save;
                       updateBlocProvider(context);
                     }
                   },
@@ -130,20 +133,52 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
     );
   }
 
+  void customSnackBar(BuildContext context, {required String message}) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        backgroundColor: AppColors.primary,
+        content: Text(
+          message,
+          style: TextStyle(
+            fontSize: 18.sp,
+            color: AppColors.white,
+          ),
+        ),
+      ),
+    );
+  }
+
   void updateBlocProvider(BuildContext context) {
     BlocProvider.of<UserProfileBloc>(context).add(
-      LoadUserProfile('KEzYRBL0AWKuYjl1ht4F'),
+      LoadUserProfile('WT4NU9fy0uQc6nQyno6j3VqbE8G2'),
     );
     BlocProvider.of<UserProfileBloc>(context).add(
       UpdateUserProfile(
         User(
-          id: 'KEzYRBL0AWKuYjl1ht4F',
+          id: 'WT4NU9fy0uQc6nQyno6j3VqbE8G2',
           name: nameTextEditingController.text,
           email: emailTextEditingController.text,
           phone: phoneTextEditingController.text,
           profilePhotoUrl: imageController.text,
         ),
       ),
+    );
+  }
+
+  @override
+  void dispose() {
+    nameTextEditingController.dispose();
+    emailTextEditingController.dispose();
+    phoneTextEditingController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _initializeTextControllers() async {
+    nameTextEditingController = TextEditingController();
+    emailTextEditingController = TextEditingController();
+    phoneTextEditingController = TextEditingController();
+    BlocProvider.of<UserProfileBloc>(context).add(
+      LoadUserProfile('WT4NU9fy0uQc6nQyno6j3VqbE8G2'),
     );
   }
 }

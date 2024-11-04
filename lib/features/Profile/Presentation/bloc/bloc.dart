@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/networking/firebase_error_model.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/state.dart';
 import 'package:meal_recommendation_b1/features/Profile/domain/usecase/editUser.dart';
 import 'package:meal_recommendation_b1/features/Profile/domain/usecase/getUser.dart';
@@ -58,11 +59,12 @@ class UserProfileBloc extends Bloc<UserProfileEvent, UserProfileState> {
   ) async {
     emit(UserProfileUpdating());
     try {
-      Either<Unit, String> result = await uploadUserImage(
+      Either<FirebaseErrorModel, String> result = await uploadUserImage(
           newImage: event.newImageFile, oldImage: event.oldImageFile);
       result.fold((fail) {
         emit(
-          UploadUserImageFailure(message: "Can't Upload Your Image "),
+          UploadUserImageFailure(
+              message: fail.message ?? "Can't Upload Your Image"),
         );
       }, (success) {
         emit(

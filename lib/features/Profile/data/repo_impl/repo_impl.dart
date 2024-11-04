@@ -3,6 +3,8 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dartz/dartz.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:meal_recommendation_b1/core/networking/firebase_error_handler.dart';
+import 'package:meal_recommendation_b1/core/networking/firebase_error_model.dart';
 import '../../domain/entity/entity.dart';
 import '../../domain/repo/repo.dart';
 import '../Model/UserModel.dart';
@@ -32,13 +34,13 @@ class FirebaseUserRepository implements UserRepository {
   }
 
   @override
-  Future<Either<Unit, String>> uploadUserImage(
+  Future<Either<FirebaseErrorModel, String>> uploadUserImage(
       {required File newImage, String? oldImage}) async {
     return await _uploadImageToFirebaseStorage(
         image: newImage, oldImage: oldImage);
   }
 
-  Future<Either<Unit, String>> _uploadImageToFirebaseStorage(
+  Future<Either<FirebaseErrorModel, String>> _uploadImageToFirebaseStorage(
       {required File image, String? oldImage}) async {
     try {
       String filePath = 'profile_images/${DateTime.now()}.png';
@@ -52,36 +54,33 @@ class FirebaseUserRepository implements UserRepository {
       return Right(downlownUrl);
     } on FirebaseException catch (e) {
       // Firebase-specific errors
-      if (e.code == 'unauthorized') {
-        // Handle permission error
-        print('User does not have permission to upload to this reference.');
-      } else if (e.code == 'canceled') {
-        // Handle cancel error
-        print('Upload was canceled.');
-      } else if (e.code == 'object-not-found') {
-        // Handle path not found
-        print('File not found at specified path.');
-      } else {
-        // General Firebase error
-        print('FirebaseException: ${e.message}');
-      }
-      return Left(unit);
+      return Left(
+        FirebaseErrorHandler.handle(e),
+      );
     } on SocketException {
       // Network error
-      print('Network error: No Internet connection.');
-      return Left(unit);
+      return Left(
+        FirebaseErrorModel(
+            message: 'Network error: No Internet connection.', errorCode: -1),
+      );
     } on TimeoutException {
       // Handle timeout
-      print('Upload timed out.');
-      return Left(unit);
+      return Left(
+        FirebaseErrorModel(message: 'Upload timed out.', errorCode: -1),
+      );
     } on FormatException {
       // Handle format errors
-      print('File format error: Image file format is not supported.');
-      return Left(unit);
+      return Left(
+        FirebaseErrorModel(
+            message: 'File format error: Image file format is not supported.',
+            errorCode: -1),
+      );
     } catch (e) {
       // Generic error handling
-      print('An unexpected error occurred: $e');
-      return Left(unit);
+      return Left(
+        FirebaseErrorModel(
+            message: 'An unexpected error occurred: $e', errorCode: -1),
+      );
     }
   }
 }

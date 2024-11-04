@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/bloc.dart';
 import 'package:meal_recommendation_b1/features/Profile/data/repo_impl/repo_impl.dart';
 import 'package:meal_recommendation_b1/features/Profile/domain/repo/repo.dart';
 import 'package:meal_recommendation_b1/features/Profile/domain/usecase/editUser.dart';
@@ -68,6 +69,14 @@ Future<void> setup() async {
       loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
       getSavedUserUseCase: getIt<GetSavedUserUseCase>(),
       logoutUseCase: getIt<LogoutUseCase>(),
+    ),
+  );
+
+  getIt.registerFactory(
+    () => UserProfileBloc(
+      getIt(),
+      getUserProfile: getIt(),
+      updateUserProfile: getIt(),
     ),
   );
 }

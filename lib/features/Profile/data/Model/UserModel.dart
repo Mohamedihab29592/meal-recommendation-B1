@@ -14,8 +14,8 @@ class UserModel extends User {
       id: id,
       name: json['name'],
       email: json['email'],
-      phone: json['phoneNumber'],
-      profilePhotoUrl: json['profile_pic'] ?? '',
+      phone: json['phone'],
+      profilePhotoUrl: json['profilePhoto'] ?? '',
     );
   }
 
@@ -23,8 +23,8 @@ class UserModel extends User {
     return {
       'name': name,
       'email': email,
-      'phoneNumber': phone,
-      'profile_pic': profilePhotoUrl,
+      'phone': phone,
+      'profilePhoto': profilePhotoUrl,
     };
   }
 }
