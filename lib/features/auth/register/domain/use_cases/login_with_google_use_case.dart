@@ -1,10 +1,10 @@
 import '../entity/user_entity.dart';
 import '../repository/register_repository.dart';
 
-class LoginWithGoogleUseCase {
+class RegisterWithGoogleUseCase {
   final RegisterRepository repository;
 
-  LoginWithGoogleUseCase(this.repository);
+  RegisterWithGoogleUseCase(this.repository);
 
   Future<UserEntity?> call() async {
     return await repository.loginWithGoogle();

@@ -11,7 +11,6 @@ class AppStrings {
   static const String dismiss = "Dismiss";
 
   static const String uid = 'uid';
-  static const String pleaseWait = "please wait";
   static const String home = "Home";
   static const String profile = "Profile";
   static const String favorites = "Favorites";

@@ -23,7 +23,6 @@ class CustomButton extends StatelessWidget {
           backgroundColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(45.r),
-            borderRadius: BorderRadius.circular(66.r),
           ),
           padding: EdgeInsets.symmetric(
               vertical: 16.h), // Padding for better touch area
@@ -36,11 +35,9 @@ class CustomButton extends StatelessWidget {
             text,
             style: TextStyle(fontSize: 21.sp,fontWeight: FontWeight.bold,color: AppColors.primary),
           ),
-        child: Text(
-          text,
-          style: Theme.of(context).textTheme.headlineLarge,
-        ),
+
       ),
+    ),
     );
   }
 }

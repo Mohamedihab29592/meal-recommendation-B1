@@ -14,12 +14,12 @@ part 'register_state.dart';
 
 class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
   final RegisterWithEmailUseCase registerWithEmailUseCase;
-  final LoginWithGoogleUseCase loginWithGoogleUseCase;
+  final RegisterWithGoogleUseCase registerWithGoogleUseCase;
   final SaveUserDataInFirebaseUseCase saveUserUseCase;
   RegisterBloc({
     required this.saveUserUseCase,
     required this.registerWithEmailUseCase,
-    required this.loginWithGoogleUseCase,
+    required this.registerWithGoogleUseCase,
   }) : super(RegisterInitialState()) {
     on<RegisterWithEmailEvent>(_onRegisterWithEmail);
     on<LoginWithGoogleEvent>(_onLoginWithGoogle);
@@ -59,7 +59,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       LoginWithGoogleEvent event, Emitter<RegisterState> emit) async {
     emit(RegisterLoadingState());
     try {
-      final user = await loginWithGoogleUseCase();
+      final user = await registerWithGoogleUseCase();
       if (user != null) {
         await _saveUser(
             user: user,
