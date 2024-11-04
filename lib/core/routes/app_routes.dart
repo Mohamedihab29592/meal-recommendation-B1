@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Screens/HomePage.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Screens/NavBarPage.dart';
 
-import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
-import '../../features/auth/login/persentation/screens/login/login_screen.dart';
-import '../../features/auth/register/register_screen.dart';
-import '../../features/on_boarding/screens/on_boarding_screen.dart';
+import '../../features/auth/OTP/presentation/screens/otp.dart';
+import '../../features/auth/persentation/screens/login/login_screen.dart';
+import '../../features/auth/persentation/screens/register/register_screen.dart';
+  import '../../features/on_boarding/screens/on_boarding_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../services/di.dart';
 
@@ -24,14 +19,14 @@ class AppRoutes {
   static const String details = '/details';
   static const String seeAll = '/seeAll';
   static const String addIngredients = '/addIngredients';
-  static const String navBar = '/NavBar';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
       case splash:
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case onboarding:
-        return MaterialPageRoute(builder: (_) =>OnBoardingScreen(),);
+        return MaterialPageRoute(builder: (_) => const OnBoardingScreen());
+
       case login:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
@@ -39,6 +34,8 @@ class AppRoutes {
         );
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case otp:
+        return MaterialPageRoute(builder: (_) => const OTPView());
       case verification:
       //return MaterialPageRoute(builder: (_) => VerificationScreen());
       case home:

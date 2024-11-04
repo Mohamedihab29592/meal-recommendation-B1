@@ -3,7 +3,21 @@ import 'package:flutter/material.dart';
 import '../utiles/assets.dart';
 
 class CustomeRecipesCard extends StatelessWidget {
-   CustomeRecipesCard({super.key,required this.ontap,this.time,this.firsttext,this.ingrediantes,this.middleText,this.image});
+  CustomeRecipesCard(
+      {super.key,
+      required this.ontap,
+      this.time,
+      this.firsttext,
+      this.ingrediantes,
+      this.middleText,
+      this.image,
+      this.rating,
+        this.isFavorite
+      });
+  String? firsttext, middleText, ingrediantes, time, image;
+  double? rating;
+  bool? isFavorite;
+
   String? firsttext,middleText,ingrediantes,time,image;
   final VoidCallback ontap;
   @override
@@ -13,31 +27,67 @@ class CustomeRecipesCard extends StatelessWidget {
       color: Colors.white,
       elevation: 25,
       shadowColor: Colors.black,
-      child:Row(
+      child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Padding(
             padding: const EdgeInsets.only(left: 8.0),
-            child: CircleAvatar(radius: 40,backgroundImage: NetworkImage("$image"),),
+            child: CircleAvatar(
+              radius: 40,
+              backgroundImage: AssetImage("$image"),
+            ),
           ),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("$firsttext",style: TextStyle(fontWeight: FontWeight.w400),),
-              Text("$middleText",style: TextStyle(fontWeight: FontWeight.bold),),
+              Text(
+                "$firsttext",
+                style: const TextStyle(fontWeight: FontWeight.w400),
+              ),
+              Text(
+                "$middleText",
+                style: const TextStyle(fontWeight: FontWeight.bold),
+              ),
               Row(
                 children: [
-                  Text("$ingrediantes"),SizedBox(width: 10,),
-                  Text("$time",style: TextStyle(fontWeight: FontWeight.bold,fontSize: 15),),
-                ],),
-
-            ],),
+                  Text("$ingrediantes"),
+                  const SizedBox(
+                    width: 10,
+                  ),
+                  Text(
+                    "$time",
+                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  ),
+                ],
+              ),
+              SizedBox(
+                width: MediaQuery.sizeOf(context).width / 2,
+                child: RatingBar.builder(
+                  initialRating: rating!,
+                  direction: Axis.horizontal,
+                  allowHalfRating: true,
+                  itemSize: 25.w,
+                  itemCount: 5,
+                  itemPadding: const EdgeInsets.symmetric(horizontal: 0.0),
+                  itemBuilder: (context, _) => const Icon(
+                    Icons.star,
+                    color: Colors.amber,
+                  ),
+                  onRatingUpdate: (rating) {
+                  },
+                ),
+              )
+            ],
+          ),
           Container(
-              padding: EdgeInsets.all(10),
+              padding: const EdgeInsets.all(10),
               alignment: Alignment.topRight,
               width: 50,
               height: 100,
-              child: InkWell(onTap: ontap,child: Image.asset("${Assets.icFavorite}")))
-        ],),);
+              child: InkWell(
+                  onTap: ontap, child: Image.asset(isFavorite! ? Assets.icFilledHeart : Assets.icFavorite))),
+        ],
+      ),
+    );
   }
 }
