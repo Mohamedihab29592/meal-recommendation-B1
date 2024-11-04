@@ -67,7 +67,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                       child: IconButton(
                         icon: Image(
                           image: AssetImage(
-                            _isObscure ? Assets.icEye : Assets.visibleOff,
+                            _isObscure ? Assets.icEye : Assets.icVisibleOff,
                           ),
                           color: Colors.white,
                         ),

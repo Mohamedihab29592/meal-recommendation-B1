@@ -17,6 +17,11 @@ class Assets {
   static const String icSend = 'assets/images/ic_send.png';
   static const String icSettings = 'assets/images/ic_settings.png';
   static const String icSplash = 'assets/images/splash_logo.png';
+  static const String icMail = 'assets/images/ic_mail.png';
+  static const String icPhone = 'assets/images/ic_phone.png';
+  static const String icEye = 'assets/images/icEye.png';
+  static const String icVisibleOff = 'assets/images/ic_visibility_off.png';
+  static const String icLock = 'assets/images/ic_lock.png';
   static const String firstOnbordingLogo = 'assets/images/first onboarding.png';
   static const String secoundtOnbordingLogo =
       'assets/images/secound onboarding.png';

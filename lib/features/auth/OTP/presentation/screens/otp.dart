@@ -69,7 +69,7 @@ class _OTPViewState extends State<OTPView> {
               padding: EdgeInsets.symmetric(vertical: 20.h, horizontal: 15.w),
               child: Column(
                 children: [
-                  Image.asset(Assets.logo),
+                  Image.asset(Assets.icSplash),
                   SizedBox(
                     height: 33.h,
                   ),
