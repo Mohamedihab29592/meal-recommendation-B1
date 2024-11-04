@@ -19,7 +19,6 @@ class AppRoutes {
   static const String details = '/details';
   static const String seeAll = '/seeAll';
   static const String addIngredients = '/addIngredients';
-  static const String otp = '/otp';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -40,7 +39,11 @@ class AppRoutes {
       case verification:
       //return MaterialPageRoute(builder: (_) => VerificationScreen());
       case home:
-      //return MaterialPageRoute(builder: (_) => HomeScreen());
+      return MaterialPageRoute(builder: (_) =>  BlocProvider(
+        create: (_) => getIt<HomeCubit>(),child: HomePage(),));
+      case navBar:
+      return MaterialPageRoute(builder: (_) =>  BlocProvider(
+        create: (context) => getIt<NavBarCubit>(),child: NavBarPage(),));
       case favorites:
       //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:

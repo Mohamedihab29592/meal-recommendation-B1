@@ -28,16 +28,18 @@ class MealApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-        child: MaterialApp(
-          title: 'Meal - Recommendation',
-          debugShowCheckedModeBanner: false,
-          theme: AppThemes.lightTheme,
-          initialRoute: AppRoutes.splash,
-          onGenerateRoute: AppRoutes.generateRoute,
-        ),
+    return DevicePreview(
+      builder: (context) =>ScreenUtilInit(
+        designSize: const Size(375, 812),
+        minTextAdapt: true,
+          child: MaterialApp(
+            title: 'Meal - Recommendation',
+            debugShowCheckedModeBanner: false,
+            theme: AppThemes.lightTheme,
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: AppRoutes.generateRoute,
+          ),
+      ),
     );
   }
 }

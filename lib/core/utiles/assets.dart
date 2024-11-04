@@ -1,3 +1,4 @@
+
 class Assets {
   static const String authLayoutFoodImage =
       'assets/images/auth_layout_food_image.png';
@@ -31,4 +32,5 @@ class Assets {
   static const String favoriteWhite = 'assets/images/heart_white.svg';
   static const String settings = 'assets/images/settings.svg';
   static const String settingsWhite = 'assets/images/settings_white.svg';
+  static const String icSearch = 'assets/images/Search.png';
 }
