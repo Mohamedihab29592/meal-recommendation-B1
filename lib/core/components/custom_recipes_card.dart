@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../utiles/assets.dart';
 
-class CustomeRecipesCard extends StatelessWidget {
-  CustomeRecipesCard(
+class CustomRecipesCard extends StatelessWidget {
+  CustomRecipesCard(
       {super.key,
       required this.ontap,
       this.time,
@@ -18,7 +20,6 @@ class CustomeRecipesCard extends StatelessWidget {
   double? rating;
   bool? isFavorite;
 
-  String? firsttext,middleText,ingrediantes,time,image;
   final VoidCallback ontap;
   @override
   Widget build(BuildContext context) {

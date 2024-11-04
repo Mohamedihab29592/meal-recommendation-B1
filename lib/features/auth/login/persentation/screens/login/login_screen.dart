@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
@@ -101,7 +100,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         //Todo: check icon data issue
                         //  prefixIcon: CupertinoIcons.person,
                           inputType: TextInputType.emailAddress,
-                          controller: _emailController,
+                          controller: _emailController, validator: (String? value) {  },
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         CustomTextField(
@@ -111,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
                          // prefixIcon: Icons.lock_outline_rounded,
                           inputType: TextInputType.text,
                           controller: _passwordController,
-                          isPassword: true,
+                          isPassword: true, validator: (String? value) {  },
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         Row(
@@ -155,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               LoginWithEmailEvent(email, password),
                             );
                             _saveUserData();
-                            Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
+                            //Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
                           },
                         ),
                         const Padding(
