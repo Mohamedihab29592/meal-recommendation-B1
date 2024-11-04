@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
@@ -98,20 +97,17 @@ class _LoginScreenState extends State<LoginScreen> {
                         SizedBox(height: screenHeight * 0.05),
                         CustomTextField(
                           hintText: 'User Name',
-                        //Todo: check icon data issue
-                        //  prefixIcon: CupertinoIcons.person,
+                          prefixIcon: Assets.icAccount,
                           inputType: TextInputType.emailAddress,
-                          controller: _emailController,
+                          controller: _emailController, validator: (String? value) {  },
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         CustomTextField(
                           hintText: 'Password',
-                          //Todo: check icon data issue
-
-                         // prefixIcon: Icons.lock_outline_rounded,
+                          prefixIcon: Assets.icLock,
                           inputType: TextInputType.text,
                           controller: _passwordController,
-                          isPassword: true,
+                          isPassword: true, validator: (String? value) {  },
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         Row(
@@ -155,7 +151,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               LoginWithEmailEvent(email, password),
                             );
                             _saveUserData();
-                            Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
+                            //Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
                           },
                         ),
                         const Padding(

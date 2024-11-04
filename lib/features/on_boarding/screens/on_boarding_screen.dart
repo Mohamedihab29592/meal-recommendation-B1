@@ -2,9 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Screens/HomePage.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Screens/NavBarPage.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/utiles/assets.dart';
 import '../../../core/utiles/app_colors.dart';
@@ -57,7 +54,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           // Circle container (second component oval)
           Container(
             height: 450.h,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.primary,
               borderRadius: BorderRadius.only(
                 bottomLeft: Radius.circular(400),
