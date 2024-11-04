@@ -22,6 +22,7 @@ void main() async {
   await setup(favoriteBox);
   runApp(const MealApp());
 }
+
 class MealApp extends StatelessWidget {
   const MealApp({super.key});
 

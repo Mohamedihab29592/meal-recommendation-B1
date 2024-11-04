@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/persentation/screens/login/login_screen.dart';
 import '../../features/auth/persentation/screens/register/register_screen.dart';
   import '../../features/on_boarding/screens/on_boarding_screen.dart';
@@ -18,6 +19,7 @@ class AppRoutes {
   static const String details = '/details';
   static const String seeAll = '/seeAll';
   static const String addIngredients = '/addIngredients';
+  static const String otp = '/otp';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -33,6 +35,8 @@ class AppRoutes {
         );
       case register:
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case otp:
+        return MaterialPageRoute(builder: (_) => const OTPView());
       case verification:
       //return MaterialPageRoute(builder: (_) => VerificationScreen());
       case home:
