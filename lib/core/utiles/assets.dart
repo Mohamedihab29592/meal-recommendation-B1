@@ -1,4 +1,3 @@
-
 class Assets {
   static const String authLayoutFoodImage =
       'assets/images/auth_layout_food_image.png';
@@ -22,14 +21,14 @@ class Assets {
   static const String secoundtOnbordingLogo =
       'assets/images/secound onboarding.png';
   static const String thirdOnbordingLogo = 'assets/images/third onboarding.png';
-  static const String icFilledHeart= 'assets/images/ic_fillled_heart.png';
+  static const String icFilledHeart = 'assets/images/ic_fillled_heart.png';
 
-  static const String profile= 'assets/images/profile.svg';
-  static const String profileWhite= 'assets/images/profile_white.svg';
-  static const String home= 'assets/images/home.svg';
-  static const String homeWhite= 'assets/images/home_white.svg';
-  static const String favorite= 'assets/images/heart.svg';
-  static const String favoriteWhite= 'assets/images/heart_white.svg';
-  static const String settings= 'assets/images/settings.svg';
-  static const String settingsWhite= 'assets/images/settings_white.svg';
+  static const String profile = 'assets/images/profile.svg';
+  static const String profileWhite = 'assets/images/profile_white.svg';
+  static const String home = 'assets/images/home.svg';
+  static const String homeWhite = 'assets/images/home_white.svg';
+  static const String favorite = 'assets/images/heart.svg';
+  static const String favoriteWhite = 'assets/images/heart_white.svg';
+  static const String settings = 'assets/images/settings.svg';
+  static const String settingsWhite = 'assets/images/settings_white.svg';
 }
