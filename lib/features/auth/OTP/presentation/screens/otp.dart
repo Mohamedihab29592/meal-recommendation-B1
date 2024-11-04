@@ -4,9 +4,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 
 import '../../../../../core/components/custom_button.dart';
-import '../../../../../core/utiles/Assets.dart';
 import '../../../../../core/utiles/app_colors.dart';
 import '../../../../../core/utiles/app_strings.dart';
+import '../../../../../core/utiles/assets.dart';
 import '../widgets/my_loading_dialog.dart';
 import '../widgets/pin_code_fields.dart';
 import '../phone_bloc/phone_bloc.dart';

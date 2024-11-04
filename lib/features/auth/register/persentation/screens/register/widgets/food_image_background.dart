@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:meal_recommendation_b1/core/utiles/Assets.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+
+import '../../../../../../../core/utiles/assets.dart';
 
 class FoodImageBackground extends StatelessWidget {
   const FoodImageBackground({

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meal_recommendation_b1/core/components/custom_text_field.dart';
 import 'package:meal_recommendation_b1/core/services/form_input_validation.dart';
-import 'package:meal_recommendation_b1/core/utiles/Assets.dart';
+
+import '../../../../../../../core/utiles/assets.dart';
 
 class RegisterForm extends StatefulWidget {
   const RegisterForm({

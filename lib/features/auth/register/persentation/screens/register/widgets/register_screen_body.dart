@@ -5,10 +5,11 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
 import 'package:meal_recommendation_b1/core/components/show_message.dart';
 import 'package:meal_recommendation_b1/core/components/social_button.dart';
-import 'package:meal_recommendation_b1/core/utiles/Assets.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/screens/register/widgets/accepting_terms_check_box.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/screens/register/widgets/register_form.dart';
+
+import '../../../../../../../core/utiles/assets.dart';
 
 class RegisterScreenBody extends StatefulWidget {
   const RegisterScreenBody({
