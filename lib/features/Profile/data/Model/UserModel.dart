@@ -1,8 +1,9 @@
 import 'package:hive/hive.dart';
 import '../../domain/entity/entity.dart';
 
+part 'UserModel.g.dart'; // Make sure this line is present
 
-@HiveType(typeId: 0)
+@HiveType(typeId: 32)
 class UserModel extends User {
   @HiveField(0)
   final String id;
@@ -17,7 +18,7 @@ class UserModel extends User {
   final String phone;
 
   @HiveField(4)
-  final String? profilePhotoUrl;
+  final String? profilePhotoUrl; // Nullable field
 
   UserModel({
     required this.id,
@@ -33,7 +34,7 @@ class UserModel extends User {
       name: json['name'],
       email: json['email'],
       phone: json['phone'],
-      profilePhotoUrl: json['profilePhoto'] ?? '',
+      profilePhotoUrl: json['profilePhoto'] ?? '', // Handle null values
     );
   }
 

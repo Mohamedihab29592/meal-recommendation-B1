@@ -88,7 +88,7 @@ class _ProfileViewPictureState extends State<ProfileViewPicture> {
 
   Future<File?> _selectImageFromGallery() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
       return File(image.path);

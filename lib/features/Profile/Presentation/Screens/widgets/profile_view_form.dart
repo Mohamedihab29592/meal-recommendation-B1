@@ -134,6 +134,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
   }
 
   void customSnackBar(BuildContext context, {required String message}) {
+    print(message);
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         backgroundColor: AppColors.primary,
