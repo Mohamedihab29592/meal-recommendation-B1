@@ -38,4 +38,6 @@ class Assets {
   static const String settings = 'assets/images/settings.svg';
   static const String settingsWhite = 'assets/images/settings_white.svg';
   static const String icSearch = 'assets/images/Search.png';
+  static const String gemini = 'assets/images/gemini.png';
+
 }
