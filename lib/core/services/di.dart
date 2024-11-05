@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:meal_recommendation_b1/features/favorites/presentaion/bloc/favorites_bloc.dart';
 import '../../features/auth/OTP/data/data_source/base_remote_data_source.dart';
 import '../../features/auth/OTP/data/data_source/remote_data_source.dart';
 import '../../features/auth/login/data/data_source/remote/auth_remote_data_source.dart';
@@ -25,13 +26,14 @@ import '../../features/auth/OTP/data/repository/repository.dart';
 import '../../features/auth/OTP/domin/use_case/phone_authentication_use_case.dart';
 import '../../features/auth/OTP/domin/use_case/submit_otp_use_case.dart';
 import '../../features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
-import '../../features/home/favorites/data/models/favorites.dart';
-import '../../features/home/favorites/data/repository_impl/favorites_repository_impl.dart';
-import '../../features/home/favorites/domain/repository/favorites_repository.dart';
-import '../../features/home/favorites/domain/usecases/delete_favorite_use_case.dart';
-import '../../features/home/favorites/domain/usecases/get_all_favorites_use_case.dart';
-import '../../features/home/favorites/domain/usecases/save_favorite_use_case.dart';
-import '../../features/home/favorites/presentaion/bloc/favorites_bloc.dart';
+import '../../features/favorites/data/models/favorites.dart';
+import '../../features/favorites/data/repository_impl/favorites_repository_impl.dart';
+import '../../features/favorites/domain/repository/favorites_repository.dart';
+import '../../features/favorites/domain/usecases/delete_favorite_use_case.dart';
+import '../../features/favorites/domain/usecases/get_all_favorites_use_case.dart';
+import '../../features/favorites/domain/usecases/save_favorite_use_case.dart';
+import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
+
 
 final getIt = GetIt.instance;
 
@@ -109,4 +111,13 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
     phoneAuthenticationUseCase: getIt<PhoneAuthenticationUseCase>(),
     submitOTPUseCase: getIt<SubmitOTPUseCase>(),
   ));
+  //  HomeCubit
+  // getIt.registerFactory(() => HomeCubit());
+  //  NavBar
+  getIt.registerFactory(() => NavBarCubit());
+  //  Add Ingrediants
+  // getIt.registerFactory(() => ImageCubit());
+  //detals
+  // getIt.registerFactory(() => DetailsCubit());
+
 }

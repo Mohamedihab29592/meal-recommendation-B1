@@ -4,6 +4,8 @@ import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/screens/login/login_screen.dart';
 import '../../features/auth/register/persentation/screens/register/register_screen.dart';
+import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
+import '../../features/home/persentation/Screens/NavBarPage.dart';
 import '../../features/on_boarding/screens/on_boarding_screen.dart';
 import '../../features/splash/splash_screen.dart';
 import '../services/di.dart';
@@ -21,6 +23,8 @@ class AppRoutes {
   static const String seeAll = '/seeAll';
   static const String addIngredients = '/addIngredients';
   static const String otp = '/addIngredients';
+  static const String navBar = '/NavBar';
+
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -40,12 +44,12 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const OTPView());
       case verification:
       //return MaterialPageRoute(builder: (_) => VerificationScreen());
-      /*case home:
-      return MaterialPageRoute(builder: (_) =>  BlocProvider(
-        create: (_) => getIt<HomeCubit>(),child: HomePage(),));
+      // case home:
+      // return MaterialPageRoute(builder: (_) =>  BlocProvider(
+      //   create: (_) => getIt<HomeCubit>(),child: HomePage(),));
       case navBar:
       return MaterialPageRoute(builder: (_) =>  BlocProvider(
-        create: (context) => getIt<NavBarCubit>(),child: NavBarPage(),));*/
+        create: (context) => getIt<NavBarCubit>(),child: NavBarPage(),));
       case favorites:
       //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:
