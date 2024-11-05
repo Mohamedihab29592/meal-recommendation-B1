@@ -13,8 +13,8 @@ class NavBarPage extends StatelessWidget {
   // Main pages list
   List<Widget> pages = [
     HomePage(),
-    FavoritesView(),
-    Center(child: Text("profile")),
+    const FavoritesView(),
+    const Center(child: Text("profile")),
   ];
 
   AppColors appcolor = AppColors();

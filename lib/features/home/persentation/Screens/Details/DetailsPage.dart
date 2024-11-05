@@ -12,7 +12,7 @@ import '../../../../../core/utiles/assets.dart';
 import 'DirectionScreen.dart';
 
 class DetailsPage extends StatefulWidget {
-  DetailsPage({Key? key}) : super(key: key);
+  const DetailsPage({Key? key}) : super(key: key);
 
   @override
   _DetailsPageState createState() => _DetailsPageState();
@@ -44,7 +44,7 @@ class _DetailsPageState extends State<DetailsPage> with SingleTickerProviderStat
         body: BlocBuilder<DetailsCubit, DetailsState>(
           builder: (context, state) {
             if (state is IsLoadingDetailsState) {
-              return Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator());
             } else if (state is SucessState) {
               final recipe = BlocProvider.of<DetailsCubit>(context).dataref.first; // Access recipe data here
               return SafeArea(
@@ -60,7 +60,7 @@ class _DetailsPageState extends State<DetailsPage> with SingleTickerProviderStat
 
                     // Image
                     Container(
-                      margin: EdgeInsets.only(top: 20.0),
+                      margin: const EdgeInsets.only(top: 20.0),
                       height: screenSize.height * 0.25, // Responsive height
                       width: double.infinity,
                       decoration: BoxDecoration(
@@ -73,7 +73,7 @@ class _DetailsPageState extends State<DetailsPage> with SingleTickerProviderStat
 
                     // Details
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16.0), // Padding for the text
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Padding for the text
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [

@@ -41,8 +41,8 @@ class AddRecipes extends StatelessWidget {
 
     return Scaffold(
         body: Container(
-          padding: EdgeInsets.only(top: 10, left: 10, right: 10),
-          decoration: BoxDecoration(
+          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+          decoration: const BoxDecoration(
             color: Colors.black38,
             image: DecorationImage(
               image: AssetImage("${Assets.authLayoutFoodImage}"),
@@ -53,7 +53,7 @@ class AddRecipes extends StatelessWidget {
             children: [
               //appbar
               CustomeAppbar(leftImage: Assets.icBack,rightImage: Assets.gemini,ontapleft: (){Navigator.of(context).pop();},ontapright: (){},),
-            SizedBox(height: 35,),
+            const SizedBox(height: 35,),
               //upload image
               BlocConsumer<ImageCubit, ImagesState>(
                 listener: (context, state) {
@@ -67,7 +67,7 @@ class AddRecipes extends StatelessWidget {
                   return loading == false
                       ? CircleAvatar(
                     backgroundImage: BlocProvider.of<ImageCubit>(context).urlimage == null
-                        ? AssetImage("${Assets.icSearch}")
+                        ? const AssetImage("${Assets.icSearch}")
                         : NetworkImage("${BlocProvider.of<ImageCubit>(context).urlimage}"),
                     backgroundColor: Colors.black,
                     radius: screenSize.width < 600 ? 40 : 50,
@@ -78,7 +78,7 @@ class AddRecipes extends StatelessWidget {
                       icon: Icon(Icons.camera_alt_outlined, color: Colors.white),
                     ),
                   )
-                      : CircularProgressIndicator();
+                      : const CircularProgressIndicator();
                 },
               ),
               SizedBox(height: 10),
@@ -192,13 +192,13 @@ class AddRecipes extends StatelessWidget {
                     secoundtStep: secoundStep.text.trim(),
                   );
                 },
-                child: Text(
-                  "Add Ingredients",
-                  style: TextStyle(color: Colors.white, fontSize: screenSize.width < 600 ? 15 : 20),
-                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
                   padding: EdgeInsets.all(screenSize.width < 600 ? 15 : 18),
+                ),
+                child: Text(
+                  "Add Ingredients",
+                  style: TextStyle(color: Colors.white, fontSize: screenSize.width < 600 ? 15 : 20),
                 ),
               ),
             ],

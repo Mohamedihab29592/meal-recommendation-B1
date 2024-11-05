@@ -32,6 +32,9 @@ import '../../features/favorites/domain/repository/favorites_repository.dart';
 import '../../features/favorites/domain/usecases/delete_favorite_use_case.dart';
 import '../../features/favorites/domain/usecases/get_all_favorites_use_case.dart';
 import '../../features/favorites/domain/usecases/save_favorite_use_case.dart';
+import '../../features/home/persentation/Cubits/AddRecipesCubit/ImageCubit.dart';
+import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
+import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
 
 
@@ -112,12 +115,12 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
     submitOTPUseCase: getIt<SubmitOTPUseCase>(),
   ));
   //  HomeCubit
-  // getIt.registerFactory(() => HomeCubit());
+   getIt.registerFactory(() => HomeCubit());
   //  NavBar
   getIt.registerFactory(() => NavBarCubit());
   //  Add Ingrediants
-  // getIt.registerFactory(() => ImageCubit());
+  getIt.registerFactory(() => ImageCubit());
   //detals
-  // getIt.registerFactory(() => DetailsCubit());
+   getIt.registerFactory(() => DetailsCubit());
 
 }
