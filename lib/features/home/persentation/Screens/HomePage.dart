@@ -4,14 +4,12 @@ import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/features/home/data/data_source/data_source.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Screens/Details/DetailsPage.dart';
 import '../../../../core/components/CustomeTextRow.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/Custome_recipes_card.dart';
 import '../../../../core/utiles/assets.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
-import 'AddRecipes.dart';
 
 class HomePage extends StatelessWidget {
   final Assets asset = Assets();
@@ -27,7 +25,8 @@ class HomePage extends StatelessWidget {
       create: (context) => HomeCubit()..getdata(),
       child: Scaffold(
         body: Padding(
-          padding: EdgeInsets.all(screenSize.width * 0.025), // Responsive padding
+          padding: EdgeInsets.all(screenSize.width * 0.025),
+          // Responsive padding
           child: SafeArea(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
@@ -39,7 +38,8 @@ class HomePage extends StatelessWidget {
                   leftImage: "${Assets.icProfileMenu}",
                   rightImage: "${Assets.icNotification}",
                 ),
-                SizedBox(height: screenSize.height * 0.05), // Responsive spacing
+                SizedBox(height: screenSize.height * 0.05),
+                // Responsive spacing
 
                 // Search
                 TextFormField(
@@ -49,28 +49,36 @@ class HomePage extends StatelessWidget {
                     hintText: "Search Recipes",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(color: Colors.black, width: 1),
+                      borderSide: const BorderSide(color: Colors.black, width: 1),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: BorderSide(color: Colors.black, width: 1),
+                      borderSide: const BorderSide(color: Colors.black, width: 1),
                     ),
-                    suffixIcon: Image.asset("${Assets.icFilter}", color: Colors.black, height: 25),
-                    prefixIcon: Image.asset("${Assets.icSearch}", color: Colors.black, height: 25),
+                    suffixIcon: Image.asset("${Assets.icFilter}",
+                        color: Colors.black, height: 25),
+                    prefixIcon: Image.asset("${Assets.icSearch}",
+                        color: Colors.black, height: 25),
                   ),
                 ),
 
                 // Add Ingredients Button
-                SizedBox(height: screenSize.height * 0.02), // Responsive spacing
+                SizedBox(height: screenSize.height * 0.02),
+                // Responsive spacing
                 ElevatedButton(
                   onPressed: () {
-                    Navigator.of(context).push(MaterialPageRoute(builder: (context) => AddRecipes()));
+                    Navigator.of(context).pushNamed(AppRoutes.addRecipes);
                   },
+                  style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary),
                   child: Text(
                     "Add Your Ingredients",
-                    style: TextStyle(color: Colors.white, fontSize: screenSize.width < 600 ? 12 : 16), // Responsive font size
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: screenSize.width < 600
+                            ? 12
+                            : 16), // Responsive font size
                   ),
-                  style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
                 ),
 
                 // Top Recipes & View All
@@ -80,25 +88,35 @@ class HomePage extends StatelessWidget {
                 BlocBuilder<HomeCubit, HomeState>(
                   builder: (context, state) {
                     if (state is IsLoadingHome) {
-                      return Center(child: CircularProgressIndicator());
+                      return const Center(child: CircularProgressIndicator());
                     } else if (state is SuccessState) {
-                      return Container(
+                      return SizedBox(
                         height: screenSize.height * 0.45, // Responsive height
                         child: ListView.builder(
-                          itemCount: BlocProvider.of<HomeCubit>(context).dataa.length,
+                          itemCount:
+                              BlocProvider.of<HomeCubit>(context).dataa.length,
                           itemBuilder: (context, index) => InkWell(
                             onTap: () {
-                              BlocProvider.of<DetailsCubit>(context).getDetailsData(context);
-                              BlocProvider.of<DetailsCubit>(context).reff = BlocProvider.of<HomeCubit>(context).dataa[index]['typeofmeal'];
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailsPage()));
+                              BlocProvider.of<DetailsCubit>(context)
+                                  .getDetailsData(context);
+                              BlocProvider.of<DetailsCubit>(context).reff =
+                                  BlocProvider.of<HomeCubit>(context)
+                                      .dataa[index]['typeofmeal'];
+                              Navigator.of(context)
+                                  .pushNamed(AppRoutes.detailsPage);
                             },
                             child: CustomeRecipesCard(
                               ontapFav: () {},
-                              firsttext: "${BlocProvider.of<HomeCubit>(context).dataa[index]["typeofmeal"]}",
-                              ingrediantes: "${BlocProvider.of<HomeCubit>(context).dataa[index]["NOingrediantes"]} ingredients",
-                              time: "${BlocProvider.of<HomeCubit>(context).dataa[index]["time"]} min",
-                              middleText: "${BlocProvider.of<HomeCubit>(context).dataa[index]["mealName"]}",
-                              image: "${BlocProvider.of<HomeCubit>(context).dataa[index]["image"]}",
+                              firsttext:
+                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["typeofmeal"]}",
+                              ingrediantes:
+                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["NOingrediantes"]} ingredients",
+                              time:
+                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["time"]} min",
+                              middleText:
+                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["mealName"]}",
+                              image:
+                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["image"]}",
                             ),
                           ),
                         ),

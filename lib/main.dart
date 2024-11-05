@@ -38,19 +38,12 @@ class MealApp extends StatelessWidget {
       builder: (context) =>ScreenUtilInit(
         designSize: const Size(375, 812),
         minTextAdapt: true,
-          child: MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (context) => HomeCubit(),),
-              BlocProvider(create: (context) => ImageCubit(),),
-              BlocProvider(create: (context) => DetailsCubit(),),
-            ],
-            child: MaterialApp(
-              title: 'Meal - Recommendation',
-              debugShowCheckedModeBanner: false,
-              theme: AppThemes.lightTheme,
-              initialRoute: AppRoutes.splash,
-              onGenerateRoute: AppRoutes.generateRoute,
-            ),
+          child: MaterialApp(
+            title: 'Meal - Recommendation',
+            debugShowCheckedModeBanner: false,
+            theme: AppThemes.lightTheme,
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: AppRoutes.generateRoute,
           ),
       ),
     );
