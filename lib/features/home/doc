@@ -1,0 +1,22 @@
+Home Page : it's main screen that include various pages that user can moving between them using NavBar
+HOme Page Include :
+    three features :
+        - NavBar Between three screens (Main Home,Fav Page ,Profile Screen)
+        - user can search about any meals provided in the app
+        - user can add new recipes
+        - Details Page
+
+- used firebase database to store describtion about meals
+- use media query to make screen responsive for many devices
+- use cubit to change state the screen
+- used device preview package to test the screens in various version of devices
+
+Vedio about Onboarding & HomeScreen :
+https://drive.google.com/drive/folders/1dr5RLR4vUC-LoV0YGywRnquq8fQbgT73?usp=drive_link
+
+Details Page :
+it describe details about meals like :
+            - summary about meal
+            - Nutrations of the meal
+            - ingrediants of meal
+            - How this meal will do

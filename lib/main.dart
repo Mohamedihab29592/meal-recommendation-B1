@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
-import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/gemini_recipe.dart';
+import 'features/favorites/data/models/favorites.dart';
+import 'features/home/persentation/Cubits/AddRecipesCubit/ImageCubit.dart';
+import 'features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
+import 'features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import 'firebase_options.dart';
 
 
@@ -15,7 +18,11 @@ void main() async {
   await ScreenUtil.ensureScreenSize();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,);
-await setup();
+  await Hive.initFlutter();
+  Hive.registerAdapter(FavoritesAdapter());
+  final favoriteBox = await Hive.openBox<Favorites>('favorites');
+
+  await setup(favoriteBox);
   runApp(const MealApp());
 }
 
@@ -24,17 +31,18 @@ class MealApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(375, 812),
-      minTextAdapt: true,
-        child: MaterialApp(
-          title: 'Meal - Recommendation',
-          debugShowCheckedModeBanner: false,
-          theme: AppThemes.lightTheme,
-          home: const GeminiRecipePage(),
-          /*initialRoute: AppRoutes.splash,
-          onGenerateRoute: AppRoutes.generateRoute,*/
-        ),
+    return DevicePreview(
+      builder: (context) =>ScreenUtilInit(
+        designSize: const Size(375, 812),
+        minTextAdapt: true,
+          child: MaterialApp(
+            title: 'Meal - Recommendation',
+            debugShowCheckedModeBanner: false,
+            theme: AppThemes.lightTheme,
+            initialRoute: AppRoutes.splash,
+            onGenerateRoute: AppRoutes.generateRoute,
+          ),
+      ),
     );
   }
 }

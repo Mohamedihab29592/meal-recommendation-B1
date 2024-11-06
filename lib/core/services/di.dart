@@ -10,14 +10,12 @@ import '../../features/auth/login/domain/use_cases/login_with_email_use_case.dar
 import '../../features/auth/login/domain/use_cases/login_with_google_use_case.dart';
 import '../../features/auth/login/domain/use_cases/logout_use_case.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
-import '../../features/gemini_integrate/data/RecipeRepository.dart';
-import '../../features/gemini_integrate/domain/FetchRecipesUseCase.dart';
-import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
-import 'GeminiApiService.dart';
-import 'RecipeApiService.dart';
 
 final getIt = GetIt.instance;
 
+Future<void> setup(Box<Favorites> favoriteBox) async {
+  // Core dependencies
+  getIt.registerLazySingleton(() => FirebaseFirestore.instance);
 Future<void> setup() async {
   const apiGeminiKey = "AIzaSyAKoyYu10J806FFFA7n2KEO7w3hChyL_Pk";
   const spoonacularApiKey = "4dfcf4986aee47f78776848664336a9c";
@@ -26,29 +24,83 @@ Future<void> setup() async {
   getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
   getIt.registerLazySingleton(() => GoogleSignIn());
-  getIt.registerLazySingleton(() => secureFlutter);
-// Data Sources
-  getIt.registerLazySingleton<AuthRemoteDataSource>(
-          () => AuthRemoteDataSource(getIt(), getIt(),getIt()));
+  getIt.registerLazySingleton(() => const FlutterSecureStorage());
 
-  // Repository
+  // Data Sources
+  getIt.registerLazySingleton<BaseOTPRemoteDataSource>(() => RemoteDataSource());
+  getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
+        () => RegisterRemoteDataSourceImpl(getIt(), getIt()),
+  );
+  getIt.registerLazySingleton<RegisterFirebaseDataSourceImpl>(
+        () => RegisterFirebaseDataSourceImpl(),
+  );
+
+  // Registering AuthRemoteDataSource to resolve the missing type
+  getIt.registerLazySingleton<AuthRemoteDataSource>(
+        () => AuthRemoteDataSource(getIt(),getIt(),getIt()),
+  );
+
+  // Repositories
+  getIt.registerLazySingleton<RegisterRepository>(
+        () => RegisterRepositoryImpl(
+      getIt<RegisterRemoteDataSourceImpl>(),
+      getIt<RegisterFirebaseDataSourceImpl>(),
+    ),
+  );
   getIt.registerLazySingleton<AuthRepository>(
-          () => AuthRepositoryImpl(getIt()));
+        () => AuthRepositoryImpl(getIt()),
+  );
+  getIt.registerLazySingleton<FavoritesRepository>(
+        () => FavoritesRepositoryImpl(favoriteBox),
+  );
+  getIt.registerLazySingleton<OTPRepository>(
+        () => OTPRepository(getIt()),
+  );
 
   // Use Cases
-  getIt.registerLazySingleton(
-          () => LoginWithEmailUseCase(getIt<AuthRepository>()));
-
-  getIt.registerLazySingleton(
-          () => LoginWithGoogleUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(() => RegisterWithEmailUseCase(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton(() => RegisterWithGoogleUseCase(getIt<RegisterRepository>()));
+  getIt.registerLazySingleton(() => SaveUserDataInFirebaseUseCase(getIt()));
+  getIt.registerLazySingleton(() => LoginWithEmailUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(() => LoginWithGoogleUseCase(getIt<AuthRepository>()));
   getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
+  getIt.registerLazySingleton(() => SaveFavoriteUseCase(getIt()));
+  getIt.registerLazySingleton(() => DeleteFavoriteUseCase(getIt()));
+  getIt.registerLazySingleton(() => GetAllFavoritesUseCase(getIt()));
+  getIt.registerLazySingleton(() => PhoneAuthenticationUseCase(getIt()));
+  getIt.registerLazySingleton(() => SubmitOTPUseCase(getIt()));
 
-  // Bloc
+  // Blocs
   getIt.registerFactory(() => AuthBloc(
     loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
     loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
     logoutUseCase: getIt<LogoutUseCase>(),
   ));
+
+  getIt.registerFactory(() => RegisterBloc(
+    registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
+    registerWithGoogleUseCase: getIt<RegisterWithGoogleUseCase>(),
+    saveUserUseCase: getIt<SaveUserDataInFirebaseUseCase>(),
+  ));
+
+  getIt.registerFactory(() => FavoritesBloc(
+    getIt<SaveFavoriteUseCase>(),
+    getIt<DeleteFavoriteUseCase>(),
+    getIt<GetAllFavoritesUseCase>(),
+  ));
+
+  getIt.registerFactory(() => PhoneAuthBloc(
+    phoneAuthenticationUseCase: getIt<PhoneAuthenticationUseCase>(),
+    submitOTPUseCase: getIt<SubmitOTPUseCase>(),
+  ));
+  //  HomeCubit
+   getIt.registerFactory(() => HomeCubit());
+  //  NavBar
+  getIt.registerFactory(() => NavBarCubit());
+  //  Add Ingrediants
+  getIt.registerFactory(() => ImageCubit());
+  //detals
+   getIt.registerFactory(() => DetailsCubit());
 
 
   // Register services
@@ -66,4 +118,6 @@ Future<void> setup() async {
 
   // Register BLoC
   getIt.registerFactory<RecipeBloc>(() => RecipeBloc(fetchRecipesUseCase: getIt<FetchRecipesUseCase>()));
+}
+
 }
