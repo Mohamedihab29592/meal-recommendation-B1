@@ -65,11 +65,11 @@ class FirebaseUserRepository implements UserRepository {
   }) async {
     try {
       String filePath = 'profile_images/${DateTime.now()}.png';
-      final imageUrl = await FirebaseStorage.instance.ref(filePath).putFile(image);
+      final imageUrl =
+          await FirebaseStorage.instance.ref(filePath).putFile(image);
       String downloadUrl = await imageUrl.ref.getDownloadURL();
-
-      if (oldImage != null && oldImage.isNotEmpty) {
-        final ref = FirebaseStorage.instance.refFromURL(oldImage);
+      if (oldImage != '') {
+        final ref = FirebaseStorage.instance.refFromURL(oldImage!);
         await ref.delete();
       }
       return Right(downloadUrl);
@@ -78,9 +78,7 @@ class FirebaseUserRepository implements UserRepository {
     } on SocketException {
       return Left(
         FirebaseErrorModel(
-            message: 'Network error: No Internet connection.',
-            errorCode: -1
-        ),
+            message: 'Network error: No Internet connection.', errorCode: -1),
       );
     } on TimeoutException {
       return Left(

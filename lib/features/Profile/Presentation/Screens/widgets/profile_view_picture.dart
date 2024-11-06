@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:badges/badges.dart' as badges;
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/assets.dart';
@@ -29,7 +28,7 @@ class _ProfileViewPictureState extends State<ProfileViewPicture> {
             if (state is UploadUserImageFailure) {}
 
             return CircleAvatar(
-              radius: 60.r,
+              radius: MediaQuery.of(context).size.height * 0.075,
               backgroundColor: const Color(0xffD9D9D9),
               child: (state is UserProfileLoaded &&
                       state.user.profilePhotoUrl != '')
@@ -52,21 +51,22 @@ class _ProfileViewPictureState extends State<ProfileViewPicture> {
                         )
                       : Icon(
                           Icons.person,
-                          size: 50.sp,
+                          size: MediaQuery.of(context).size.height * 0.08,
                           color: Colors.white.withOpacity(0.8),
                         ),
             );
           },
         ),
         Positioned(
-          bottom: -10.sp,
-          right: -10.sp,
+          bottom: -MediaQuery.of(context).size.height * 0.013,
+          right: -MediaQuery.of(context).size.height * 0.013,
           child: badges.Badge(
             badgeAnimation: const badges.BadgeAnimation.fade(),
             badgeStyle: const badges.BadgeStyle(badgeColor: Colors.transparent),
             badgeContent: IconButton.filled(
               style: IconButton.styleFrom(
-                  fixedSize: Size(50.sp, 50.sp),
+                  fixedSize: Size(MediaQuery.of(context).size.height * 0.065,
+                      MediaQuery.of(context).size.height * 0.065),
                   backgroundColor: AppColors.primary),
               onPressed: () async {
                 image = await _selectImageFromGallery();
@@ -75,7 +75,7 @@ class _ProfileViewPictureState extends State<ProfileViewPicture> {
 
                 setState(() {});
               },
-              iconSize: 26.sp,
+              iconSize: MediaQuery.of(context).size.height * 0.026,
               icon: Image.asset(
                 Assets.icEdit,
               ),

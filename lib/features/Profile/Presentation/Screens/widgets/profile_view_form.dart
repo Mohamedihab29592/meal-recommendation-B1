@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/profile_button.dart';
 import 'package:meal_recommendation_b1/core/services/form_input_validation.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
@@ -57,7 +56,6 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
             updateBlocProvider(context);
             BlocProvider.of<UserProfileBloc>(context).saveLocallyProfileImage =
                 null;
-            customSnackBar(context, message: "Changes Saved");
           } else if (state is UserProfileUpdated) {
             customSnackBar(context, message: "Changes Saved");
           }
@@ -116,7 +114,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
                                       .saveLocallyProfileImage!),
                         );
                       }
-                      formKey.currentState!.save;
+                      formKey.currentState!.save();
                       updateBlocProvider(context);
                     }
                   },
@@ -141,7 +139,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
         content: Text(
           message,
           style: TextStyle(
-            fontSize: 18.sp,
+            fontSize: MediaQuery.of(context).size.height * 0.024,
             color: AppColors.white,
           ),
         ),
@@ -151,12 +149,9 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
 
   void updateBlocProvider(BuildContext context) {
     BlocProvider.of<UserProfileBloc>(context).add(
-      LoadUserProfile('WT4NU9fy0uQc6nQyno6j3VqbE8G2'),
-    );
-    BlocProvider.of<UserProfileBloc>(context).add(
       UpdateUserProfile(
         User(
-          id: 'WT4NU9fy0uQc6nQyno6j3VqbE8G2',
+          id: '9uXQoT0sMkfqwhqevcJpfhJSEbm1',
           name: nameTextEditingController.text,
           email: emailTextEditingController.text,
           phone: phoneTextEditingController.text,
@@ -179,7 +174,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
     emailTextEditingController = TextEditingController();
     phoneTextEditingController = TextEditingController();
     BlocProvider.of<UserProfileBloc>(context).add(
-      LoadUserProfile('WT4NU9fy0uQc6nQyno6j3VqbE8G2'),
+      LoadUserProfile('9uXQoT0sMkfqwhqevcJpfhJSEbm1'),
     );
   }
 }
