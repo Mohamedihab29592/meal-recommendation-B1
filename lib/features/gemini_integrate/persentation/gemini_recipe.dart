@@ -9,11 +9,8 @@ class GeminiRecipePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<RecipeBloc>(),
-      child: Scaffold(
-        body:  RecipeSearchScreen(), // List of Recipes
-      ),
+    return Scaffold(
+      body:  RecipeSearchScreen(), // List of Recipes
     );
   }
 }

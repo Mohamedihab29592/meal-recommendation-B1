@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/gemini_recipe.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/AddRecipes.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/Details/DetailsPage.dart';
@@ -32,6 +34,7 @@ class AppRoutes {
   static const String navBar = '/NavBar';
   static const String detailsPage = '/detailsPage';
   static const String addRecipes = '/addRecipes';
+  static const String geminiRecipe = '/geminiRecipe';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     switch (settings.name) {
@@ -49,8 +52,11 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const RegisterScreen());
       case otp:
         return MaterialPageRoute(builder: (_) => const OTPView());
-      case verification:
-      //return MaterialPageRoute(builder: (_) => VerificationScreen());
+      case geminiRecipe:
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                create: (context) => getIt<RecipeBloc>(),
+                child: const GeminiRecipePage()));
       case home:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
@@ -71,8 +77,7 @@ class AppRoutes {
       case addRecipes:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                create: (context) => getIt<ImageCubit>(),
-                child: AddRecipes()));
+                create: (context) => getIt<ImageCubit>(), child: AddRecipes()));
       case favorites:
       //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:
