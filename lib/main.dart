@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/gemini_recipe.dart';
 import 'firebase_options.dart';
 
 
@@ -30,8 +31,9 @@ class MealApp extends StatelessWidget {
           title: 'Meal - Recommendation',
           debugShowCheckedModeBanner: false,
           theme: AppThemes.lightTheme,
-          initialRoute: AppRoutes.splash,
-          onGenerateRoute: AppRoutes.generateRoute,
+          home: const GeminiRecipe(),
+          /*initialRoute: AppRoutes.splash,
+          onGenerateRoute: AppRoutes.generateRoute,*/
         ),
     );
   }

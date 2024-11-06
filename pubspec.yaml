@@ -47,7 +47,8 @@ dependencies:
   geolocator: ^13.0.1 # Location services
   google_maps_flutter: ^2.9.0 # Google Maps integration (if needed)
   flutter_native_splash: ^2.4.2 #splash
-
+  http: ^1.2.2
+  dio: ^5.7.0
   pexels_client: ^2.0.0 #An unofficial dart wrapper for the [Pexels API](https://www.pexels.com/api/).
   google_generative_ai: ^0.4.6 #The Google AI Dart SDK enables developers to use Google's state-of-the-art generative AI models (like Gemini).
   # The following adds the Cupertino Icons font to your application.
