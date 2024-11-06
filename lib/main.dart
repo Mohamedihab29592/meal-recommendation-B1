@@ -31,7 +31,7 @@ class MealApp extends StatelessWidget {
           title: 'Meal - Recommendation',
           debugShowCheckedModeBanner: false,
           theme: AppThemes.lightTheme,
-          home: const GeminiRecipe(),
+          home: const GeminiRecipePage(),
           /*initialRoute: AppRoutes.splash,
           onGenerateRoute: AppRoutes.generateRoute,*/
         ),
