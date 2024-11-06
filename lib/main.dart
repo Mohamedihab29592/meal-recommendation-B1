@@ -1,14 +1,11 @@
+import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'features/favorites/data/models/favorites.dart';
-import 'features/home/persentation/Cubits/AddRecipesCubit/ImageCubit.dart';
-import 'features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
-import 'features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import 'firebase_options.dart';
-
-
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
 
