@@ -4,6 +4,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import '../../features/Profile/Presentation/bloc/bloc.dart';
+import '../../features/Profile/data/Model/UserModel.dart';
+import '../../features/Profile/data/dataSource/local/LocalData.dart';
+import '../../features/Profile/data/repo_impl/repo_impl.dart';
+import '../../features/Profile/domain/repo/repo.dart';
+import '../../features/Profile/domain/usecase/editUser.dart';
+import '../../features/Profile/domain/usecase/getUser.dart';
+import '../../features/Profile/domain/usecase/update_user_image_use_case.dart';
 import '../../features/auth/OTP/data/data_source/base_remote_data_source.dart';
 import '../../features/auth/OTP/data/data_source/remote_data_source.dart';
 import '../../features/auth/OTP/data/repository/repository.dart';
@@ -57,13 +65,15 @@ import 'RecipeApiService.dart';
 final getIt = GetIt.instance;
 
 Future<void> setup(Box<Favorites> favoriteBox) async {
-  // Core dependencies
-  getIt.registerLazySingleton(() => FirebaseFirestore.instance);
-Future<void> setup() async {
+
   const apiGeminiKey = "AIzaSyAKoyYu10J806FFFA7n2KEO7w3hChyL_Pk";
   const spoonacularApiKey = "4dfcf4986aee47f78776848664336a9c";
+  if (!Hive.isAdapterRegistered(32)) {
+    Hive.registerAdapter(UserModelAdapter());
+  }
+  Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');
 
-  const secureFlutter =  FlutterSecureStorage();
+  getIt.registerLazySingleton<Box<UserModel>>(() => userBox);
   getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
   getIt.registerLazySingleton(() => FirebaseAuth.instance);
   getIt.registerLazySingleton(() => GoogleSignIn());
@@ -145,7 +155,6 @@ Future<void> setup() async {
         updateUserProfile: getIt(),
       ),
     );
-  }
 
   // Blocs
   getIt.registerFactory(() => AuthBloc(
@@ -197,4 +206,3 @@ Future<void> setup() async {
   getIt.registerFactory<RecipeBloc>(() => RecipeBloc(fetchRecipesUseCase: getIt<FetchRecipesUseCase>()));
 }
 
-}
