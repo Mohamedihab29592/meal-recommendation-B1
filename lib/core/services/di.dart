@@ -51,12 +51,11 @@ final getIt = GetIt.instance;
 
 Future<void> setup() async {
   await Hive.initFlutter();
-  Hive.registerAdapter(UserModelAdapter());
+ // Hive.registerAdapter(UserModelAdapter());
   final userBox = await Hive.openBox<UserModel>('userBox');
 
   getIt.registerSingleton<Box<UserModel>>(userBox);
 
-  final sharedPreferences = await SharedPreferences.getInstance();
   Future<void> setup(Box<Favorites> favoriteBox) async {
     // Core dependencies
     getIt.registerLazySingleton(() => FirebaseFirestore.instance);
