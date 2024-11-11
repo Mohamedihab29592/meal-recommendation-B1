@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/profile_screen.dart';
 import 'package:meal_recommendation_b1/features/favorites/presentaion/favorites_view.dart';
 import '../../../../core/services/di.dart';
 import '../../../../core/utiles/app_colors.dart';
 import '../../../../core/utiles/assets.dart';
+import '../../../Profile/Presentation/bloc/bloc.dart';
 import '../Cubits/DetailsCubit/DetailsCubit.dart';
 import '../Cubits/NavBarCubits/NavBarCubit.dart';
 import '../Cubits/NavBarCubits/NavBarState.dart';
@@ -21,8 +23,10 @@ class NavBarPage extends StatelessWidget {
       child: HomePage(),
     ),
     const FavoritesView(),
-    const Center(child: Text("profile")),
-  ];
+    BlocProvider(
+      create: (context) => getIt<UserProfileBloc>(),
+      child: const ProfileScreen(),
+    ),  ];
 
   AppColors appcolor = AppColors();
   Assets asset = Assets();

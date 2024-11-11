@@ -3,6 +3,17 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hive/hive.dart';
+import 'package:hive_flutter/adapters.dart';
+import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/bloc.dart';
+import 'package:meal_recommendation_b1/features/Profile/data/repo_impl/repo_impl.dart';
+import 'package:meal_recommendation_b1/features/Profile/domain/repo/repo.dart';
+import 'package:meal_recommendation_b1/features/Profile/domain/usecase/editUser.dart';
+import 'package:meal_recommendation_b1/features/Profile/domain/usecase/getUser.dart';
+import 'package:meal_recommendation_b1/features/Profile/domain/usecase/update_user_image_use_case.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/Profile/data/Model/UserModel.dart';
+import '../../features/Profile/data/dataSource/local/LocalData.dart';
 import 'package:meal_recommendation_b1/features/favorites/presentaion/bloc/favorites_bloc.dart';
 import '../../features/auth/OTP/data/data_source/base_remote_data_source.dart';
 import '../../features/auth/OTP/data/data_source/remote_data_source.dart';
@@ -21,7 +32,6 @@ import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/l
 import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/register_with_email_use_case.dart';
 import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
-import 'package:hive/hive.dart';
 import '../../features/auth/OTP/data/repository/repository.dart';
 import '../../features/auth/OTP/domin/use_case/phone_authentication_use_case.dart';
 import '../../features/auth/OTP/domin/use_case/submit_otp_use_case.dart';
@@ -37,90 +47,131 @@ import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
 
-
 final getIt = GetIt.instance;
 
-Future<void> setup(Box<Favorites> favoriteBox) async {
-  // Core dependencies
-  getIt.registerLazySingleton(() => FirebaseFirestore.instance);
-  getIt.registerLazySingleton(() => FirebaseAuth.instance);
-  getIt.registerLazySingleton(() => GoogleSignIn());
-  getIt.registerLazySingleton(() => const FlutterSecureStorage());
+Future<void> setup() async {
+  await Hive.initFlutter();
+ // Hive.registerAdapter(UserModelAdapter());
+  final userBox = await Hive.openBox<UserModel>('userBox');
 
-  // Data Sources
-  getIt.registerLazySingleton<BaseOTPRemoteDataSource>(() => RemoteDataSource());
-  getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
-        () => RegisterRemoteDataSourceImpl(getIt(), getIt()),
-  );
-  getIt.registerLazySingleton<RegisterFirebaseDataSourceImpl>(
-        () => RegisterFirebaseDataSourceImpl(),
-  );
+  getIt.registerSingleton<Box<UserModel>>(userBox);
 
-  // Registering AuthRemoteDataSource to resolve the missing type
-  getIt.registerLazySingleton<AuthRemoteDataSource>(
-        () => AuthRemoteDataSource(getIt(),getIt(),getIt()),
-  );
+  Future<void> setup(Box<Favorites> favoriteBox) async {
+    // Core dependencies
+    getIt.registerLazySingleton(() => FirebaseFirestore.instance);
+    getIt.registerLazySingleton(() => FirebaseAuth.instance);
 
-  // Repositories
-  getIt.registerLazySingleton<RegisterRepository>(
-        () => RegisterRepositoryImpl(
-      getIt<RegisterRemoteDataSourceImpl>(),
-      getIt<RegisterFirebaseDataSourceImpl>(),
-    ),
-  );
-  getIt.registerLazySingleton<AuthRepository>(
-        () => AuthRepositoryImpl(getIt()),
-  );
-  getIt.registerLazySingleton<FavoritesRepository>(
-        () => FavoritesRepositoryImpl(favoriteBox),
-  );
-  getIt.registerLazySingleton<OTPRepository>(
-        () => OTPRepository(getIt()),
-  );
+    getIt.registerLazySingleton(() => FirebaseFirestore.instance);
+    getIt.registerLazySingleton(() => GoogleSignIn());
+    getIt.registerLazySingleton(() => const FlutterSecureStorage());
 
-  // Use Cases
-  getIt.registerLazySingleton(() => RegisterWithEmailUseCase(getIt<RegisterRepository>()));
-  getIt.registerLazySingleton(() => RegisterWithGoogleUseCase(getIt<RegisterRepository>()));
-  getIt.registerLazySingleton(() => SaveUserDataInFirebaseUseCase(getIt()));
-  getIt.registerLazySingleton(() => LoginWithEmailUseCase(getIt<AuthRepository>()));
-  getIt.registerLazySingleton(() => LoginWithGoogleUseCase(getIt<AuthRepository>()));
-  getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
-  getIt.registerLazySingleton(() => SaveFavoriteUseCase(getIt()));
-  getIt.registerLazySingleton(() => DeleteFavoriteUseCase(getIt()));
-  getIt.registerLazySingleton(() => GetAllFavoritesUseCase(getIt()));
-  getIt.registerLazySingleton(() => PhoneAuthenticationUseCase(getIt()));
-  getIt.registerLazySingleton(() => SubmitOTPUseCase(getIt()));
+    // Data Sources
+    getIt.registerLazySingleton<BaseOTPRemoteDataSource>(
+        () => RemoteDataSource());
+    getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
+      () => RegisterRemoteDataSourceImpl(getIt(), getIt()),
+    );
+    getIt.registerLazySingleton<RegisterFirebaseDataSourceImpl>(
+      () => RegisterFirebaseDataSourceImpl(),
+    );
+
+    // Registering AuthRemoteDataSource to resolve the missing type
+    getIt.registerLazySingleton<AuthRemoteDataSource>(
+      () => AuthRemoteDataSource(getIt(), getIt(), getIt()),
+    );
+
+    // Repositories
+    getIt.registerLazySingleton<RegisterRepository>(
+      () => RegisterRepositoryImpl(
+        getIt<RegisterRemoteDataSourceImpl>(),
+        getIt<RegisterFirebaseDataSourceImpl>(),
+      ),
+    );
+    getIt.registerLazySingleton<AuthRepository>(
+      () => AuthRepositoryImpl(getIt()),
+    );
+    getIt.registerLazySingleton<FavoritesRepository>(
+      () => FavoritesRepositoryImpl(favoriteBox),
+    );
+    getIt.registerLazySingleton<OTPRepository>(
+      () => OTPRepository(getIt()),
+    );
+
+    // Use Cases
+    getIt.registerLazySingleton(
+        () => RegisterWithEmailUseCase(getIt<RegisterRepository>()));
+    getIt.registerLazySingleton(
+        () => RegisterWithGoogleUseCase(getIt<RegisterRepository>()));
+    getIt.registerLazySingleton(() => SaveUserDataInFirebaseUseCase(getIt()));
+    getIt.registerLazySingleton(
+        () => LoginWithEmailUseCase(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(
+        () => LoginWithGoogleUseCase(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(() => LogoutUseCase(getIt<AuthRepository>()));
+    getIt.registerLazySingleton(() => SaveFavoriteUseCase(getIt()));
+    getIt.registerLazySingleton(() => DeleteFavoriteUseCase(getIt()));
+    getIt.registerLazySingleton(() => GetAllFavoritesUseCase(getIt()));
+    getIt.registerLazySingleton(() => PhoneAuthenticationUseCase(getIt()));
+    getIt.registerLazySingleton(() => SubmitOTPUseCase(getIt()));
+
+    getIt.registerLazySingleton<HiveLocalUserDataSource>(
+        () => HiveLocalUserDataSource(getIt()));
+    getIt.registerLazySingleton<UserRepository>(
+      () => FirebaseUserRepository(getIt(), getIt()),
+    );
+    getIt.registerLazySingleton<GetUserProfileUseCase>(
+      () => GetUserProfileUseCase(
+        getIt(),
+      ),
+    );
+    getIt.registerLazySingleton<UpdateUserProfileUseCase>(
+      () => UpdateUserProfileUseCase(
+        getIt(),
+      ),
+    );
+    getIt.registerLazySingleton(
+      () => UploadUserProfileImage(
+        userRepository: getIt(),
+      ),
+    );
+    getIt.registerFactory(
+      () => UserProfileBloc(
+        getIt(),
+        getUserProfile: getIt(),
+        updateUserProfile: getIt(),
+      ),
+    );
+  }
 
   // Blocs
   getIt.registerFactory(() => AuthBloc(
-    loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
-    loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
-    logoutUseCase: getIt<LogoutUseCase>(),
-  ));
+        loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
+        loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
+        logoutUseCase: getIt<LogoutUseCase>(),
+      ));
 
   getIt.registerFactory(() => RegisterBloc(
-    registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
-    registerWithGoogleUseCase: getIt<RegisterWithGoogleUseCase>(),
-    saveUserUseCase: getIt<SaveUserDataInFirebaseUseCase>(),
-  ));
+        registerWithEmailUseCase: getIt<RegisterWithEmailUseCase>(),
+        registerWithGoogleUseCase: getIt<RegisterWithGoogleUseCase>(),
+        saveUserUseCase: getIt<SaveUserDataInFirebaseUseCase>(),
+      ));
 
   getIt.registerFactory(() => FavoritesBloc(
-    getIt<SaveFavoriteUseCase>(),
-    getIt<DeleteFavoriteUseCase>(),
-    getIt<GetAllFavoritesUseCase>(),
-  ));
+        getIt<SaveFavoriteUseCase>(),
+        getIt<DeleteFavoriteUseCase>(),
+        getIt<GetAllFavoritesUseCase>(),
+      ));
 
   getIt.registerFactory(() => PhoneAuthBloc(
-    phoneAuthenticationUseCase: getIt<PhoneAuthenticationUseCase>(),
-    submitOTPUseCase: getIt<SubmitOTPUseCase>(),
-  ));
+        phoneAuthenticationUseCase: getIt<PhoneAuthenticationUseCase>(),
+        submitOTPUseCase: getIt<SubmitOTPUseCase>(),
+      ));
   //  HomeCubit
-   getIt.registerFactory(() => HomeCubit());
+  getIt.registerFactory(() => HomeCubit());
   //  NavBar
   getIt.registerFactory(() => NavBarCubit());
   //  Add Ingrediants
   getIt.registerFactory(() => ImageCubit());
   //detals
-   getIt.registerFactory(() => DetailsCubit());
-
+  getIt.registerFactory(() => DetailsCubit());
 }

@@ -37,7 +37,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
     final double height = screenSize.height;
     final double width = screenSize.width;
 
-    return  Scaffold(
+    return Scaffold(
       body: Stack(
         children: [
           // First component in stack (text, circle, points)
@@ -65,7 +65,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
 
           // Third component (logo & image & pageview)
           Padding(
-            padding: EdgeInsets.only(top: height * 0.1), // Top padding relative to screen height
+            padding: EdgeInsets.only(
+                top: height * 0.1), // Top padding relative to screen height
             child: Column(
               children: [
                 // Logo
@@ -77,7 +78,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ),
                 // PageView
                 Container(
-                  margin: EdgeInsets.only(top: height * 0.1), // Margin relative to screen height
+                  margin: EdgeInsets.only(
+                      top: height * 0.1), // Margin relative to screen height
                   height: height * 0.35, // 35% of screen height
                   width: width * 0.7, // 70% of screen width
                   child: PageView.builder(
@@ -107,7 +109,9 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 // Text
                 Text(
                   "Like in a Restaurant but at Home",
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold), // Defined in logical units
+                  style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold), // Defined in logical units
                 ),
                 SizedBox(height: height * 0.03), // 3% of screen height
                 Center(
@@ -126,7 +130,8 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     // Skip
                     TextButton(
                       onPressed: () {
-                        Navigator.pushReplacementNamed(context, AppRoutes.login);
+                        Navigator.pushReplacementNamed(
+                            context, AppRoutes.login);
                       },
                       child: Text(
                         "Skip",
@@ -141,7 +146,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     Row(
                       children: List.generate(
                         images.length,
-                            (index) => AnimatedContainer(
+                        (index) => AnimatedContainer(
                           margin: EdgeInsets.only(right: 10),
                           width: 25, // Fixed width for points
                           height: 10, // Fixed height for points
@@ -159,35 +164,35 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                     // Next text
                     _currentpage != images.length - 1
                         ? TextButton(
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 800),
-                          curve: Curves.decelerate,
-                        );
-                      },
-                      child: Text(
-                        "Next",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    )
+                            onPressed: () {
+                              _pageController.nextPage(
+                                duration: Duration(milliseconds: 800),
+                                curve: Curves.decelerate,
+                              );
+                            },
+                            child: Text(
+                              "Next",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          )
                         : TextButton(
-                      onPressed: () {
-                        Navigator.pushNamed(context, AppRoutes.login);
-                        // Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
-                      },
-                      child: Text(
-                        "Login",
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 15,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
+                            onPressed: () {
+                              Navigator.pushNamed(context, AppRoutes.login);
+                              // Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
+                            },
+                            child: Text(
+                              "Login",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                fontSize: 15,
+                                color: AppColors.primary,
+                              ),
+                            ),
+                          ),
                   ],
                 ),
               ],
@@ -195,7 +200,6 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
           ),
         ],
       ),
-
-);
+    );
   }
 }
