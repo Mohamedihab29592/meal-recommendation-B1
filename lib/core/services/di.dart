@@ -67,7 +67,7 @@ final getIt = GetIt.instance;
 Future<void> setup(Box<Favorites> favoriteBox) async {
 
   const apiGeminiKey = "AIzaSyAKoyYu10J806FFFA7n2KEO7w3hChyL_Pk";
-  const spoonacularApiKey = "4dfcf4986aee47f78776848664336a9c";
+  const pexelsApiKey = "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
   if (!Hive.isAdapterRegistered(32)) {
     Hive.registerAdapter(UserModelAdapter());
   }
@@ -190,7 +190,7 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
 
 
   // Register services
-  getIt.registerLazySingleton<RecipeApiService>(() => RecipeApiService(apiKey: spoonacularApiKey));
+  getIt.registerLazySingleton<RecipeApiService>(() => RecipeApiService(apiKey: pexelsApiKey));
   getIt.registerLazySingleton<GeminiApiService>(() => GeminiApiService(apiKey: apiGeminiKey));
 
   // Register repositories

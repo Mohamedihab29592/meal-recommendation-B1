@@ -14,7 +14,7 @@ class RecipeRepository {
       final geminiResponse = await geminiApiService.fetchRecipeFromGemini(query);
 
       // Check if geminiResponse or recipeData is null
-      if (geminiResponse == null || geminiResponse['name'] == null) {
+      if (geminiResponse['name'] == null) {
         print('No recipe data found from Gemini');
         return [];  // Return an empty list if no recipe data is found
       }
@@ -23,7 +23,7 @@ class RecipeRepository {
       var recipeData = {
         'name': geminiResponse['name'] ?? 'Unknown Dish',
         'description': geminiResponse['description'] ?? 'No description available',
-        'imageUrl': await apiService.fetchRecipeImage(query),  // Get recipe image URL from Spoonacular
+        'imageUrl': await apiService.fetchRecipeImage(query),  // Get recipe image URL from Pexels
         'ingredients': await _getIngredientsWithImages(geminiResponse['ingredients']),
         'instructions': geminiResponse['instructions'] ?? [],
         'nutrition': geminiResponse['nutrition'] ?? {}
@@ -46,7 +46,7 @@ class RecipeRepository {
     for (var ingredient in ingredients) {
       final ingredientName = ingredient['name'] as String;
       final imageUrl = await apiService.fetchIngredientImage(ingredientName);
-      ingredient['imageUrl'] = imageUrl;
+      ingredient['imageUrl'] = imageUrl ?? 'default_image_url'; // Provide a fallback URL if null
       ingredientsWithImages.add(ingredient);
     }
 
