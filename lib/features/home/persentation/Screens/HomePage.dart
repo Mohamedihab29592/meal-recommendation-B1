@@ -38,8 +38,8 @@ class HomePage extends StatelessWidget {
                     context.pushNamed(AppRoutes.geminiRecipe);
                   },
                   ontapright: () {},
-                  leftImage: "${Assets.icProfileMenu}",
-                  rightImage: "${Assets.icNotification}",
+                  leftImage: Assets.icProfileMenu,
+                  rightImage: Assets.icNotification,
                 ),
                 SizedBox(height: screenSize.height * 0.05),
                 // Responsive spacing

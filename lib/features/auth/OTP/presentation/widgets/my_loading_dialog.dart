@@ -4,13 +4,13 @@ import 'package:loading_indicator/loading_indicator.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_strings.dart';
 
-class MyLoadingDialog extends StatefulWidget {
+class MyLoadingOTPDialog extends StatefulWidget {
   static void show(BuildContext context) =>
       showDialog<void>(
         context: context,
         useRootNavigator: false,
         barrierDismissible: false,
-        builder: (_) => const MyLoadingDialog(),
+        builder: (_) => const MyLoadingOTPDialog(),
       ).then((_) => FocusScope.of(context).requestFocus(FocusNode()));
 
   static void hide(BuildContext context) => Navigator.of(context).pop();
@@ -49,13 +49,13 @@ class MyLoadingDialog extends StatefulWidget {
     );
   }
 
-  const MyLoadingDialog({super.key});
+  const MyLoadingOTPDialog({super.key});
 
   @override
-  MyLoadingDialogState createState() => MyLoadingDialogState();
+  MyLoadingOTPDialogState createState() => MyLoadingOTPDialogState();
 }
 
-class MyLoadingDialogState extends State<MyLoadingDialog> {
+class MyLoadingOTPDialogState extends State<MyLoadingOTPDialog> {
   final List<Color> _kDefaultRainbowColors = const [
     AppColors.primary,
   ];

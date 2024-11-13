@@ -5,6 +5,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
 import 'package:meal_recommendation_b1/core/components/show_message.dart';
 import 'package:meal_recommendation_b1/core/components/social_button.dart';
+import 'package:meal_recommendation_b1/features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
+import 'package:meal_recommendation_b1/features/auth/OTP/presentation/phone_bloc/phone_event.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/screens/register/widgets/accepting_terms_check_box.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/screens/register/widgets/register_form.dart';
@@ -33,6 +35,7 @@ class _RegisterScreenBodyState extends State<RegisterScreenBody> {
 
   late TextEditingController confirmPasswordTextEditingController;
   ValueNotifier<bool> acceptingTermsNotifier = ValueNotifier(false);
+
   @override
   void initState() {
     super.initState();
@@ -100,6 +103,11 @@ class _RegisterScreenBodyState extends State<RegisterScreenBody> {
                                 confirmPassword:
                                     confirmPasswordTextEditingController.text,
                               ),
+                            );
+                            BlocProvider.of<PhoneAuthBloc>(context).add(
+                              SubmittedPhoneNumber(
+                                  phoneNumber:
+                                      mobileTextEditingController.text),
                             );
                           } else {
                             ShowMessage.show(
