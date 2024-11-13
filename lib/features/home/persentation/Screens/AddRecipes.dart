@@ -99,6 +99,7 @@ class AddRecipes extends StatelessWidget {
                 hintText: 'Type Of Meal',
                 inputType: TextInputType.text,
                 controller: typeMeal,
+
               ),
               SizedBox(height: 15),
               CustomTextField(validator: (value) {},
