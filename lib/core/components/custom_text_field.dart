@@ -51,7 +51,7 @@ class CustomTextFieldState extends State<CustomTextField> {
               width: 30.sp,
               child: Center(
                 child: Image.asset(
-                  widget.prefixIcon??"",
+                  widget.prefixIcon?? Assets.icSplash,
                   height: 30.sp,
                   width: 30.sp,
                   color: Colors.white,

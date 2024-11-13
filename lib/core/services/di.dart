@@ -4,19 +4,20 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
-import 'package:hive_flutter/adapters.dart';
-import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/bloc.dart';
-import 'package:meal_recommendation_b1/features/Profile/data/repo_impl/repo_impl.dart';
-import 'package:meal_recommendation_b1/features/Profile/domain/repo/repo.dart';
-import 'package:meal_recommendation_b1/features/Profile/domain/usecase/editUser.dart';
-import 'package:meal_recommendation_b1/features/Profile/domain/usecase/getUser.dart';
-import 'package:meal_recommendation_b1/features/Profile/domain/usecase/update_user_image_use_case.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import '../../features/Profile/Presentation/bloc/bloc.dart';
 import '../../features/Profile/data/Model/UserModel.dart';
 import '../../features/Profile/data/dataSource/local/LocalData.dart';
-import 'package:meal_recommendation_b1/features/favorites/presentaion/bloc/favorites_bloc.dart';
+import '../../features/Profile/data/repo_impl/repo_impl.dart';
+import '../../features/Profile/domain/repo/repo.dart';
+import '../../features/Profile/domain/usecase/editUser.dart';
+import '../../features/Profile/domain/usecase/getUser.dart';
+import '../../features/Profile/domain/usecase/update_user_image_use_case.dart';
 import '../../features/auth/OTP/data/data_source/base_remote_data_source.dart';
 import '../../features/auth/OTP/data/data_source/remote_data_source.dart';
+import '../../features/auth/OTP/data/repository/repository.dart';
+import '../../features/auth/OTP/domin/use_case/phone_authentication_use_case.dart';
+import '../../features/auth/OTP/domin/use_case/submit_otp_use_case.dart';
+import '../../features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
 import '../../features/auth/login/data/data_source/remote/auth_remote_data_source.dart';
 import '../../features/auth/login/data/repository_impl/auth_repository_impl.dart';
 import '../../features/auth/login/domain/repository/auth_repository.dart';
@@ -24,6 +25,14 @@ import '../../features/auth/login/domain/use_cases/login_with_email_use_case.dar
 import '../../features/auth/login/domain/use_cases/login_with_google_use_case.dart';
 import '../../features/auth/login/domain/use_cases/logout_use_case.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
+import '../../features/auth/register/data/data_source_impl/remote_impl/register_firebase_data_source_impl.dart';
+import '../../features/auth/register/data/data_source_impl/remote_impl/register_remote_data_source_Impl.dart';
+import '../../features/auth/register/data/repository_impl/register_repository_impl.dart';
+import '../../features/auth/register/domain/repository/register_repository.dart';
+import '../../features/auth/register/domain/use_cases/login_with_google_use_case.dart';
+import '../../features/auth/register/domain/use_cases/register_with_email_use_case.dart';
+import '../../features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
+import '../../features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_firebase_data_source_impl.dart';
 import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_remote_data_source_Impl.dart';
 import 'package:meal_recommendation_b1/features/auth/register/data/repository_impl/register_repository_impl.dart';
@@ -42,28 +51,33 @@ import '../../features/favorites/domain/repository/favorites_repository.dart';
 import '../../features/favorites/domain/usecases/delete_favorite_use_case.dart';
 import '../../features/favorites/domain/usecases/get_all_favorites_use_case.dart';
 import '../../features/favorites/domain/usecases/save_favorite_use_case.dart';
+import '../../features/favorites/presentaion/bloc/favorites_bloc.dart';
+import '../../features/gemini_integrate/data/RecipeRepository.dart';
+import '../../features/gemini_integrate/domain/FetchRecipesUseCase.dart';
+import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/home/persentation/Cubits/AddRecipesCubit/ImageCubit.dart';
 import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
+import 'GeminiApiService.dart';
+import 'RecipeApiService.dart';
 
 final getIt = GetIt.instance;
 
-Future<void> setup() async {
-  await Hive.initFlutter();
- // Hive.registerAdapter(UserModelAdapter());
-  final userBox = await Hive.openBox<UserModel>('userBox');
+Future<void> setup(Box<Favorites> favoriteBox) async {
 
-  getIt.registerSingleton<Box<UserModel>>(userBox);
+  const apiGeminiKey = "AIzaSyAKoyYu10J806FFFA7n2KEO7w3hChyL_Pk";
+  const pexelsApiKey = "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
+  if (!Hive.isAdapterRegistered(32)) {
+    Hive.registerAdapter(UserModelAdapter());
+  }
+  Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');
 
-  Future<void> setup(Box<Favorites> favoriteBox) async {
-    // Core dependencies
-    getIt.registerLazySingleton(() => FirebaseFirestore.instance);
-    getIt.registerLazySingleton(() => FirebaseAuth.instance);
-
-    getIt.registerLazySingleton(() => FirebaseFirestore.instance);
-    getIt.registerLazySingleton(() => GoogleSignIn());
-    getIt.registerLazySingleton(() => const FlutterSecureStorage());
+  getIt.registerLazySingleton<Box<UserModel>>(() => userBox);
+  getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
+  getIt.registerLazySingleton(() => FirebaseAuth.instance);
+  getIt.registerLazySingleton(() => GoogleSignIn());
+  getIt.registerLazySingleton(() => const FlutterSecureStorage());
 
     // Data Sources
     getIt.registerLazySingleton<BaseOTPRemoteDataSource>(
@@ -141,7 +155,6 @@ Future<void> setup() async {
         updateUserProfile: getIt(),
       ),
     );
-  }
 
   // Blocs
   getIt.registerFactory(() => AuthBloc(
@@ -173,5 +186,23 @@ Future<void> setup() async {
   //  Add Ingrediants
   getIt.registerFactory(() => ImageCubit());
   //detals
-  getIt.registerFactory(() => DetailsCubit());
+   getIt.registerFactory(() => DetailsCubit());
+
+
+  // Register services
+  getIt.registerLazySingleton<RecipeApiService>(() => RecipeApiService(apiKey: pexelsApiKey));
+  getIt.registerLazySingleton<GeminiApiService>(() => GeminiApiService(apiKey: apiGeminiKey));
+
+  // Register repositories
+  getIt.registerLazySingleton<RecipeRepository>(() => RecipeRepository(
+    apiService: getIt<RecipeApiService>(),
+    geminiApiService: getIt<GeminiApiService>(),
+  ));
+
+  // Register use cases
+  getIt.registerLazySingleton<FetchRecipesUseCase>(() => FetchRecipesUseCase(repository: getIt<RecipeRepository>()));
+
+  // Register BLoC
+  getIt.registerFactory<RecipeBloc>(() => RecipeBloc(fetchRecipesUseCase: getIt<FetchRecipesUseCase>()));
 }
+
