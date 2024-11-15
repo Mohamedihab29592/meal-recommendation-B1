@@ -28,9 +28,6 @@ class HomePage extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
 
     return
-      BlocProvider(
-      create: (context) => HomeCubit()..getdata(),
-      child:
       Scaffold(
         body: Padding(
           padding: EdgeInsets.all(screenSize.width * 0.025),
@@ -40,13 +37,14 @@ class HomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 // AppBar
-                CustomeAppbar(
+                CustomAppbar(
                   ontapleft: () {
+
+                  },
+                  ontapright: () {
                     context.pushNamed(AppRoutes.geminiRecipe);
                   },
-                  ontapright: () {},
                   leftImage: Assets.icProfileMenu,
-                  rightImage: Assets.icNotification,
                 ),
                 SizedBox(height: screenSize.height * 0.05),
                 // Responsive spacing
@@ -65,9 +63,9 @@ class HomePage extends StatelessWidget {
                       borderRadius: BorderRadius.circular(15),
                       borderSide: const BorderSide(color: Colors.black, width: 1),
                     ),
-                    suffixIcon: Image.asset("${Assets.icFilter}",
+                    suffixIcon: Image.asset(Assets.icFilter,
                         color: Colors.black, height: 25),
-                    prefixIcon: Image.asset("${Assets.icSearch}",
+                    prefixIcon: Image.asset(Assets.icSearch,
                         color: Colors.black, height: 25),
                   ),
                 ),
@@ -106,10 +104,12 @@ class HomePage extends StatelessWidget {
                           itemCount:
                               BlocProvider.of<HomeCubit>(context).dataa.length,
                           itemBuilder: (context, index) => InkWell(
-                            onTap: ()async {
-                              BlocProvider.of<DetailsCubit>(context).getDetailsData(context);
-                              BlocProvider.of<DetailsCubit>(context).reff = BlocProvider.of<HomeCubit>(context).dataa[index]['typeofmeal'];
-                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailsPage()));
+                            onTap: () async {
+                              final detailsCubit = BlocProvider.of<DetailsCubit>(context); // Ensure it's available
+                              detailsCubit.getDetailsData(context);
+                              detailsCubit.reff = BlocProvider.of<HomeCubit>(context).dataa[index]['typeofmeal'];
+
+                              context.pushNamed(AppRoutes.detailsPage);
                             },
                             child: CustomeRecipesCard(
                               //delete meal
@@ -187,7 +187,6 @@ class HomePage extends StatelessWidget {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

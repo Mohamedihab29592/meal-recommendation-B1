@@ -6,7 +6,7 @@ import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/routes/app_routes.dart';
-import '../../../../core/utiles/app_colors.dart';
+
 import '../../../../core/utiles/assets.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
@@ -34,7 +34,7 @@ class SeeAllScreen extends StatelessWidget {
                 return ListView(
                   //crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    CustomeAppbar(
+                    CustomAppbar(
                       ontapleft: () {
                         context.pushNamed(AppRoutes.geminiRecipe);
                       },

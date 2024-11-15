@@ -50,7 +50,7 @@ class _DetailsPageState extends State<DetailsPage> with SingleTickerProviderStat
                 child: Column(
                   children: [
                     // AppBar
-                    CustomeAppbar(
+                    CustomAppbar(
                       ontapleft: () => Navigator.pop(context),
                       ontapright: () {
                         String docId=BlocProvider.of<HomeCubit>(context).idDoc.toString();

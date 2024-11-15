@@ -53,7 +53,7 @@ class AddRecipes extends StatelessWidget {
           child: ListView(
             children: [
               //appbar
-              CustomeAppbar(leftImage: Assets.icBack,rightImage: Assets.gemini,ontapleft: (){Navigator.of(context).pop();},ontapright: (){Navigator.of(context).pushNamed(AppRoutes.geminiRecipe);},),
+              CustomAppbar(leftImage: Assets.icBack,rightImage: Assets.gemini,ontapleft: (){Navigator.of(context).pop();},ontapright: (){Navigator.of(context).pushNamed(AppRoutes.geminiRecipe);},),
             const SizedBox(height: 35,),
               //upload image
               BlocConsumer<ImageCubit, ImagesState>(
