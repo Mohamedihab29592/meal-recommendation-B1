@@ -6,7 +6,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
@@ -37,11 +36,8 @@ class MealApp extends StatelessWidget {
         designSize: const Size(375, 812),
         minTextAdapt: true,
           child:
-          MultiBlocProvider(
-            providers: [
-              BlocProvider(create: (context) => HomeCubit(),),
-              BlocProvider(create: (context) => DetailsCubit(),),
-            ],
+          BlocProvider(
+            create: (context) => DetailsCubit(),
             child: MaterialApp(
               title: 'Meal - Recommendation',
               debugShowCheckedModeBanner: false,

@@ -42,11 +42,11 @@ class AddRecipes extends StatelessWidget {
 
     return Scaffold(
         body: Container(
-          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+          padding: const EdgeInsets.only( left: 10, right: 10),
           decoration: const BoxDecoration(
             color: Colors.black38,
             image: DecorationImage(
-              image: AssetImage("${Assets.authLayoutFoodImage}"),
+              image: AssetImage(Assets.authLayoutFoodImage),
               fit: BoxFit.fill,
             ),
           ),
@@ -68,7 +68,7 @@ class AddRecipes extends StatelessWidget {
                   return loading == false
                       ? CircleAvatar(
                     backgroundImage: BlocProvider.of<ImageCubit>(context).urlimage == null
-                        ? const AssetImage("${Assets.icSearch}")
+                        ? const AssetImage(Assets.icSearch)
                         : NetworkImage("${BlocProvider.of<ImageCubit>(context).urlimage}"),
                     backgroundColor: Colors.black,
                     radius: screenSize.width < 600 ? 40 : 50,
@@ -76,13 +76,13 @@ class AddRecipes extends StatelessWidget {
                       onPressed: () {
                         BlocProvider.of<ImageCubit>(context).gettimage();
                       },
-                      icon: Icon(Icons.camera_alt_outlined, color: Colors.white),
+                      icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
                     ),
                   )
                       : const CircularProgressIndicator();
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Center(
                 child: Text(
                   "Add Meal Image",

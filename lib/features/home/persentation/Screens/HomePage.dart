@@ -4,6 +4,7 @@ import 'package:dartz/dartz.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
@@ -21,35 +22,52 @@ class HomePage extends StatelessWidget {
   final Assets asset = Assets();
   final AppColors appColors = AppColors();
   final DataSource data = DataSource();
-  String? name,idDoc;
+  String? name, idDoc;
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return
-      Scaffold(
-        body: Padding(
-          padding: EdgeInsets.all(screenSize.width * 0.025),
-          // Responsive padding
-          child: SafeArea(
+    return Scaffold(
+      body: SafeArea(
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: EdgeInsets.symmetric(horizontal: screenSize.width * 0.04),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // AppBar
+                // Custom AppBar with profile menu and navigation
                 CustomAppbar(
-                  ontapleft: () {
-
-                  },
+                  ontapleft: () {},
                   ontapright: () {
                     context.pushNamed(AppRoutes.geminiRecipe);
                   },
                   leftImage: Assets.icProfileMenu,
                 ),
-                SizedBox(height: screenSize.height * 0.05),
-                // Responsive spacing
+                SizedBox(height: screenSize.height * 0.03),
 
-                // Search
+                // Welcome Text
+                const Text(
+                  "Welcome to Your Recipes!",
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
+                  ),
+                ),
+                SizedBox(height: screenSize.height * 0.01),
+
+                // Subtitle
+                Text(
+                  "Discover new recipes or add your ingredients to get started.",
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[700],
+                  ),
+                ),
+                SizedBox(height: screenSize.height * 0.03),
+
+                // Search Bar with Filter Icon
                 TextFormField(
                   autocorrect: true,
                   decoration: InputDecoration(
@@ -57,136 +75,198 @@ class HomePage extends StatelessWidget {
                     hintText: "Search Recipes",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Colors.black, width: 1),
+                      borderSide:
+                          BorderSide(color: Colors.grey[400]!, width: 1),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(15),
-                      borderSide: const BorderSide(color: Colors.black, width: 1),
+                      borderSide: const BorderSide(
+                          color: AppColors.primary, width: 1.5),
                     ),
-                    suffixIcon: Image.asset(Assets.icFilter,
-                        color: Colors.black, height: 25),
-                    prefixIcon: Image.asset(Assets.icSearch,
-                        color: Colors.black, height: 25),
+                      suffixIcon: Image.asset(Assets.icFilter,
+                          color: Colors.black, height: 25),
+                      prefixIcon: Image.asset(Assets.icSearch,
+                          color: Colors.black, height: 25),
                   ),
                 ),
+                SizedBox(height: screenSize.height * 0.02),
 
                 // Add Ingredients Button
-                SizedBox(height: screenSize.height * 0.02),
-                // Responsive spacing
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.of(context).pushNamed(AppRoutes.addRecipes);
-                  },
-                  style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary),
-                  child: Text(
-                    "Add Your Ingredients",
-                    style: TextStyle(
-                        color: Colors.white,
-                        fontSize: screenSize.width < 600
-                            ? 12
-                            : 16), // Responsive font size
-                  ),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(AppRoutes.addRecipes);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 12, horizontal: 8),
+                      ),
+                      icon: const Icon(Icons.add, color: Colors.white),
+                      label: const Text(
+                        "Add Your Ingredients",
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ],
                 ),
+                SizedBox(height: screenSize.height * 0.03),
 
-                // Top Recipes & View All
-                CustomeTextRow(leftText: "Top Recipes", rightText: "See All"),
+                // Top Recipes Header with "See All"
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Text(
+                      "Top Recipes",
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        context.pushNamed(AppRoutes.seeAll);
+                      },
+                      child: const Text(
+                        "See All",
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: screenSize.height * 0.02),
 
-                // Card ==> Description Meal
+                // Recipes List
                 BlocBuilder<HomeCubit, HomeState>(
                   builder: (context, state) {
                     if (state is IsLoadingHome) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (state is SuccessState) {
-                      return SizedBox(
-                        height: screenSize.height * 0.46, // Responsive height
-                        child: ListView.builder(
-                          itemCount:
-                              BlocProvider.of<HomeCubit>(context).dataa.length,
-                          itemBuilder: (context, index) => InkWell(
-                            onTap: () async {
-                              final detailsCubit = BlocProvider.of<DetailsCubit>(context); // Ensure it's available
-                              detailsCubit.getDetailsData(context);
-                              detailsCubit.reff = BlocProvider.of<HomeCubit>(context).dataa[index]['typeofmeal'];
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: BlocProvider.of<HomeCubit>(context)
+                              .dataa
+                              .asMap()
+                              .entries
+                              .map((entry) {
+                            var index = entry.key;
+                            var meal = entry.value;
 
-                              context.pushNamed(AppRoutes.detailsPage);
-                            },
-                            child: CustomeRecipesCard(
-                              //delete meal
-                              ontapDelete: () {
-                                // Get the idDoc from the HomeCubit
-                                String idDoc = BlocProvider.of<HomeCubit>(context).dataa[index]["id"];
+                            return InkWell(
+                              onTap: () async {
+                                final detailsCubit =
+                                    BlocProvider.of<DetailsCubit>(
+                                        context); // Ensure it's available
+                                detailsCubit.getDetailsData(context);
+                                detailsCubit.reff =
+                                    BlocProvider.of<HomeCubit>(context)
+                                        .dataa[index]['typeofmeal'];
 
-                                AwesomeDialog(
-                                  context: context,
-                                  dialogType: DialogType.info,
-                                  animType: AnimType.rightSlide,
-                                  title: 'Delete Meal',
-                                  desc: 'Are you sure you want to delete this meal?',
-                                  btnCancelOnPress: () {
-                                    Navigator.of(context).pop(); // Close the dialog without action
-                                  },
-                                  btnOkOnPress: () async {
-                                    try {
-                                      print("Attempting to delete document with ID: $idDoc");
-
-                                      QuerySnapshot snapshot = await FirebaseFirestore.instance
-                                          .collection("Recipes")
-                                          .where("id", isEqualTo: idDoc) // Match the field 'id'
-                                          .get();
-                                      // Check if any documents were found
-                                      if (snapshot.docs.isNotEmpty) {
-                                        for (var doc in snapshot.docs) {
-                                          await doc.reference.delete();
-                                          print("Successfully deleted document ID: ${doc.id}");
-                                        }
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Meal deleted successfully!'))
-                                        );
-                                      } else {
-                                        print("No document found with ID: $idDoc");
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('No meal found to delete!'))
-                                        );
-                                      }
-                                      Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
-                                    } catch (e) {
-                                      print("Error deleting document: $e");
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                          SnackBar(content: Text('Failed to delete meal: $e'))
-                                      );
-                                    }
-                                  },
-                                ).show();
+                                context.pushNamed(AppRoutes.detailsPage);
                               },
-
-                              //fav button
-                              ontapFav: () {},
-                              firsttext:
-                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["typeofmeal"]}",
-                              ingrediantes:
-                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["NOingrediantes"]} ingredients",
-                              time:
-                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["time"]} min",
-                              middleText:
-                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["mealName"]}",
-                              image:
-                                  "${BlocProvider.of<HomeCubit>(context).dataa[index]["image"]}",
-                            ),
-                          ),
+                              child: CustomeRecipesCard(
+                                key: ValueKey(meal["id"]),
+                                // Add a unique key
+                                ontapDelete: () {
+                                  String mealId = meal["id"];
+                                  showDeleteDialog(
+                                    context: context,
+                                    mealId: mealId,
+                                    onSuccess: () {
+                                      BlocProvider.of<HomeCubit>(context)
+                                          .deleteRecipe(mealId);
+                                    },
+                                  );
+                                },
+                                ontapFav: () {
+                                  // Add to favorite functionality
+                                },
+                                firsttext: meal["typeofmeal"] ?? "",
+                                ingrediantes:
+                                    "${meal["NOingrediantes"] ?? 0} ingredients",
+                                time: "${meal["time"] ?? 0} min",
+                                middleText: meal["mealName"] ?? "",
+                                image: meal["image"] ?? "",
+                              ),
+                            );
+                          }).toList(),
                         ),
                       );
                     } else if (state is FailureState) {
-                      return Center(child: Text("${state.errorMessage}"));
+                      return Center(
+                          child: Text(state.errorMessage ?? "Error!"));
                     } else {
-                      return Container();
+                      return const SizedBox.shrink();
                     }
                   },
-                ),
+                )
               ],
             ),
           ),
         ),
-      );
+      ),
+    );
   }
+}
+
+Future<void> showDeleteDialog({
+  required BuildContext context,
+  required String mealId,
+  required VoidCallback onSuccess,
+}) async {
+  AwesomeDialog(
+    context: context,
+    dialogType: DialogType.warning,
+    animType: AnimType.rightSlide,
+    title: 'Delete Meal',
+    desc: 'Are you sure you want to delete this meal?',
+    btnCancelOnPress: () {
+      // Optional: Perform actions on cancel
+    },
+    btnOkOnPress: () async {
+      try {
+        print("Attempting to delete document with ID: $mealId");
+
+        // Query the Firestore collection for the document matching the given ID
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection("Recipes")
+            .where("id", isEqualTo: mealId) // Match the field 'id'
+            .get();
+
+        if (snapshot.docs.isNotEmpty) {
+          // Delete all matching documents
+          for (var doc in snapshot.docs) {
+            await doc.reference.delete();
+            print("Successfully deleted document ID: ${doc.id}");
+          }
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Meal deleted successfully!')),
+          );
+          // Trigger success callback to refresh UI or perform navigation
+          onSuccess();
+        } else {
+          print("No document found with ID: $mealId");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No meal found to delete!')),
+          );
+        }
+      } catch (e) {
+        print("Error deleting document: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete meal: $e')),
+        );
+      }
+    },
+  ).show();
 }
