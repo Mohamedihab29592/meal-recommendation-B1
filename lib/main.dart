@@ -25,7 +25,6 @@ void main() async {
 
 class MealApp extends StatelessWidget {
   const MealApp({super.key});
-sss
   @override
   Widget build(BuildContext context) {
     return DevicePreview(

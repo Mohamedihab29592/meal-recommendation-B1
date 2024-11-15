@@ -12,7 +12,7 @@ class HomeCubit extends Cubit<HomeState> {
     emit(IsLoadingHome());
     try {
         dataa=await datasource.getdata();
-      emit(SuccessState());
+      emit(SuccessState(dataa));
       print(dataa);
     } catch (e) {
       print(e);

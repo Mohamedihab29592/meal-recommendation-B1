@@ -7,4 +7,5 @@ class AppColors {
   static const Color white = Colors.white;
   static const Color gray = Colors.grey;
   static const Color selected = Color(0xf78a8c8c);
+  static const Color grayInSeeAllScreen = Color(0xff8A8A8A);
 }
