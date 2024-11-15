@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../utiles/assets.dart';
 
 class CustomeRecipesCard extends StatelessWidget {
-   CustomeRecipesCard({super.key,required this.ontapFav,this.time,this.firsttext,this.ingrediantes,this.middleText,this.image});
+   CustomeRecipesCard({super.key,required this.ontapFav,this.time,this.firsttext,this.ingrediantes,this.middleText,this.image,required this.ontapDelete});
   String? firsttext,middleText,ingrediantes,time,image;
   final VoidCallback ontapFav;
+  final VoidCallback ontapDelete;
   @override
   Widget build(BuildContext context) {
     return Card(
@@ -37,7 +38,13 @@ class CustomeRecipesCard extends StatelessWidget {
               alignment: Alignment.topRight,
               width: 50,
               height: 100,
-              child: InkWell(onTap: ontapFav,child: Image.asset("${Assets.icFavorite}")))
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  InkWell(onTap: ontapFav,child: Image.asset("${Assets.icFavorite}",width: 25,)),
+                  InkWell(onTap: ontapDelete,child:Icon(Icons.delete,size: 20,)),
+                ],
+              ))
         ],),);
   }
 }

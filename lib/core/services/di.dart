@@ -180,13 +180,13 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
         submitOTPUseCase: getIt<SubmitOTPUseCase>(),
       ));
   //  HomeCubit
-  getIt.registerFactory(() => HomeCubit());
+  // getIt.registerFactory(() => HomeCubit());
   //  NavBar
   getIt.registerFactory(() => NavBarCubit());
   //  Add Ingrediants
   getIt.registerFactory(() => ImageCubit());
   //detals
-   getIt.registerFactory(() => DetailsCubit());
+  //  getIt.registerFactory(() => DetailsCubit());
 
 
   // Register services

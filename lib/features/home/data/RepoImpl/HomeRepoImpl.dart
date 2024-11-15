@@ -13,6 +13,7 @@ class HomeRepoImpl extends HomeRepo{
   }) {
     CollectionReference addRecipes=FirebaseFirestore.instance.collection("Recipes");
     return addRecipes.add({
+      "id":FirebaseFirestore.instance.collection("Recipes").doc().id,
       "typeofmeal":typeofmeal,
       "mealName":mealName,
       "NOingrediantes":ingrediantes,

@@ -4,6 +4,7 @@ import '../../../data/data_source/data_source.dart';
 import 'HomeState.dart';
 
 class HomeCubit extends Cubit<HomeState> {
+String? idDoc;
   HomeCubit() : super(InintialState());
   List<QueryDocumentSnapshot> dataa = [];
   DataSource datasource = DataSource();

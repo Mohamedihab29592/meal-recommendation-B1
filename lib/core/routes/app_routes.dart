@@ -59,8 +59,11 @@ class AppRoutes {
             builder: (_) => BlocProvider(
                 create: (context) => getIt<RecipeBloc>(),
                 child: const GeminiRecipePage()));
-      case home:
-      //return MaterialPageRoute(builder: (_) => HomeScreen());
+      // case home:
+      //   final homeCubit = getIt<HomeCubit>();
+      // return MaterialPageRoute(builder: (_)=>BlocProvider.value(
+      //     value: homeCubit,
+      // child: HomePage(),));
       case favorites:
       //return MaterialPageRoute(builder: (_) => FavoritesScreen());
       case profile:
@@ -77,11 +80,14 @@ class AppRoutes {
                   create: (context) => getIt<NavBarCubit>(),
                   child: NavBarPage(),
                 ));
-      case detailsPage:
-        return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                create: (context) => getIt<DetailsCubit>(),
-                child: const DetailsPage()));
+      // case detailsPage:
+      //   final detailsCubit = getIt<DetailsCubit>(); // Get the instance first
+      //   return MaterialPageRoute(
+      //     builder: (_) => BlocProvider.value(
+      //       value: detailsCubit, // Provide the instance
+      //       child: const DetailsPage(),
+      //     ),
+      //   );
       case addRecipes:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(

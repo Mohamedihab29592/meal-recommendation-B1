@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/custom_text_field.dart';
 import '../../../../core/utiles/app_colors.dart';
@@ -52,7 +53,7 @@ class AddRecipes extends StatelessWidget {
           child: ListView(
             children: [
               //appbar
-              CustomeAppbar(leftImage: Assets.icBack,rightImage: Assets.gemini,ontapleft: (){Navigator.of(context).pop();},ontapright: (){},),
+              CustomeAppbar(leftImage: Assets.icBack,rightImage: Assets.gemini,ontapleft: (){Navigator.of(context).pop();},ontapright: (){Navigator.of(context).pushNamed(AppRoutes.geminiRecipe);},),
             const SizedBox(height: 35,),
               //upload image
               BlocConsumer<ImageCubit, ImagesState>(

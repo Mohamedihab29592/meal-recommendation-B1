@@ -20,7 +20,6 @@ class DetailsPage extends StatefulWidget {
 
 class _DetailsPageState extends State<DetailsPage> with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
   @override
   void initState() {
     super.initState();
@@ -53,7 +52,10 @@ class _DetailsPageState extends State<DetailsPage> with SingleTickerProviderStat
                     // AppBar
                     CustomeAppbar(
                       ontapleft: () => Navigator.pop(context),
-                      ontapright: () {},
+                      ontapright: () {
+                        String docId=BlocProvider.of<HomeCubit>(context).idDoc.toString();
+                        print(docId);
+                      },
                       leftImage: Assets.icBack,
                       rightImage: Assets.icFavorite,
                     ),

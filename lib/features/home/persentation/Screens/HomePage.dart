@@ -1,3 +1,7 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dartz/dartz.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
@@ -5,6 +9,7 @@ import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/home/data/data_source/data_source.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Screens/Details/DetailsPage.dart';
 import '../../../../core/components/CustomeTextRow.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/Custome_recipes_card.dart';
@@ -16,15 +21,17 @@ class HomePage extends StatelessWidget {
   final Assets asset = Assets();
   final AppColors appColors = AppColors();
   final DataSource data = DataSource();
-  String? name;
+  String? name,idDoc;
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
-    return BlocProvider(
+    return
+      BlocProvider(
       create: (context) => HomeCubit()..getdata(),
-      child: Scaffold(
+      child:
+      Scaffold(
         body: Padding(
           padding: EdgeInsets.all(screenSize.width * 0.025),
           // Responsive padding
@@ -94,21 +101,66 @@ class HomePage extends StatelessWidget {
                       return const Center(child: CircularProgressIndicator());
                     } else if (state is SuccessState) {
                       return SizedBox(
-                        height: screenSize.height * 0.45, // Responsive height
+                        height: screenSize.height * 0.46, // Responsive height
                         child: ListView.builder(
                           itemCount:
                               BlocProvider.of<HomeCubit>(context).dataa.length,
                           itemBuilder: (context, index) => InkWell(
-                            onTap: () {
-                              BlocProvider.of<DetailsCubit>(context)
-                                  .getDetailsData(context);
-                              BlocProvider.of<DetailsCubit>(context).reff =
-                                  BlocProvider.of<HomeCubit>(context)
-                                      .dataa[index]['typeofmeal'];
-                              Navigator.of(context)
-                                  .pushNamed(AppRoutes.detailsPage);
+                            onTap: ()async {
+                              BlocProvider.of<DetailsCubit>(context).getDetailsData(context);
+                              BlocProvider.of<DetailsCubit>(context).reff = BlocProvider.of<HomeCubit>(context).dataa[index]['typeofmeal'];
+                              Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailsPage()));
                             },
                             child: CustomeRecipesCard(
+                              //delete meal
+                              ontapDelete: () {
+                                // Get the idDoc from the HomeCubit
+                                String idDoc = BlocProvider.of<HomeCubit>(context).dataa[index]["id"];
+
+                                AwesomeDialog(
+                                  context: context,
+                                  dialogType: DialogType.info,
+                                  animType: AnimType.rightSlide,
+                                  title: 'Delete Meal',
+                                  desc: 'Are you sure you want to delete this meal?',
+                                  btnCancelOnPress: () {
+                                    Navigator.of(context).pop(); // Close the dialog without action
+                                  },
+                                  btnOkOnPress: () async {
+                                    try {
+                                      print("Attempting to delete document with ID: $idDoc");
+
+                                      QuerySnapshot snapshot = await FirebaseFirestore.instance
+                                          .collection("Recipes")
+                                          .where("id", isEqualTo: idDoc) // Match the field 'id'
+                                          .get();
+                                      // Check if any documents were found
+                                      if (snapshot.docs.isNotEmpty) {
+                                        for (var doc in snapshot.docs) {
+                                          await doc.reference.delete();
+                                          print("Successfully deleted document ID: ${doc.id}");
+                                        }
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('Meal deleted successfully!'))
+                                        );
+                                      } else {
+                                        print("No document found with ID: $idDoc");
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                            SnackBar(content: Text('No meal found to delete!'))
+                                        );
+                                      }
+                                      Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
+                                    } catch (e) {
+                                      print("Error deleting document: $e");
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          SnackBar(content: Text('Failed to delete meal: $e'))
+                                      );
+                                    }
+                                  },
+                                )..show();
+                              },
+
+                              //fav button
                               ontapFav: () {},
                               firsttext:
                                   "${BlocProvider.of<HomeCubit>(context).dataa[index]["typeofmeal"]}",
