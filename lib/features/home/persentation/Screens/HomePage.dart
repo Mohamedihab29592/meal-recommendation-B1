@@ -141,12 +141,12 @@ class HomePage extends StatelessWidget {
                                           print("Successfully deleted document ID: ${doc.id}");
                                         }
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('Meal deleted successfully!'))
+                                            const SnackBar(content: Text('Meal deleted successfully!'))
                                         );
                                       } else {
                                         print("No document found with ID: $idDoc");
                                         ScaffoldMessenger.of(context).showSnackBar(
-                                            SnackBar(content: Text('No meal found to delete!'))
+                                            const SnackBar(content: Text('No meal found to delete!'))
                                         );
                                       }
                                       Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
@@ -157,7 +157,7 @@ class HomePage extends StatelessWidget {
                                       );
                                     }
                                   },
-                                )..show();
+                                ).show();
                               },
 
                               //fav button
