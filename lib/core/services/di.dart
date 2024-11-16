@@ -66,7 +66,7 @@ final getIt = GetIt.instance;
 
 Future<void> setup(Box<Favorites> favoriteBox) async {
 
-  const apiGeminiKey = "AIzaSyAKoyYu10J806FFFA7n2KEO7w3hChyL_Pk";
+  const apiGeminiKey = "AIzaSyBnRMY9VLpC2Y2k6m7ManTZKnkmh7NfM6Q";
   const pexelsApiKey = "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
   if (!Hive.isAdapterRegistered(32)) {
     Hive.registerAdapter(UserModelAdapter());

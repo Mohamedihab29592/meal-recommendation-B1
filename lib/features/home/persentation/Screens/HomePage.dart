@@ -152,55 +152,53 @@ class HomePage extends StatelessWidget {
                     if (state is IsLoadingHome) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (state is SuccessState) {
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: BlocProvider.of<HomeCubit>(context)
-                              .dataa
-                              .asMap()
-                              .entries
-                              .map((entry) {
-                            var index = entry.key;
-                            var meal = entry.value;
+                      return Column(
+                        children: [
+                          ListView(
+                            shrinkWrap: true, // Makes the ListView adapt to its content
+                            physics: const NeverScrollableScrollPhysics(), // Disables scrolling
+                            children: BlocProvider.of<HomeCubit>(context)
+                                .dataa
+                                .asMap()
+                                .entries
+                                .map((entry) {
+                              var index = entry.key;
+                              var meal = entry.value;
 
-                            return InkWell(
-                              onTap: () async {
-                                final detailsCubit =
-                                    BlocProvider.of<DetailsCubit>(
-                                        context); // Ensure it's available
-                                detailsCubit.getDetailsData(context);
-                                detailsCubit.reff =
-                                    BlocProvider.of<HomeCubit>(context)
-                                        .dataa[index]['typeofmeal'];
+                              return InkWell(
+                                onTap: () async {
+                                  final detailsCubit = BlocProvider.of<DetailsCubit>(context);
+                                  detailsCubit.getDetailsData(context);
+                                  detailsCubit.reff =
+                                  BlocProvider.of<HomeCubit>(context).dataa[index]['typeofmeal'];
 
-                                context.pushNamed(AppRoutes.detailsPage);
-                              },
-                              child: CustomeRecipesCard(
-                                key: ValueKey(meal["id"]),
-                                // Add a unique key
-                                ontapDelete: () {
-                                  String mealId = meal["id"];
-                                  showDeleteDialog(
-                                    context: context,
-                                    mealId: mealId,
-                                    onSuccess: () {
-                                      BlocProvider.of<HomeCubit>(context)
-                                          .deleteRecipe(mealId);
-                                    },
-                                  );
+                                  context.pushNamed(AppRoutes.detailsPage);
                                 },
-                                ontapFav: () {
-                                  // Add to favorite functionality
-                                },
-                                firsttext: meal["typeofmeal"] ?? "",
-                                ingrediantes:
-                                    "${meal["NOingrediantes"] ?? 0} ingredients",
-                                time: "${meal["time"] ?? 0} min",
-                                middleText: meal["mealName"] ?? "",
-                                image: meal["image"] ?? "",
-                              ),
-                            );
-                          }).toList(),
-                        ),
+                                child: CustomeRecipesCard(
+                                  key: ValueKey(meal["id"]), // Add a unique key
+                                  ontapDelete: () {
+                                    String mealId = meal["id"];
+                                    showDeleteDialog(
+                                      context: context,
+                                      mealId: mealId,
+                                      onSuccess: () {
+                                        BlocProvider.of<HomeCubit>(context).deleteRecipe(mealId);
+                                      },
+                                    );
+                                  },
+                                  ontapFav: () {
+                                    // Add to favorite functionality
+                                  },
+                                  firsttext: meal["typeofmeal"] ?? "",
+                                  ingrediantes: "${meal["NOingrediantes"] ?? 0} ingredients",
+                                  time: "${meal["time"] ?? 0} min",
+                                  middleText: meal["mealName"] ?? "",
+                                  image: meal["image"] ?? "",
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ],
                       );
                     } else if (state is FailureState) {
                       return Center(

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/custom_text_field.dart';
 import '../../../../core/utiles/app_colors.dart';
@@ -168,39 +169,51 @@ class AddRecipes extends StatelessWidget {
               Customemultilinetextfield(hintText: "Step 2",controller:secoundStep ,),SizedBox(height: 30,),
 
               // Button
-              ElevatedButton(
-                onPressed: () {
-                  homerepoimpl.sendData(
-                    image: BlocProvider.of<ImageCubit>(context).im.toString(),
-                    typeofmeal: typeMeal.text.trim(),
-                    mealName: mealName.text.trim(),
-                    ingrediantes: numberOfIngrediantes.text.trim(),
-                    time: time.text.trim(),
-                    summary: summary.text.trim(),
-                    protein: protein.text.trim(),
-                    carb: carb.text.trim(),
-                    fat: fat.text.trim(),
-                    kcal: kcal.text.trim(),
-                    vitamins: vitamenes.text.trim(),
-                    firstIngrediants: firstingrediant.text.trim(),
-                    secoundIngrediants: secoundingrediant.text.trim(),
-                    thirdIngrediants: thirdingrediant.text.trim(),
-                    fourthIngrediants: fourthingrediant.text.trim(),
-                    piecesone: piecesone.text.trim(),
-                    piecestwo: piecestwo.text.trim(),
-                    piecesthree: piecesthree.text.trim(),
-                    piecesfour: piecesfour.text.trim(),
-                    firstStep: firstStep.text.trim(),
-                    secoundtStep: secoundStep.text.trim(),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: EdgeInsets.all(screenSize.width < 600 ? 15 : 18),
-                ),
-                child: Text(
-                  "Add Ingredients",
-                  style: TextStyle(color: Colors.white, fontSize: screenSize.width < 600 ? 15 : 20),
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    homerepoimpl
+                        .sendData(
+                      image: BlocProvider.of<ImageCubit>(context).im.toString(),
+                      typeofmeal: typeMeal.text.trim(),
+                      mealName: mealName.text.trim(),
+                      ingrediantes: numberOfIngrediantes.text.trim(),
+                      time: time.text.trim(),
+                      summary: summary.text.trim(),
+                      protein: protein.text.trim(),
+                      carb: carb.text.trim(),
+                      fat: fat.text.trim(),
+                      kcal: kcal.text.trim(),
+                      vitamins: vitamenes.text.trim(),
+                      firstIngrediants: firstingrediant.text.trim(),
+                      secoundIngrediants: secoundingrediant.text.trim(),
+                      thirdIngrediants: thirdingrediant.text.trim(),
+                      fourthIngrediants: fourthingrediant.text.trim(),
+                      piecesone: piecesone.text.trim(),
+                      piecestwo: piecestwo.text.trim(),
+                      piecesthree: piecesthree.text.trim(),
+                      piecesfour: piecesfour.text.trim(),
+                      firstStep: firstStep.text.trim(),
+                      secoundtStep: secoundStep.text.trim(),
+                    )?.then((value) {
+                      context.pushReplacementNamed(AppRoutes.navBar);
+                    })
+                        .catchError((error) {
+                      // Handle errors here
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to send data: $error')),
+                      );
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: EdgeInsets.all(screenSize.width < 600 ? 15 : 18),
+                  ),
+                  child: Text(
+                    "Add Ingredients",
+                    style: TextStyle(color: Colors.white, fontSize: screenSize.width < 600 ? 15 : 20),
+                  ),
                 ),
               ),
             ],
