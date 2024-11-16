@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/custom_text_field.dart';
 import '../../../../core/utiles/app_colors.dart';
@@ -41,18 +43,18 @@ class AddRecipes extends StatelessWidget {
 
     return Scaffold(
         body: Container(
-          padding: const EdgeInsets.only(top: 10, left: 10, right: 10),
+          padding: const EdgeInsets.only( left: 10, right: 10),
           decoration: const BoxDecoration(
             color: Colors.black38,
             image: DecorationImage(
-              image: AssetImage("${Assets.authLayoutFoodImage}"),
+              image: AssetImage(Assets.authLayoutFoodImage),
               fit: BoxFit.fill,
             ),
           ),
           child: ListView(
             children: [
               //appbar
-              CustomeAppbar(leftImage: Assets.icBack,rightImage: Assets.gemini,ontapleft: (){Navigator.of(context).pop();},ontapright: (){},),
+              CustomAppbar(leftImage: Assets.icBack,rightImage: Assets.gemini,ontapleft: (){Navigator.of(context).pop();},ontapright: (){Navigator.of(context).pushNamed(AppRoutes.geminiRecipe);},),
             const SizedBox(height: 35,),
               //upload image
               BlocConsumer<ImageCubit, ImagesState>(
@@ -67,7 +69,7 @@ class AddRecipes extends StatelessWidget {
                   return loading == false
                       ? CircleAvatar(
                     backgroundImage: BlocProvider.of<ImageCubit>(context).urlimage == null
-                        ? const AssetImage("${Assets.icSearch}")
+                        ? const AssetImage(Assets.icSearch)
                         : NetworkImage("${BlocProvider.of<ImageCubit>(context).urlimage}"),
                     backgroundColor: Colors.black,
                     radius: screenSize.width < 600 ? 40 : 50,
@@ -75,13 +77,13 @@ class AddRecipes extends StatelessWidget {
                       onPressed: () {
                         BlocProvider.of<ImageCubit>(context).gettimage();
                       },
-                      icon: Icon(Icons.camera_alt_outlined, color: Colors.white),
+                      icon: const Icon(Icons.camera_alt_outlined, color: Colors.white),
                     ),
                   )
                       : const CircularProgressIndicator();
                 },
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Center(
                 child: Text(
                   "Add Meal Image",
@@ -167,39 +169,51 @@ class AddRecipes extends StatelessWidget {
               Customemultilinetextfield(hintText: "Step 2",controller:secoundStep ,),SizedBox(height: 30,),
 
               // Button
-              ElevatedButton(
-                onPressed: () {
-                  homerepoimpl.sendData(
-                    image: BlocProvider.of<ImageCubit>(context).im.toString(),
-                    typeofmeal: typeMeal.text.trim(),
-                    mealName: mealName.text.trim(),
-                    ingrediantes: numberOfIngrediantes.text.trim(),
-                    time: time.text.trim(),
-                    summary: summary.text.trim(),
-                    protein: protein.text.trim(),
-                    carb: carb.text.trim(),
-                    fat: fat.text.trim(),
-                    kcal: kcal.text.trim(),
-                    vitamins: vitamenes.text.trim(),
-                    firstIngrediants: firstingrediant.text.trim(),
-                    secoundIngrediants: secoundingrediant.text.trim(),
-                    thirdIngrediants: thirdingrediant.text.trim(),
-                    fourthIngrediants: fourthingrediant.text.trim(),
-                    piecesone: piecesone.text.trim(),
-                    piecestwo: piecestwo.text.trim(),
-                    piecesthree: piecesthree.text.trim(),
-                    piecesfour: piecesfour.text.trim(),
-                    firstStep: firstStep.text.trim(),
-                    secoundtStep: secoundStep.text.trim(),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: EdgeInsets.all(screenSize.width < 600 ? 15 : 18),
-                ),
-                child: Text(
-                  "Add Ingredients",
-                  style: TextStyle(color: Colors.white, fontSize: screenSize.width < 600 ? 15 : 20),
+              Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                child: ElevatedButton(
+                  onPressed: () {
+                    homerepoimpl
+                        .sendData(
+                      image: BlocProvider.of<ImageCubit>(context).im.toString(),
+                      typeofmeal: typeMeal.text.trim(),
+                      mealName: mealName.text.trim(),
+                      ingrediantes: numberOfIngrediantes.text.trim(),
+                      time: time.text.trim(),
+                      summary: summary.text.trim(),
+                      protein: protein.text.trim(),
+                      carb: carb.text.trim(),
+                      fat: fat.text.trim(),
+                      kcal: kcal.text.trim(),
+                      vitamins: vitamenes.text.trim(),
+                      firstIngrediants: firstingrediant.text.trim(),
+                      secoundIngrediants: secoundingrediant.text.trim(),
+                      thirdIngrediants: thirdingrediant.text.trim(),
+                      fourthIngrediants: fourthingrediant.text.trim(),
+                      piecesone: piecesone.text.trim(),
+                      piecestwo: piecestwo.text.trim(),
+                      piecesthree: piecesthree.text.trim(),
+                      piecesfour: piecesfour.text.trim(),
+                      firstStep: firstStep.text.trim(),
+                      secoundtStep: secoundStep.text.trim(),
+                    )?.then((value) {
+                      context.pushReplacementNamed(AppRoutes.navBar);
+                    })
+                        .catchError((error) {
+                      // Handle errors here
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to send data: $error')),
+                      );
+                    });
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: EdgeInsets.all(screenSize.width < 600 ? 15 : 18),
+                  ),
+                  child: Text(
+                    "Add Ingredients",
+                    style: TextStyle(color: Colors.white, fontSize: screenSize.width < 600 ? 15 : 20),
+                  ),
                 ),
               ),
             ],

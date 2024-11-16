@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/AddRecipes.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Screens/Details/DetailsPage.dart';
 import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/screens/login/login_screen.dart';
@@ -10,8 +8,10 @@ import '../../features/auth/register/persentation/screens/register/register_scre
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/gemini_recipe.dart';
 import '../../features/home/persentation/Cubits/AddRecipesCubit/ImageCubit.dart';
+import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
+import '../../features/home/persentation/Screens/Details/DetailsPage.dart';
 import '../../features/home/persentation/Screens/HomePage.dart';
 import '../../features/home/persentation/Screens/NavBarPage.dart';
 import '../../features/home/persentation/Screens/see_all_page.dart';
@@ -43,57 +43,43 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const SplashScreen());
       case onboarding:
         return MaterialPageRoute(builder: (_) => const OnBoardingScreen());
-
       case login:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
               create: (_) => getIt<AuthBloc>(), child: const LoginScreen()),
         );
+      case register:
+        return MaterialPageRoute(builder: (_) => const RegisterScreen());
+      case otp:
+        return MaterialPageRoute(builder: (_) => const OTPView());
       case geminiRecipe:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                 create: (context) => getIt<RecipeBloc>(),
                 child: const GeminiRecipePage()));
-      case register:
-        return MaterialPageRoute(builder: (_) => const RegisterScreen());
-      case otp:
-        return MaterialPageRoute(builder: (_) => const OTPView());
-      case verification:
-      //return MaterialPageRoute(builder: (_) => VerificationScreen());
       case home:
         return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                  create: (_) => getIt<HomeCubit>(),
-                  child: HomePage(),
-                ));
+            builder: (_) => HomePage(),
+                );
       case navBar:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                   create: (context) => getIt<NavBarCubit>(),
                   child: NavBarPage(),
                 ));
-      case detailsPage:
-        return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                create: (context) => getIt<DetailsCubit>(),
-                child: const DetailsPage()));
+       case detailsPage:// Get the instance first
+         return MaterialPageRoute(
+           builder: (_) => const DetailsPage(),
+         );
       case addRecipes:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                 create: (context) => getIt<ImageCubit>(), child: AddRecipes()));
-      case favorites:
-      //return MaterialPageRoute(builder: (_) => FavoritesScreen());
-      case profile:
-      //return MaterialPageRoute(builder: (_) => ProfileScreen());
-      case details:
-      // return MaterialPageRoute(builder: (_) => DetailsScreen());
       case seeAll:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                 create: (_) => getIt<HomeCubit>()..getdata(),
                 child: const SeeAllScreen()));
-      case addIngredients:
-      // return MaterialPageRoute(builder: (_) => AddIngredientsScreen());
       default:
         return MaterialPageRoute(
             builder: (_) => Scaffold(
