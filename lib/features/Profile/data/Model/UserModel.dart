@@ -3,7 +3,7 @@ import '../../domain/entity/entity.dart';
 
 part 'UserModel.g.dart'; // Make sure this matches the exact file name
 
-@HiveType(typeId: 32)
+@HiveType(typeId: 0)
 class UserModel extends User  {
   @HiveField(0)
   final String id;

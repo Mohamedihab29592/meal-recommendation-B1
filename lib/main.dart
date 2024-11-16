@@ -4,7 +4,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
-import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
@@ -16,10 +15,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,);
   await Hive.initFlutter();
-  Hive.registerAdapter(FavoritesAdapter());
-  final favoriteBox = await Hive.openBox<Favorites>('favorites');
-
-  await setup(favoriteBox);
+  await setup();
   runApp(const MealApp());
 }
 
