@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/data_source/data_source.dart';
 import 'HomeState.dart';
 class HomeCubit extends Cubit<HomeState> {
-  HomeCubit() : super(InintialState());
+  HomeCubit() : super(InitialState());
   String? idDoc;
 
   List<dynamic> homeRecipes = []; // Initialize with an empty list

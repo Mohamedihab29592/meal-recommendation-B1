@@ -332,6 +332,7 @@ class AddRecipes extends StatelessWidget {
                       additionalSteps: [], // Add additional steps if any
                     ),
                   );
+
                   homerepoimpl.addIngredients(recipe).then((value) {
                     context.pushReplacementNamed(AppRoutes.navBar);
                   }).catchError((error) {

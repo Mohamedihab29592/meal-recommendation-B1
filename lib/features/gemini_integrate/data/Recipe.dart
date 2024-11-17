@@ -14,10 +14,12 @@ class Recipe {
     required this.typeOfMeal,
     required this.time,
     required this.imageUrl,
-    required this.ingredients,
+    required List<Ingredient> ingredients,
     required this.nutrition,
     required this.directions,
-  });
+  }) : ingredients = List.unmodifiable(ingredients) /*This prevents external modification of lists*/ {
+    _validate();
+  }
 
   // Factory constructor to parse JSON data
   factory Recipe.fromJson(Map<String, dynamic> json) {
@@ -38,6 +40,18 @@ class Recipe {
           ? Directions.fromJson(json['directions'])
           : Directions.defaultValues(),
     );
+  }
+
+  // Validation method to ensure required fields are not empty
+  void _validate() {
+    if (name.isEmpty || summary.isEmpty || typeOfMeal.isEmpty) {
+      throw ArgumentError('Name, summary, and typeOfMeal cannot be empty.');
+    }
+  }
+
+  @override
+  String toString() {
+    return 'Recipe{name: $name, summary: $summary, typeOfMeal: $typeOfMeal, time: $time}';
   }
 }
 
@@ -63,6 +77,11 @@ class Ingredient {
       imageUrl: json['imageUrl'] ?? '', // Fallback if image URL is missing
     );
   }
+
+  @override
+  String toString() {
+    return 'Ingredient{name: $name, quantity: $quantity $unit}';
+  }
 }
 
 class Nutrition {
@@ -77,8 +96,8 @@ class Nutrition {
     required this.protein,
     required this.carbs,
     required this.fat,
-    required this.vitamins,
-  });
+    required List<String> vitamins,
+  }) : vitamins = List.unmodifiable(vitamins);
 
   // Factory constructor to parse JSON data
   factory Nutrition.fromJson(Map<String, dynamic> json) {
@@ -102,7 +121,6 @@ class Nutrition {
     );
   }
 
-  // Helper methods for type conversion
   static int _parseInt(dynamic value) {
     if (value is int) return value;
     if (value is String) return int.tryParse(value) ?? 0;
@@ -115,6 +133,11 @@ class Nutrition {
     if (value is String) return double.tryParse(value) ?? 0.0;
     return 0.0; // Default to 0.0 if unable to parse
   }
+
+  @override
+  String toString() {
+    return 'Nutrition{calories: $calories, protein: $protein, carbs: $carbs, fat: $fat, vitamins: $vitamins}';
+  }
 }
 
 class Directions {
@@ -125,8 +148,8 @@ class Directions {
   Directions({
     required this.firstStep,
     required this.secondStep,
-    required this.additionalSteps,
-  });
+    required List<String> additionalSteps,
+  }) : additionalSteps = List.unmodifiable(additionalSteps);
 
   // Factory constructor to parse JSON data
   factory Directions.fromJson(Map<String, dynamic> json) {
@@ -144,5 +167,10 @@ class Directions {
       secondStep: 'N/A',
       additionalSteps: [],
     );
+  }
+
+  @override
+  String toString() {
+    return 'Directions{firstStep: $firstStep, secondStep: $secondStep, additionalSteps: $additionalSteps}';
   }
 }
