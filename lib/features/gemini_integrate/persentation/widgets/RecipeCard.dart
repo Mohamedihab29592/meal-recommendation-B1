@@ -88,12 +88,12 @@ class RecipeCard extends StatelessWidget {
                   // Ingredients Count with Icon
                   Row(
                     children: [
-                      const Icon(Icons.kitchen, size: 18, color: AppColors.primary),
+                      const Icon(Icons.kitchen, size: 18, color: Colors.blueAccent),
                       const SizedBox(width: 4),
                       Text(
                         '${recipe.ingredients.length} Ingredients',
                         style: const TextStyle(
-                          color: Colors.black,
+                          color: Colors.black54,
                           fontSize: 16,
                           fontWeight: FontWeight.bold
                         ),
@@ -101,7 +101,7 @@ class RecipeCard extends StatelessWidget {
                       const Spacer(),
                       Row(
                         children: [
-                           const Icon(Icons.timer, size: 18, color: AppColors.primary),
+                           const Icon(Icons.timer, size: 18, color: Colors.orangeAccent),
                           const SizedBox(width: 4),
                           Text(
                             '${recipe.time} min',

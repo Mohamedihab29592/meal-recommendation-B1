@@ -62,18 +62,17 @@ class _FavoritesViewState extends State<FavoritesView> {
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
                       return CustomRecipesCard(
-                        ontap: () {
+                        onTapFav: () {
                           selectedId = favorites[index].id;
                           BlocProvider.of<FavoritesBloc>(context).add(
                               DeleteFavoriteEvent(selectedId));
                         },
                         time: favorites[index].timing,
                         middleText: favorites[index].subTitle,
-                        firsttext: favorites[index].title,
-                        ingrediantes: favorites[index].ingredients,
+                        firstText: favorites[index].title,
+                        ingredients: favorites[index].ingredients,
                         image: favorites[index].image,
-                        rating: favorites[index].rating,
-                        isFavorite: true,
+                        onTapDelete: () {},
                       );
                     },
                     separatorBuilder: (context, index) {

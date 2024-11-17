@@ -1,28 +1,19 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dartz/dartz.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
-import 'package:meal_recommendation_b1/features/home/data/data_source/data_source.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Screens/Details/DetailsPage.dart';
-import '../../../../core/components/CustomeTextRow.dart';
 import '../../../../core/components/Custome_Appbar.dart';
-import '../../../../core/components/Custome_recipes_card.dart';
+import '../../../../core/components/custom_recipes_card.dart';
 import '../../../../core/utiles/assets.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 
 class HomePage extends StatelessWidget {
-  final Assets asset = Assets();
-  final AppColors appColors = AppColors();
-  final DataSource data = DataSource();
-  String? name, idDoc;
+  const HomePage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -85,10 +76,10 @@ class HomePage extends StatelessWidget {
                       borderSide: const BorderSide(
                           color: AppColors.primary, width: 1.5),
                     ),
-                      suffixIcon: Image.asset(Assets.icFilter,
-                          color: Colors.black, height: 25),
-                      prefixIcon: Image.asset(Assets.icSearch,
-                          color: Colors.black, height: 25),
+                    suffixIcon: Image.asset(Assets.icFilter,
+                        color: Colors.black, height: 25),
+                    prefixIcon: Image.asset(Assets.icSearch,
+                        color: Colors.black, height: 25),
                   ),
                 ),
                 SizedBox(height: screenSize.height * 0.02),
@@ -154,62 +145,70 @@ class HomePage extends StatelessWidget {
                     if (state is IsLoadingHome) {
                       return const Center(child: CircularProgressIndicator());
                     } else if (state is SuccessState) {
+                      final homeRecipes = BlocProvider.of<HomeCubit>(context).homeRecipes;
+                      print("test : $homeRecipes");
+                      if (homeRecipes.isEmpty) {
+                        return const Center(
+                          child: Text(
+                            "No recipes found.",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        );
+                      }
                       return Column(
                         children: [
-                          ListView(
-                            shrinkWrap: true, // Makes the ListView adapt to its content
-                            physics: const NeverScrollableScrollPhysics(), // Disables scrolling
-                            children: BlocProvider.of<HomeCubit>(context)
-                                .dataa
-                                .asMap()
-                                .entries
-                                .map((entry) {
-                              var index = entry.key;
-                              var meal = entry.value;
+                          ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: homeRecipes.length,
+                            itemBuilder: (context, index) {
+                              var meal = homeRecipes[index];
 
                               return InkWell(
                                 onTap: () async {
-                                  final detailsCubit = BlocProvider.of<DetailsCubit>(context);
+                                  final detailsCubit =
+                                  BlocProvider.of<DetailsCubit>(context);
                                   detailsCubit.getDetailsData(context);
-                                  detailsCubit.reff =
-                                  BlocProvider.of<HomeCubit>(context).dataa[index]['typeofmeal'];
+                                  detailsCubit.reff = meal['typeOfMeal'];
 
                                   context.pushNamed(AppRoutes.detailsPage);
                                 },
-                                child: CustomeRecipesCard(
+                                child: CustomRecipesCard(
                                   key: ValueKey(meal["id"]), // Add a unique key
-                                  ontapDelete: () {
+                                  onTapDelete: () {
                                     String mealId = meal["id"];
                                     showDeleteDialog(
                                       context: context,
                                       mealId: mealId,
                                       onSuccess: () {
-                                        BlocProvider.of<HomeCubit>(context).deleteRecipe(mealId);
+                                        BlocProvider.of<HomeCubit>(context)
+                                            .deleteRecipe(mealId);
                                       },
                                     );
                                   },
-                                  ontapFav: () {
+                                  onTapFav: () {
                                     // Add to favorite functionality
                                   },
-                                  firsttext: meal["typeofmeal"] ?? "",
-                                  ingrediantes: "${meal["NOingrediantes"] ?? 0} ingredients",
+                                  firstText: meal["typeOfMeal"] ?? "",
+                                  ingredients:
+                                  "${meal["NOingrediantes"] ?? 0} ingredients",
                                   time: "${meal["time"] ?? 0} min",
                                   middleText: meal["mealName"] ?? "",
                                   image: meal["image"] ?? "",
                                 ),
                               );
-                            }).toList(),
+                            },
                           ),
                         ],
                       );
                     } else if (state is FailureState) {
-                      return Center(
-                          child: Text(state.errorMessage ?? "Error!"));
+                      return Center(child: Text(state.errorMessage ?? "Error!"));
                     } else {
                       return const SizedBox.shrink();
                     }
                   },
                 )
+
               ],
             ),
           ),

@@ -4,7 +4,7 @@ abstract class HomeState{}
 class InintialState extends HomeState{}
 class IsLoadingHome extends HomeState{}
 class SuccessState extends HomeState{
-  List<QueryDocumentSnapshot> data = [];
+  List<dynamic> data = [];
   SuccessState(this.data);
 }
 class FailureState extends HomeState{

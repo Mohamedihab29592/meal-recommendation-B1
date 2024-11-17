@@ -18,7 +18,7 @@ class SeeAllScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final data = BlocProvider.of<HomeCubit>(context).dataa;
+    final data = BlocProvider.of<HomeCubit>(context).homeRecipes;
     final screenSize = MediaQuery.of(context).size;
 
     return BlocProvider(

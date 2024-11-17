@@ -64,8 +64,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) {
           if (state is Authenticated) {
-            // Navigate to the home screen on successful login
-            Navigator.pushReplacementNamed(context, AppRoutes.home);
+            Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),
@@ -151,7 +150,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               LoginWithEmailEvent(email, password),
                             );
                             _saveUserData();
-                            Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
                           },
                         ),
                         const Padding(
