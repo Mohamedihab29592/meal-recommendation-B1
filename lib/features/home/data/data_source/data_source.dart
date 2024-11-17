@@ -1,19 +1,30 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 
 abstract class BaseDataSource{
-   getdata();
+   getData();
    getdatawithid(context);
 }
 class DataSource extends BaseDataSource{
   List<QueryDocumentSnapshot> data=[];
   @override
-   getdata()async {
-    QuerySnapshot querySnapshot =await FirebaseFirestore.instance.collection("Recipes").get();
-    data.addAll(querySnapshot.docs);
-    print(data);
+  getData() async {
+
+    // data.clear();
+    try {
+      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+          .collection("Recipes")
+          .where("uid", isEqualTo: FirebaseAuth.instance.currentUser!.uid)
+          .get();
+
+      data.addAll(querySnapshot.docs);
+    } catch (e) {
+      print("Error fetching data: $e");
+      return [];
+    }
     return data;
   }
 

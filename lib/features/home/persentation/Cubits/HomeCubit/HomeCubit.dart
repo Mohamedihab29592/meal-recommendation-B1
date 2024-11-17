@@ -14,7 +14,7 @@ class HomeCubit extends Cubit<HomeState> {
     emit(IsLoadingHome());
     try {
       dataa.clear(); // Clear existing data
-      dataa = await datasource.getdata(); // Fetch new data
+      dataa = await datasource.getData(); // Fetch new data
       emit(SuccessState(dataa));
     } catch (e) {
       emit(FailureState(errorMessage: "$e"));

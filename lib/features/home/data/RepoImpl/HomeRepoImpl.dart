@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/domain/HomeRepo/HomeRepo.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/ImageCubit.dart';
@@ -9,10 +10,11 @@ class HomeRepoImpl extends HomeRepo{
       String? protein,String? carb,String? fat,String? kcal,String? vitamins,
       String? firstIngrediants,String? secoundIngrediants,String? thirdIngrediants,String? fourthIngrediants,
     String? firstStep,String? secoundtStep,
-    String? piecesone,String? piecestwo,String? piecesthree,String? piecesfour
+    String? piecesone,String? piecestwo,String? piecesthree,String? piecesfour,
   }) {
     CollectionReference addRecipes=FirebaseFirestore.instance.collection("Recipes");
     return addRecipes.add({
+      "uid":FirebaseAuth.instance.currentUser!.uid,
       "id":FirebaseFirestore.instance.collection("Recipes").doc().id,
       "typeofmeal":typeofmeal,
       "mealName":mealName,
