@@ -13,28 +13,29 @@ class RecipeRepository {
       // Fetch recipe data from Gemini
       final geminiResponse = await geminiApiService.fetchRecipeFromGemini(query);
 
-      // Check if geminiResponse or recipeData is null
-      if (geminiResponse['name'] == null) {
-        print('No recipe data found from Gemini');
-        return [];  // Return an empty list if no recipe data is found
+      // Check if the response contains necessary fields
+      if (geminiResponse.isEmpty) {
+        print('No data received from Gemini API');
+        return [];
       }
 
-      // Prepare the recipe data structure
+      // Prepare the recipe data structure with safe handling for missing fields
       var recipeData = {
         'name': geminiResponse['name'] ?? 'Unknown Dish',
-        'description': geminiResponse['description'] ?? 'No description available',
-        'imageUrl': await apiService.fetchRecipeImage(query),  // Get recipe image URL from Pexels
-        'ingredients': await _getIngredientsWithImages(geminiResponse['ingredients']),
-        'instructions': geminiResponse['instructions'] ?? [],
-        'nutrition': geminiResponse['nutrition'] ?? {}
+        'summary': geminiResponse['summary'] ?? 'No summary available',
+        'typeOfMeal': geminiResponse['typeOfMeal'] ?? 'General',
+        'time': geminiResponse['time'] ?? 'N/A',
+        'imageUrl': await apiService.fetchRecipeImage(query) ?? 'default_recipe_image_url',
+        'ingredients': await _getIngredientsWithImages(geminiResponse['ingredients'] ?? []),
+        'nutrition': geminiResponse['nutrition'] ?? Nutrition.defaultValues().toJson(),
+        'directions': geminiResponse['directions'] ?? Directions.defaultValues().toJson()
       };
 
       // Return the recipe object
       return [Recipe.fromJson(recipeData)];
-
     } catch (e) {
-      print('Error fetching recipes or images: $e');
-      return [];  // Return an empty list on error
+      print('Error fetching recipes or processing data: $e');
+      return [] ;
     }
   }
 
@@ -42,14 +43,39 @@ class RecipeRepository {
   Future<List<Map<String, dynamic>>> _getIngredientsWithImages(List<dynamic> ingredients) async {
     final List<Map<String, dynamic>> ingredientsWithImages = [];
 
-    // For each ingredient, fetch the image URL
     for (var ingredient in ingredients) {
-      final ingredientName = ingredient['name'] as String;
-      final imageUrl = await apiService.fetchIngredientImage(ingredientName);
-      ingredient['imageUrl'] = imageUrl ?? 'default_image_url'; // Provide a fallback URL if null
-      ingredientsWithImages.add(ingredient);
+      final ingredientName = ingredient['name'] ?? 'Unnamed Ingredient';
+      final imageUrl = await apiService.fetchIngredientImage(ingredientName) ?? 'default_image_url';
+      ingredientsWithImages.add({
+        ...ingredient,
+        'name': ingredientName,
+        'imageUrl': imageUrl,
+      });
     }
 
     return ingredientsWithImages;
+  }
+}
+
+// Extensions for converting objects to JSON
+extension NutritionExtension on Nutrition {
+  Map<String, dynamic> toJson() {
+    return {
+      'calories': calories,
+      'protein': protein,
+      'carbs': carbs,
+      'fat': fat,
+      'vitamins': vitamins,
+    };
+  }
+}
+
+extension DirectionsExtension on Directions {
+  Map<String, dynamic> toJson() {
+    return {
+      'firstStep': firstStep,
+      'secondStep': secondStep,
+      'additionalSteps': additionalSteps,
+    };
   }
 }

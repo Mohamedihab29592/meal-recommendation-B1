@@ -57,7 +57,7 @@ class _DetailsPageState extends State<DetailsPage> with SingleTickerProviderStat
                         print(docId);
                       },
                       leftImage: Assets.icBack,
-                      rightImage: Assets.icFavorite,
+
                     ),
 
                     // Image

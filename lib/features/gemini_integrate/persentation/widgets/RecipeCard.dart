@@ -1,7 +1,4 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_recommendation_b1/core/utiles/assets.dart';
-
 import '../../data/Recipe.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -11,92 +8,142 @@ class RecipeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image section with a fallback placeholder
-          recipe.imageUrl.isNotEmpty
-              ? Image.network(recipe.imageUrl, fit: BoxFit.cover)
-              : Image.asset(Assets.icSplash, fit: BoxFit.cover),
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    return GestureDetector(
+      onTap: () {
+        // Add functionality for tapping the card (e.g., navigate to details)
+      },
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        margin: const EdgeInsets.only(bottom: 16),
+        elevation: 5,
+        shadowColor: Colors.black45,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Image Section with overlay gradient
+            Stack(
               children: [
-                // Recipe name with improved text styling
-                Text(
-                  recipe.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.black87,
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                  child: Image.network(
+                    recipe.imageUrl,
+                    height: 180,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          value: loadingProgress.expectedTotalBytes != null
+                              ? loadingProgress.cumulativeBytesLoaded /
+                              loadingProgress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) {
+                      return Container(
+                        height: 180,
+                        width: double.infinity,
+                        color: Colors.grey[300],
+                        child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
+                      );
+                    },
                   ),
                 ),
-                const SizedBox(height: 6),
-
-                // Recipe description
-                Text(
-                  recipe.description,
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
+                Positioned(
+                  bottom: 10,
+                  left: 10,
+                  right: 10, // Ensure the text doesn't overflow out of bounds
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      recipe.name,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis, // Ensures text overflow works
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 12),
-
-                // Ingredients section with bold title
-                const Text(
-                  'Ingredients:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: recipe.ingredients.map((ingredient) {
-                    return Row(
-                      children: [
-                        // Ingredient image with a fallback placeholder
-                        ingredient.imageUrl.isNotEmpty
-                            ? Image.network(ingredient.imageUrl, width: 40, height: 40, fit: BoxFit.cover)
-                            : Image.asset(Assets.icSplash, width: 40, height: 40),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${ingredient.quantity} ${ingredient.unit} ${ingredient.name}',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 12),
-
-                // Instructions section with bold title
-                const Text(
-                  'Instructions:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: recipe.instructions
-                      .map((instruction) => Text('- $instruction', style: const TextStyle(fontSize: 14)))
-                      .toList(),
-                ),
-                const SizedBox(height: 12),
-
-                // Nutrition section with bold title
-                const Text(
-                  'Nutrition Info:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Text('Calories: ${recipe.nutrition.calories} kcal'),
-                Text('Protein: ${recipe.nutrition.protein} g'),
-                Text('Carbs: ${recipe.nutrition.carbs} g'),
-                Text('Fat: ${recipe.nutrition.fat} g'),
               ],
             ),
-          ),
-        ],
+            // Text Section with padding and new styles
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Ingredients Count with Icon
+                  Row(
+                    children: [
+                      const Icon(Icons.kitchen, size: 16, color: Colors.grey),
+                      const SizedBox(width: 4),
+                      Text(
+                        '${recipe.ingredients.length} Ingredients',
+                        style: TextStyle(
+                          color: Colors.grey[700],
+                          fontSize: 14,
+                        ),
+                      ),
+                      const Spacer(),
+                      // Preparation Time with updated style
+                      Row(
+                        children: [
+                          const Icon(Icons.timer, size: 16, color: Colors.blueAccent),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${recipe.time} min',
+                            style: const TextStyle(
+                              color: Colors.blueAccent,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            // Center the button
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 16.0), // Padding for spacing
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF001A3F), // Button color
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Optional padding for button size
+                  ),
+                  onPressed: () {
+                    // Add functionality for button (e.g., navigate to recipe)
+                  },
+                  child: const Text(
+                    'View Recipe',
+                    style: TextStyle(
+                      color: Colors.white, // Text color
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            )
+            ,
+          ],
+        ),
       ),
     );
   }
 }
+
+

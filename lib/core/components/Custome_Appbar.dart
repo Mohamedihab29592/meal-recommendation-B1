@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meal_recommendation_b1/core/utiles/assets.dart';
 
 class CustomAppbar extends StatelessWidget {
 
   final String? leftImage;
-  final String? rightImage;
   final VoidCallback ontapleft;
   final VoidCallback ontapright;
   final double? leftPadding ;
   final double? rightPadding ;
+  final Widget? rightChild;
   const CustomAppbar(
       {super.key,
-      this.rightImage,
       this.leftImage,
       required this.ontapleft,
-      required this.ontapright, this.leftPadding, this.rightPadding});
+      required this.ontapright, this.leftPadding, this.rightPadding, this.rightChild});
 
 
   @override
@@ -33,8 +33,8 @@ class CustomAppbar extends StatelessWidget {
             child: Container(
               margin:  EdgeInsets.only(right: rightPadding ?? 6),
               alignment: Alignment.topRight,
-              child: SvgPicture.asset(
-                "assets/images/gemini.svg",
+              child: rightChild ?? SvgPicture.asset(
+                Assets.geminiSVG,
                 width: 50.0,
                 height: 40.0,
               ),

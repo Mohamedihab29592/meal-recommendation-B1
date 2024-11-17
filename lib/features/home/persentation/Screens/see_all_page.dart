@@ -40,7 +40,6 @@ class SeeAllScreen extends StatelessWidget {
                       },
                       ontapright: () {},
                       leftImage: Assets.icProfileMenu,
-                      rightImage: Assets.icNotification,
                     ),
                     // Trending Recipes Section
                     Text(
