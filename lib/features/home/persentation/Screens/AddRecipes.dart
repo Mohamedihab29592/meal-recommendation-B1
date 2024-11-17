@@ -6,6 +6,7 @@ import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/custom_text_field.dart';
 import '../../../../core/utiles/app_colors.dart';
 import '../../../../core/utiles/assets.dart';
+import '../../../gemini_integrate/data/Recipe.dart';
 import '../../data/RepoImpl/HomeRepoImpl.dart';
 import '../Cubits/AddRecipesCubit/ImageCubit.dart';
 import '../Cubits/AddRecipesCubit/ImageState.dart';
@@ -173,34 +174,54 @@ class AddRecipes extends StatelessWidget {
                 margin: const EdgeInsets.only(bottom: 16),
                 child: ElevatedButton(
                   onPressed: () {
-                    homerepoimpl
-                        .sendData(
-                      image: BlocProvider.of<ImageCubit>(context).im.toString(),
-                      typeofmeal: typeMeal.text.trim(),
-                      mealName: mealName.text.trim(),
-                      ingrediantes: numberOfIngrediantes.text.trim(),
-                      time: time.text.trim(),
+                    final recipe = Recipe(
+                      name: mealName.text.trim(),
                       summary: summary.text.trim(),
-                      protein: protein.text.trim(),
-                      carb: carb.text.trim(),
-                      fat: fat.text.trim(),
-                      kcal: kcal.text.trim(),
-                      vitamins: vitamenes.text.trim(),
-                      firstIngrediants: firstingrediant.text.trim(),
-                      secoundIngrediants: secoundingrediant.text.trim(),
-                      thirdIngrediants: thirdingrediant.text.trim(),
-                      fourthIngrediants: fourthingrediant.text.trim(),
-                      piecesone: piecesone.text.trim(),
-                      piecestwo: piecestwo.text.trim(),
-                      piecesthree: piecesthree.text.trim(),
-                      piecesfour: piecesfour.text.trim(),
-                      firstStep: firstStep.text.trim(),
-                      secoundtStep: secoundStep.text.trim(),
-                    )?.then((value) {
+                      typeOfMeal: typeMeal.text.trim(),
+                      time: time.text.trim(),
+                      imageUrl: BlocProvider.of<ImageCubit>(context).im.toString(),
+                      ingredients: [
+                        Ingredient(
+                          name: firstingrediant.text.trim(),
+                          quantity: piecesone.text.trim(),
+                          unit: '', // Provide unit if applicable
+                          imageUrl: '', // Provide image URL if applicable
+                        ),
+                        Ingredient(
+                          name: secoundingrediant.text.trim(),
+                          quantity: piecestwo.text.trim(),
+                          unit: '',
+                          imageUrl: '',
+                        ),
+                        Ingredient(
+                          name: thirdingrediant.text.trim(),
+                          quantity: piecesthree.text.trim(),
+                          unit: '',
+                          imageUrl: '',
+                        ),
+                        Ingredient(
+                          name: fourthingrediant.text.trim(),
+                          quantity: piecesfour.text.trim(),
+                          unit: '',
+                          imageUrl: '',
+                        ),
+                      ],
+                      nutrition: Nutrition(
+                        calories: int.tryParse(kcal.text.trim()) ?? 0,
+                        protein: double.tryParse(protein.text.trim()) ?? 0.0,
+                        carbs: double.tryParse(carb.text.trim()) ?? 0.0,
+                        fat: double.tryParse(fat.text.trim()) ?? 0.0,
+                        vitamins: vitamenes.text.trim().split(','), // Assuming vitamins are comma-separated
+                      ),
+                      directions: Directions(
+                        firstStep: firstStep.text.trim(),
+                        secondStep: secoundStep.text.trim(),
+                        additionalSteps: [], // Add additional steps if any
+                      ),
+                    );
+                    homerepoimpl.addIngredients(recipe).then((value) {
                       context.pushReplacementNamed(AppRoutes.navBar);
-                    })
-                        .catchError((error) {
-                      // Handle errors here
+                    }).catchError((error) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Failed to send data: $error')),
                       );
