@@ -12,8 +12,19 @@ import '../../../../core/utiles/assets.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({super.key});
+
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+  @override
+  void initState() {
+    super.initState();
+    context.read<HomeCubit>().getdata();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -142,70 +153,96 @@ class HomePage extends StatelessWidget {
                 // Recipes List
                 BlocBuilder<HomeCubit, HomeState>(
                   builder: (context, state) {
+                    print('Current state: $state'); // Debug print to track state changes
+
                     if (state is IsLoadingHome) {
                       return const Center(child: CircularProgressIndicator());
-                    } else if (state is SuccessState) {
-                      final homeRecipes = BlocProvider.of<HomeCubit>(context).homeRecipes;
-                      print("test : $homeRecipes");
-                      if (homeRecipes.isEmpty) {
-                        return const Center(
-                          child: Text(
-                            "No recipes found.",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                    }
+
+                    if (state is SuccessState) {
+                      print('Recipes in state: ${state.data}'); // Check the contents of the recipes
+
+                      if (state.data.isEmpty) {
+                        return Center(
+                          child: Image.asset(Assets.noFoodFound)
                         );
                       }
+
+                      // Check if the first recipe has valid fields
+                      var firstRecipe = state.data.first;
+                      print('First recipe: $firstRecipe'); // Log the first recipe
+
                       return Column(
                         children: [
                           ListView.builder(
                             shrinkWrap: true,
                             physics: const NeverScrollableScrollPhysics(),
-                            itemCount: homeRecipes.length,
-                            itemBuilder: (context, index) {
-                              var meal = homeRecipes[index];
+                            itemCount: state.data.length,
+                          itemBuilder: (context, index) {
+                            var meal = state.data[index];
 
-                              return InkWell(
-                                onTap: () async {
-                                  final detailsCubit =
-                                  BlocProvider.of<DetailsCubit>(context);
-                                  detailsCubit.getDetailsData(context);
-                                  detailsCubit.reff = meal['typeOfMeal'];
+                            String mealId = meal["id"] ?? "Unknown ID";
+                            String mealName = meal["name"]?.isNotEmpty == true
+                                ? meal["name"]
+                                : "Unnamed Meal";
+                            String mealType = meal["typeOfMeal"]?.isNotEmpty ==
+                                true ? meal["typeOfMeal"] : "Unknown Type";
+                            String mealImage = meal["imageUrl"] ??
+                                "";
 
-                                  context.pushNamed(AppRoutes.detailsPage);
+                            return InkWell(
+                              onTap: () async {
+                                final detailsCubit = BlocProvider.of<
+                                    DetailsCubit>(context);
+                                detailsCubit.getDetailsData(context);
+                                detailsCubit.reff = mealType;
+
+                                context.pushNamed(AppRoutes.detailsPage);
+                              },
+                              child: CustomRecipesCard(
+                                key: ValueKey(mealId),
+                                onTapDelete: () {
+                                  showDeleteDialog(
+                                    context: context,
+                                    mealId: mealId,
+                                    onSuccess: () {
+                                      BlocProvider.of<HomeCubit>(context)
+                                          .getdata();
+                                    },
+                                  );
                                 },
-                                child: CustomRecipesCard(
-                                  key: ValueKey(meal["id"]), // Add a unique key
-                                  onTapDelete: () {
-                                    String mealId = meal["id"];
-                                    showDeleteDialog(
-                                      context: context,
-                                      mealId: mealId,
-                                      onSuccess: () {
-                                        BlocProvider.of<HomeCubit>(context)
-                                            .deleteRecipe(mealId);
-                                      },
-                                    );
-                                  },
-                                  onTapFav: () {
-                                    // Add to favorite functionality
-                                  },
-                                  firstText: meal["typeOfMeal"] ?? "",
-                                  ingredients:
-                                  "${meal["NOingrediantes"] ?? 0} ingredients",
-                                  time: "${meal["time"] ?? 0} min",
-                                  middleText: meal["mealName"] ?? "",
-                                  image: meal["image"] ?? "",
-                                ),
-                              );
-                            },
+                                onTapFav: () {
+                                  // Add to favorite functionality
+                                },
+                                firstText: mealType,
+                                ingredients: meal["ingredients"] != null &&
+                                    meal["ingredients"].isNotEmpty
+                                    ? "${meal["ingredients"]
+                                    .length} ingredients"
+                                    : "No ingredients available",
+                                time: meal["time"]?.isNotEmpty == true
+                                    ? "${meal["time"]} min"
+                                    : "N/A",
+                                middleText: mealName,
+                                image: mealImage,
+                              ),
+                            );
+                          }
                           ),
                         ],
                       );
-                    } else if (state is FailureState) {
-                      return Center(child: Text(state.errorMessage ?? "Error!"));
-                    } else {
-                      return const SizedBox.shrink();
                     }
+
+                    if (state is FailureState) {
+                      return Center(
+                          child: Text(
+                            state.errorMessage ?? "An error occurred",
+                            style: const TextStyle(color: Colors.red),
+                          )
+                      );
+                    }
+
+                    return const SizedBox.shrink();
                   },
                 )
 
@@ -236,30 +273,18 @@ Future<void> showDeleteDialog({
       try {
         print("Attempting to delete document with ID: $mealId");
 
-        // Query the Firestore collection for the document matching the given ID
-        QuerySnapshot snapshot = await FirebaseFirestore.instance
-            .collection("Recipes")
-            .where("id", isEqualTo: mealId) // Match the field 'id'
-            .get();
+        final homeCubit = BlocProvider.of<HomeCubit>(context);
 
-        if (snapshot.docs.isNotEmpty) {
-          // Delete all matching documents
-          for (var doc in snapshot.docs) {
-            await doc.reference.delete();
-            print("Successfully deleted document ID: ${doc.id}");
-          }
-          // Show success message
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Meal deleted successfully!')),
-          );
-          // Trigger success callback to refresh UI or perform navigation
-          onSuccess();
-        } else {
-          print("No document found with ID: $mealId");
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('No meal found to delete!')),
-          );
-        }
+
+        await homeCubit.deleteRecipe(mealId);
+
+        // Show success message
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Meal deleted successfully!')),
+        );
+
+        // Trigger success callback to refresh UI or perform navigation
+        onSuccess();
       } catch (e) {
         print("Error deleting document: $e");
         ScaffoldMessenger.of(context).showSnackBar(

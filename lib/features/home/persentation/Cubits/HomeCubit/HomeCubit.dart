@@ -10,65 +10,64 @@ class HomeCubit extends Cubit<HomeState> {
   List<dynamic> homeRecipes = []; // Initialize with an empty list
   DataSource datasource = DataSource();
 
-  /// Fetch recipes for the logged-in user
   Future<void> getdata() async {
-    emit(IsLoadingHome()); // Emit loading state
+    emit(IsLoadingHome());
     try {
-      // Ensure user is logged in
       String? userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
-        throw Exception("No user is logged in.");
+        emit(FailureState(errorMessage: "No user is logged in."));
+        return;
       }
 
-      // Fetch the user's document
       DocumentSnapshot userDoc = await FirebaseFirestore.instance
           .collection("users")
           .doc(userId)
           .get();
 
-      // Retrieve or initialize the "recipes" field
       if (userDoc.exists) {
         // Safely fetch the recipes or default to an empty list
-        homeRecipes = (userDoc.data() as Map<String, dynamic>?)?["recipes"] ?? [];
-        emit(SuccessState(homeRecipes)); // Emit success state with fetched data
+        homeRecipes =
+            (userDoc.data() as Map<String, dynamic>?)?["recipes"] ?? [];
+
+        print('Fetched recipes: $homeRecipes'); // Debug print
+
+        emit(SuccessState(homeRecipes));
       } else {
         homeRecipes = []; // Initialize if the document doesn't exist
-        emit(SuccessState([])); // Emit empty state
+        emit(SuccessState([]));
       }
     } catch (e) {
-      emit(FailureState(errorMessage: "$e")); // Emit failure state with error
+      print('Error fetching data: $e'); // Debug print
+      emit(FailureState(errorMessage: "$e"));
     }
   }
 
-  /// Delete a recipe by its ID
   Future<void> deleteRecipe(String id) async {
     emit(IsLoadingHome());
     try {
-      // Ensure user is logged in
       String? userId = FirebaseAuth.instance.currentUser?.uid;
       if (userId == null) {
-        throw Exception("No user is logged in.");
+        emit(FailureState(errorMessage: "No user is logged in."));
+        return;
       }
 
-      // Fetch the user's document
       DocumentReference userDoc =
       FirebaseFirestore.instance.collection("users").doc(userId);
       DocumentSnapshot snapshot = await userDoc.get();
 
       if (snapshot.exists) {
-        // Retrieve the current recipes
-        List<dynamic> recipes = (snapshot.data() as Map<String, dynamic>?)?["recipes"] ?? [];
+        List<dynamic> recipes =
+            (snapshot.data() as Map<String, dynamic>?)?["recipes"] ?? [];
 
-        // Filter out the recipe to delete
         recipes.removeWhere((recipe) => recipe["id"] == id);
 
-        // Update the document with the modified recipes list
         await userDoc.update({"recipes": recipes});
 
-        // Refresh the data after deletion
-        await getdata();
+        // Directly update the state after deletion
+        homeRecipes = recipes;
+        emit(SuccessState(homeRecipes));
       } else {
-        throw Exception("User document does not exist.");
+        emit(FailureState(errorMessage: "User document does not exist."));
       }
     } catch (e) {
       emit(FailureState(errorMessage: 'Failed to delete recipe: $e'));
