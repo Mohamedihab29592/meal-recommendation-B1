@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import '../../data/Recipe.dart';
 
 class RecipeCard extends StatelessWidget {
@@ -13,6 +14,7 @@ class RecipeCard extends StatelessWidget {
         // Add functionality for tapping the card (e.g., navigate to details)
       },
       child: Card(
+        color: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         margin: const EdgeInsets.only(bottom: 16),
         elevation: 5,
@@ -61,15 +63,17 @@ class RecipeCard extends StatelessWidget {
                       color: Colors.black54,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(
-                      recipe.name,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 20,
+                    child: Center(
+                      child: Text(
+                        recipe.name,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 20,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis, // Ensures text overflow works
                       ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis, // Ensures text overflow works
                     ),
                   ),
                 ),
@@ -84,26 +88,27 @@ class RecipeCard extends StatelessWidget {
                   // Ingredients Count with Icon
                   Row(
                     children: [
-                      const Icon(Icons.kitchen, size: 16, color: Colors.grey),
+                      const Icon(Icons.kitchen, size: 18, color: AppColors.primary),
                       const SizedBox(width: 4),
                       Text(
                         '${recipe.ingredients.length} Ingredients',
-                        style: TextStyle(
-                          color: Colors.grey[700],
-                          fontSize: 14,
+                        style: const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold
                         ),
                       ),
                       const Spacer(),
-                      // Preparation Time with updated style
                       Row(
                         children: [
-                          const Icon(Icons.timer, size: 16, color: Colors.blueAccent),
+                           const Icon(Icons.timer, size: 18, color: AppColors.primary),
                           const SizedBox(width: 4),
                           Text(
                             '${recipe.time} min',
                             style: const TextStyle(
-                              color: Colors.blueAccent,
-                              fontSize: 14,
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold
                             ),
                           ),
                         ],
@@ -129,7 +134,7 @@ class RecipeCard extends StatelessWidget {
                     // Add functionality for button (e.g., navigate to recipe)
                   },
                   child: const Text(
-                    'View Recipe',
+                    'Add Ingredients',
                     style: TextStyle(
                       color: Colors.white, // Text color
                       fontWeight: FontWeight.bold,
@@ -137,8 +142,7 @@ class RecipeCard extends StatelessWidget {
                   ),
                 ),
               ),
-            )
-            ,
+            ),
           ],
         ),
       ),

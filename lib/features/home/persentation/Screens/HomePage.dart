@@ -36,8 +36,10 @@ class HomePage extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Custom AppBar with profile menu and navigation
+                const SizedBox(height: 10),
                 CustomAppbar(
+                  rightPadding: 0,
+                  leftPadding: 0,
                   ontapleft: () {},
                   ontapright: () {
                     context.pushNamed(AppRoutes.geminiRecipe);
