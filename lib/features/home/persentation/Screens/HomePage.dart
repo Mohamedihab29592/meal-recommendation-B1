@@ -14,6 +14,7 @@ import 'package:meal_recommendation_b1/features/home/persentation/Screens/Detail
 import '../../../../core/components/CustomeTextRow.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/Custome_recipes_card.dart';
+import '../../../../core/components/side_bar.dart';
 import '../../../../core/utiles/assets.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
@@ -24,11 +25,17 @@ class HomePage extends StatelessWidget {
   final DataSource data = DataSource();
   String? name, idDoc;
 
+  var scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(
+      key: scaffoldKey,
+      drawer: SideBar(oldIndex: 1,returnedIndex: (int index){
+
+      },),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
@@ -38,7 +45,10 @@ class HomePage extends StatelessWidget {
               children: [
                 // Custom AppBar with profile menu and navigation
                 CustomAppbar(
-                  ontapleft: () {},
+                  ontapleft: () {
+                    scaffoldKey.currentState
+                        ?.openDrawer();
+                  },
                   ontapright: () {
                     context.pushNamed(AppRoutes.geminiRecipe);
                   },
