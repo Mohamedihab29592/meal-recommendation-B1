@@ -1,8 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+
+import '../../../../core/routes/app_routes.dart';
 
 class TrendingRecipeCard extends StatefulWidget {
+  final String recipeId;
   final String imageUrl;
   final String duration;
   final String numberOfIngredients;
@@ -13,7 +17,7 @@ class TrendingRecipeCard extends StatefulWidget {
     required this.duration,
     required this.typeOfMeal,
     required this.imageUrl,
-    required this.numberOfIngredients,
+    required this.numberOfIngredients, required this.recipeId,
   });
 
   @override
@@ -29,8 +33,7 @@ class TrendingRecipeCardState extends State<TrendingRecipeCard> {
 
     return GestureDetector(
       onTap: () {
-        // Navigate to recipe details
-        // context.pushNamed(AppRoutes.recipeDetails, extra: widget);
+         context.pushNamed(AppRoutes.detailsPage, arguments: widget.recipeId);
       },
       child: Container(
         width: screenSize.width * 0.7,

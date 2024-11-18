@@ -1,4 +1,7 @@
+import 'package:meal_recommendation_b1/features/gemini_integrate/data/RecipeRepository.dart';
+
 class Recipe {
+  String? id;
   final String name;
   final String summary;
   final String typeOfMeal;
@@ -9,6 +12,7 @@ class Recipe {
   final Directions directions;
 
   Recipe({
+    this.id,
     required this.name,
     required this.summary,
     required this.typeOfMeal,
@@ -17,21 +21,22 @@ class Recipe {
     required List<Ingredient> ingredients,
     required this.nutrition,
     required this.directions,
-  }) : ingredients = List.unmodifiable(ingredients) /*This prevents external modification of lists*/ {
+  }) : ingredients = List.unmodifiable(ingredients) {
     _validate();
   }
 
   // Factory constructor to parse JSON data
   factory Recipe.fromJson(Map<String, dynamic> json) {
     return Recipe(
+      id: json['id'],
       name: json['name'] ?? 'Unnamed Recipe',
       summary: json['summary'] ?? 'No summary available',
       typeOfMeal: json['typeOfMeal'] ?? 'Unknown Meal Type',
       time: json['time'] ?? 'N/A',
       imageUrl: json['imageUrl'] ?? '',
       ingredients: (json['ingredients'] as List<dynamic>?)
-          ?.map((ingredientJson) => Ingredient.fromJson(ingredientJson))
-          .toList() ??
+              ?.map((ingredientJson) => Ingredient.fromJson(ingredientJson))
+              .toList() ??
           [],
       nutrition: json['nutrition'] != null
           ? Nutrition.fromJson(json['nutrition'])
@@ -42,6 +47,21 @@ class Recipe {
     );
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'summary': summary,
+      'typeOfMeal': typeOfMeal,
+      'time': time,
+      'imageUrl': imageUrl,
+      'ingredients':
+          ingredients.map((ingredient) => ingredient.toJson()).toList(),
+      'nutrition': nutrition.toJson(),
+      'directions': directions.toJson(),
+    };
+  }
+
   // Validation method to ensure required fields are not empty
   void _validate() {
     if (name.isEmpty || summary.isEmpty || typeOfMeal.isEmpty) {
@@ -50,8 +70,17 @@ class Recipe {
   }
 
   @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Recipe && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
+
+  @override
   String toString() {
-    return 'Recipe{name: $name, summary: $summary, typeOfMeal: $typeOfMeal, time: $time}';
+    return 'Recipe{id: $id, name: $name, summary: $summary, typeOfMeal: $typeOfMeal, time: $time}';
   }
 }
 
@@ -76,6 +105,15 @@ class Ingredient {
       unit: json['unit'] ?? 'N/A',
       imageUrl: json['imageUrl'] ?? '', // Fallback if image URL is missing
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'quantity': quantity,
+      'unit': unit,
+      'imageUrl': imageUrl,
+    };
   }
 
   @override

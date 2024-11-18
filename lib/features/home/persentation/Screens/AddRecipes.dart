@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
@@ -87,37 +88,40 @@ class AddRecipes extends StatelessWidget {
               builder: (context, state) {
                 return loading
                     ? const Center(
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-                    : CircleAvatar(
-                  backgroundColor: Colors.black,
-                  radius: screenSize.width < 600 ? 62 : 50,
-                  child: InkWell(
-                    onTap: () {
-                      BlocProvider.of<ImageCubit>(context).pickMainImage();
-                    },
-                    child: ClipOval(
-                      child: BlocProvider.of<ImageCubit>(context).mainImageUrl == null
-                          ? Image.asset(
-                        Assets.icSplash,
-                        fit: BoxFit.cover,
-                        width: screenSize.width < 600 ? 124 : 100,
-                        height: screenSize.width < 600 ? 124 : 100,
+                        child: SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(),
+                        ),
                       )
-                          : Image.network(
-                        BlocProvider.of<ImageCubit>(context).mainImageUrl!,
-                        fit: BoxFit.cover,
-                        width: screenSize.width < 600 ? 124 : 100,
-                        height: screenSize.width < 600 ? 124 : 100,
-                      ),
-                    ),
-                  ),
-                )
-                ;
+                    : CircleAvatar(
+                        backgroundColor: Colors.black,
+                        radius: screenSize.width < 600 ? 62 : 50,
+                        child: InkWell(
+                          onTap: () {
+                            BlocProvider.of<ImageCubit>(context)
+                                .pickMainImage();
+                          },
+                          child: ClipOval(
+                            child: BlocProvider.of<ImageCubit>(context)
+                                        .mainImageUrl ==
+                                    null
+                                ? Image.asset(
+                                    Assets.icSplash,
+                                    fit: BoxFit.cover,
+                                    width: screenSize.width < 600 ? 124 : 100,
+                                    height: screenSize.width < 600 ? 124 : 100,
+                                  )
+                                : Image.network(
+                                    BlocProvider.of<ImageCubit>(context)
+                                        .mainImageUrl!,
+                                    fit: BoxFit.cover,
+                                    width: screenSize.width < 600 ? 124 : 100,
+                                    height: screenSize.width < 600 ? 124 : 100,
+                                  ),
+                          ),
+                        ),
+                      );
               },
             ),
             const SizedBox(height: 10),
@@ -234,29 +238,39 @@ class AddRecipes extends StatelessWidget {
                         return ingredient.loading
                             ? const CircularProgressIndicator()
                             : CircleAvatar(
-                          backgroundColor: Colors.black,
-                          radius: screenSize.width < 600 ? 40 : 50,
-                          child: InkWell(
-                            onTap: () {
-                              context.read<ImageCubit>().pickImage(ingredient.id);
-                            },
-                            child: ClipOval(
-                              child: ingredient.imageUrl == null
-                                  ? Image.asset(
-                                Assets.icSplash,
-                                fit: BoxFit.cover,
-                                width: screenSize.width < 600 ? 80 : 100,
-                                height: screenSize.width < 600 ? 80 : 100,
-                              )
-                                  : Image.network(
-                                ingredient.imageUrl!,
-                                fit: BoxFit.cover,
-                                width: screenSize.width < 600 ? 80 : 100,
-                                height: screenSize.width < 600 ? 80 : 100,
-                              ),
-                            ),
-                          ),
-                        );
+                                backgroundColor: Colors.black,
+                                radius: screenSize.width < 600 ? 40 : 50,
+                                child: InkWell(
+                                  onTap: () {
+                                    context
+                                        .read<ImageCubit>()
+                                        .pickImage(ingredient.id);
+                                  },
+                                  child: ClipOval(
+                                    child: ingredient.imageUrl == null
+                                        ? Image.asset(
+                                            Assets.icSplash,
+                                            fit: BoxFit.cover,
+                                            width: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                            height: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                          )
+                                        : Image.network(
+                                            ingredient.imageUrl!,
+                                            fit: BoxFit.cover,
+                                            width: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                            height: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                          ),
+                                  ),
+                                ),
+                              );
                       },
                     ),
                     CustomContainerWithTextfield(
@@ -274,8 +288,7 @@ class AddRecipes extends StatelessWidget {
 
             // Directions
             const SizedBox(height: 20),
-            CustomMultilineTextfield(
-                hintText: "Step 1", controller: firstStep),
+            CustomMultilineTextfield(hintText: "Step 1", controller: firstStep),
             const SizedBox(height: 10),
             CustomMultilineTextfield(
                 hintText: "Step 2", controller: secoundStep),
@@ -286,7 +299,6 @@ class AddRecipes extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               child: ElevatedButton(
                 onPressed: () {
-                  print( BlocProvider.of<ImageCubit>(context).imageUrls);
                   final recipe = Recipe(
                     name: mealName.text.trim(),
                     summary: summary.text.trim(),
@@ -372,3 +384,4 @@ class IngredientUI {
         quantityController = TextEditingController(),
         loading = false;
 }
+

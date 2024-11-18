@@ -158,10 +158,11 @@ class SeeAllScreen extends StatelessWidget {
                               itemBuilder: (context, index) {
                                 final recipe = state.data[index];
                                 return TrendingRecipeCard(
-                                  duration: "${recipe["time"]} min",
-                                  imageUrl: recipe["imageUrl"],
-                                  numberOfIngredients: "${(recipe["ingredients"] as List).length} ingredients", // Count ingredients
-                                  typeOfMeal: recipe["name"],
+                                  recipeId: recipe.id ?? "",
+                                  duration: "${recipe.time} min",
+                                  imageUrl: recipe.imageUrl,
+                                  numberOfIngredients: "${(recipe.ingredients as List).length} ingredients", // Count ingredients
+                                  typeOfMeal: recipe.name,
                                 );
                               },
                             ),
@@ -181,10 +182,11 @@ class SeeAllScreen extends StatelessWidget {
                                   vertical: screenSize.height * 0.01,
                                 ),
                                 child: RecommendedRecipeCard(
-                                  duration: "${recipe["time"]} min",
-                                  imageUrl: recipe["imageUrl"],
-                                  numberOfIngredients: "${(recipe["ingredients"] as List).length} ingredients", // Count ingredients
-                                  typeOfMeal: recipe["name"],
+                                  recipeId: recipe.id??"",
+                                  duration: "${recipe.time} min",
+                                  imageUrl: recipe.imageUrl,
+                                  numberOfIngredients: "${(recipe.ingredients as List).length} ingredients", // Count ingredients
+                                  typeOfMeal: recipe.name,
                                 ),
                               );
                             },
@@ -192,7 +194,6 @@ class SeeAllScreen extends StatelessWidget {
                         ]),
                       );
                     }
-
                     return const SliverToBoxAdapter(child: SizedBox.shrink());
                   },
                 ),
