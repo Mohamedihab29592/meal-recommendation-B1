@@ -92,7 +92,9 @@ class _RegisterScreenBodyState extends State<RegisterScreenBody> {
                         text: "register",
                         onPressed: () {
                           if (formKey.currentState!.validate() &&
-                              acceptingTermsNotifier.value) {
+                              acceptingTermsNotifier.value &&
+                              createPasswordTextEditingController.text ==
+                                  confirmPasswordTextEditingController.text) {
                             BlocProvider.of<RegisterBloc>(context).add(
                               RegisterWithEmailEvent(
                                 name: nameTextEditingController.text,
@@ -109,6 +111,10 @@ class _RegisterScreenBodyState extends State<RegisterScreenBody> {
                                   phoneNumber:
                                       mobileTextEditingController.text),
                             );
+                          } else if (createPasswordTextEditingController.text !=
+                              confirmPasswordTextEditingController.text) {
+                                ShowMessage.show(
+                                context, "Passwords do not match ...");
                           } else {
                             ShowMessage.show(
                                 context, "You Have To Accept Our Terms ...");

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
+import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/AddRecipes.dart';
 import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
@@ -49,7 +51,15 @@ class AppRoutes {
               create: (_) => getIt<AuthBloc>(), child: const LoginScreen()),
         );
       case register:
-        return MaterialPageRoute(builder: (_) => const RegisterScreen());
+        return MaterialPageRoute(
+            builder: (_) => MultiBlocProvider(providers: [
+                  BlocProvider(
+                    create: (context) => getIt<RegisterBloc>(),
+                  ),
+                  BlocProvider(
+                    create: (context) => getIt<PhoneAuthBloc>(),
+                  )
+                ], child: const RegisterScreen()));
       case otp:
         return MaterialPageRoute(builder: (_) => const OTPView());
       case geminiRecipe:
@@ -59,8 +69,11 @@ class AppRoutes {
                 child: const GeminiRecipePage()));
       case home:
         return MaterialPageRoute(
-            builder: (_) => HomePage(),
-                );
+          builder: (_) => BlocProvider(
+            create: (context) => getIt<HomeCubit>(),
+            child: HomePage(),
+          ),
+        );
       case navBar:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
