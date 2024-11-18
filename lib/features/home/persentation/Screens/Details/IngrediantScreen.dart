@@ -3,15 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/assets.dart';
 
+import '../../../../gemini_integrate/data/Recipe.dart';
+
 class IngredientsScreen extends StatelessWidget {
-  final Map<String, dynamic> recipe ;
+  final Recipe recipe ;
 
   const IngredientsScreen({super.key, required this.recipe});
 
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
-    final List<dynamic> ingredients = recipe['ingredients'] ?? [];
+    final List<Ingredient> ingredients = recipe.ingredients;
 
     return SingleChildScrollView(
       child: Padding(
@@ -61,7 +63,7 @@ class IngredientsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildIngredientsGrid(BuildContext context, Size screenSize, List<dynamic> ingredients) {
+  Widget _buildIngredientsGrid(BuildContext context, Size screenSize, List<Ingredient> ingredients) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -80,7 +82,7 @@ class IngredientsScreen extends StatelessWidget {
   }
 
   // Ingredient Card
-  Widget _buildIngredientCard(BuildContext context, Size screenSize, dynamic ingredient) {
+  Widget _buildIngredientCard(BuildContext context, Size screenSize, Ingredient ingredient) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -120,7 +122,7 @@ class IngredientsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    ingredient['name'] ?? 'Unknown',
+                    ingredient.name ,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: screenSize.width * 0.04,
@@ -131,7 +133,7 @@ class IngredientsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    "${ingredient['quantity'] ?? '0'} ${ingredient['unit'] ?? ''}",
+                    "${ingredient.quantity } ${ingredient.unit}",
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: screenSize.width * 0.035,
@@ -147,11 +149,11 @@ class IngredientsScreen extends StatelessWidget {
   }
 
   // Image handling with fallback
-  ImageProvider _getIngredientImage(dynamic ingredient) {
+  ImageProvider _getIngredientImage(Ingredient ingredient) {
     try {
       // Try network image first
-      if (ingredient['imageUrl'] != null && ingredient['imageUrl'].isNotEmpty) {
-        return NetworkImage(ingredient['imageUrl']);
+      if (ingredient.imageUrl.isNotEmpty) {
+        return NetworkImage(ingredient.imageUrl);
       }
       // Fallback to asset image
       return const AssetImage(Assets.icSplash);

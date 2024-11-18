@@ -4,6 +4,9 @@ import 'package:meal_recommendation_b1/features/home/persentation/Cubits/Details
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsState.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/Details/IngrediantScreen.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/Details/SummaryScreen.dart';
+import '../../../../../core/components/loading_dialog.dart';
+import '../../../../../core/utiles/app_colors.dart';
+import '../../../../gemini_integrate/data/Recipe.dart';
 import 'DirectionScreen.dart';
 
 class DetailsPage extends StatefulWidget {
@@ -23,8 +26,6 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-
-    // Use BlocProvider.of instead of context.read
     BlocProvider.of<DetailsCubit>(context).fetchRecipeDetails(widget.recipeId);
   }
 
@@ -36,14 +37,26 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
   }
 
   // Helper method to build recipe info chip
-  Widget _buildRecipeInfoChip({required IconData icon, required String label}) {
+  Widget _buildRecipeInfoChip({
+    required IconData icon,
+    required String label,
+    Color? iconColor,
+  }) {
     return Column(
       children: [
-        Icon(icon, size: 24),
+        Icon(
+          icon,
+          size: 24,
+          color: iconColor ?? Colors.black54,
+        ),
         const SizedBox(height: 4),
         Text(
           label,
-          style: const TextStyle(fontSize: 12),
+          style:  const TextStyle(
+            fontSize: 12,
+            color: AppColors.primary,
+            fontWeight: FontWeight.bold
+          ),
         ),
       ],
     );
@@ -58,12 +71,12 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
         builder: (context, state) {
           // Loading State
           if (state is LoadingState) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingDialog(message: 'Loading Recipes...');
           }
 
           // Success State
           else if (state is LoadedState) {
-            final recipe = state.recipe;
+            final Recipe recipe = state.recipe;
 
             return DefaultTabController(
               length: 3,
@@ -75,6 +88,7 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
                     expandedHeight: screenSize.height * 0.35,
                     pinned: true,
                     floating: false,
+                    backgroundColor: AppColors.primary,
                     leading: IconButton(
                       icon: const Icon(Icons.arrow_back, color: Colors.white),
                       onPressed: () => Navigator.pop(context),
@@ -89,29 +103,18 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
                     ],
                     flexibleSpace: FlexibleSpaceBar(
                       title: Text(
-                        recipe['name'] ?? 'Recipe',
+                        recipe.name[0].toUpperCase() + recipe.name.substring(1),
                         style: const TextStyle(
                           color: Colors.white,
-                          fontSize: 16,
+                          fontSize: 24,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       background: Stack(
                         fit: StackFit.expand,
                         children: [
-                          // Check if image exists before loading
-                          recipe['imageUrl'] != null
-                              ? Image.network(
-                            recipe['imageUrl'],
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Container(
-                                color: Colors.grey[300],
-                                child: const Icon(Icons.image_not_supported),
-                              );
-                            },
-                          )
-                              : Container(color: Colors.grey[300]),
+                          // Image loading with error handling
+                          _buildRecipeImage(recipe.imageUrl),
 
                           // Gradient overlay
                           DecoratedBox(
@@ -140,15 +143,18 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
                         children: [
                           _buildRecipeInfoChip(
                             icon: Icons.timer,
-                            label: "${recipe['time'] ?? 'N/A'} min",
+                            label: "${recipe.time} min",
+                            iconColor: Colors.orange,
                           ),
                           _buildRecipeInfoChip(
                             icon: Icons.restaurant,
-                            label: recipe['typeOfMeal'] ?? 'Unknown',
+                            label: recipe.typeOfMeal,
+                            iconColor: Colors.green,
                           ),
                           _buildRecipeInfoChip(
                             icon: Icons.person,
                             label: "1 Serving",
+                            iconColor: Colors.blue,
                           ),
                         ],
                       ),
@@ -164,7 +170,7 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
                         unselectedLabelColor: Colors.grey,
                         indicatorColor: Colors.black,
                         tabs: const [
-                          Tab(text: "Summary"),
+                          Tab(text: "Summary",),
                           Tab(text: "Ingredients"),
                           Tab(text: "Directions"),
                         ],
@@ -187,32 +193,94 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
 
           // Failure State
           else if (state is ErrorState) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(state.message),
-                  ElevatedButton(
-                    onPressed: () {
-                      BlocProvider.of<DetailsCubit>(context)
-                          .fetchRecipeDetails(widget.recipeId);
-                    },
-                    child: const Text('Retry'),
-                  ),
-                ],
-              ),
-            );
+            return _buildErrorWidget(context, state.message);
           }
 
           // Default state
-          return Container();
+          return const SizedBox.shrink();
         },
+      ),
+    );
+  }
+
+  // Separate method for image loading
+  Widget _buildRecipeImage(String imageUrl) {
+    return imageUrl.isNotEmpty
+        ? Image.network(
+      imageUrl,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          color: Colors.grey[300],
+          child: const Center(
+            child: Icon(
+              Icons.image_not_supported,
+              size: 50,
+              color: Colors.white,
+            ),
+          ),
+        );
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return Center(
+          child: CircularProgressIndicator(
+            value: loadingProgress.expectedTotalBytes != null
+                ? loadingProgress.cumulativeBytesLoaded /
+                loadingProgress.expectedTotalBytes!
+                : null,
+          ),
+        );
+      },
+    )
+        : Container(
+      color: Colors.grey[300],
+      child: const Center(
+        child: Icon(
+          Icons.image_not_supported,
+          size: 50,
+          color: Colors.white,
+        ),
+      ),
+    );
+  }
+
+  // Error handling widget
+  Widget _buildErrorWidget(BuildContext context, String errorMessage) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(
+            Icons.error_outline,
+            color: Colors.red,
+            size: 60,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Oops! Something went wrong',
+            style: Theme.of(context).textTheme.titleLarge,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            errorMessage,
+            style: Theme.of(context).textTheme.bodyMedium,
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () {
+              BlocProvider.of<DetailsCubit>(context)
+                  .fetchRecipeDetails(widget.recipeId);
+            },
+            child: const Text('Retry'),
+          ),
+        ],
       ),
     );
   }
 }
 
-// Custom Sliver Delegate
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar _tabBar;
 

@@ -1,3 +1,5 @@
+import '../../../../gemini_integrate/data/Recipe.dart';
+
 abstract class DetailsState {}
 
 class InitialState extends DetailsState {}
@@ -5,7 +7,7 @@ class InitialState extends DetailsState {}
 class LoadingState extends DetailsState {}
 
 class LoadedState extends DetailsState {
-  final Map<String, dynamic> recipe;
+  final Recipe recipe;
 
   LoadedState({required this.recipe});
 }

@@ -85,14 +85,14 @@ class _HomePageState extends State<HomePage> {
 
                   // Enhanced Search Bar with Functionality
                   SearchBar(
-                    backgroundColor: MaterialStateProperty.resolveWith((states) {
-                      if (states.contains(MaterialState.focused)) {
+                    backgroundColor: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.focused)) {
                         return Colors.white.withOpacity(0.95);
                       }
                       return Colors.white;
                     }),
-                    elevation: MaterialStateProperty.resolveWith((states) {
-                      if (states.contains(MaterialState.focused)) {
+                    elevation: WidgetStateProperty.resolveWith((states) {
+                      if (states.contains(WidgetState.focused)) {
                         return 3.0;
                       }
                       return 1.0;

@@ -1,5 +1,8 @@
- import 'package:flutter/material.dart';
+ import 'dart:math';
+
+import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:meal_recommendation_b1/core/utiles/assets.dart';
 
  class LoadingDialog extends StatefulWidget {
    final String? message;
@@ -45,41 +48,20 @@ import 'package:flutter_svg/flutter_svg.dart';
 
  class LoadingDialogState extends State<LoadingDialog>
      with SingleTickerProviderStateMixin {
-   late AnimationController _rotationController;
-   late AnimationController _scaleController;
-   late Animation<double> _scaleAnimation;
+   late AnimationController _animationController;
 
    @override
    void initState() {
      super.initState();
-
-     // Rotation Animation
-     _rotationController = AnimationController(
-       duration: const Duration(seconds: 1),
+     _animationController = AnimationController(
+       duration: const Duration(seconds: 2),
        vsync: this,
      )..repeat();
-
-     // Scale Animation
-     _scaleController = AnimationController(
-       duration: const Duration(seconds: 1),
-       vsync: this,
-     );
-
-     _scaleAnimation = Tween<double>(begin: 0.8, end: 1.0).animate(
-       CurvedAnimation(
-         parent: _scaleController,
-         curve: Curves.elasticOut,
-       ),
-     );
-
-     // Repeat the scale animation
-     _scaleController.repeat(reverse: true);
    }
 
    @override
    void dispose() {
-     _rotationController.dispose();
-     _scaleController.dispose();
+     _animationController.dispose();
      super.dispose();
    }
 
@@ -95,19 +77,22 @@ import 'package:flutter_svg/flutter_svg.dart';
          child: Column(
            mainAxisSize: MainAxisSize.min,
            children: [
-             // Combine Rotation and Scale Animations
-             ScaleTransition(
-               scale: _scaleAnimation,
-               child: RotationTransition(
-                 turns: _rotationController,
-                 child: SvgPicture.asset(
-                   'assets/ic_loading.svg', // Prefer SVG for scalability
-                   semanticsLabel: 'Loading Icon',
-                   width: widget.iconSize ?? 100,
-                   height: widget.iconSize ?? 100,
-                   color: Theme.of(context).primaryColor, // Optional color tint
-                 ),
-               ),
+             AnimatedBuilder(
+               animation: _animationController,
+               builder: (context, child) {
+                 return Transform.rotate(
+                   angle: _animationController.value * 2 * 3.14159,
+                   child: Transform.scale(
+                     scale: 1 + 0.2 * sin(_animationController.value * 2 * 3.14159),
+                     child: Image.asset(
+                       Assets.icLoading,
+                       width: widget.iconSize ?? 100,
+                       height: widget.iconSize ?? 100,
+                       color: Theme.of(context).primaryColor,
+                     ),
+                   ),
+                 );
+               },
              ),
              const SizedBox(height: 20.0),
              Text(

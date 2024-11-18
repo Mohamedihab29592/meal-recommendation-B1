@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
+import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/components/custom_text_field.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
@@ -73,7 +74,7 @@ class _LoginScreenState extends State<LoginScreen> {
         },
         builder: (context, state) {
           if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingDialog();
           }
 
           return Stack(
