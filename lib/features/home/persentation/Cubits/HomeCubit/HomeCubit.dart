@@ -1,14 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import '../../../data/data_source/data_source.dart';
 import 'HomeState.dart';
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(InitialState());
-  String? idDoc;
 
-  List<dynamic> homeRecipes = []; // Initialize with an empty list
-  DataSource datasource = DataSource();
+  List<dynamic> homeRecipes = [];
 
   Future<void> getdata() async {
     emit(IsLoadingHome());

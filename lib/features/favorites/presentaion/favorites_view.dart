@@ -72,7 +72,7 @@ class _FavoritesViewState extends State<FavoritesView> {
                         firstText: favorites[index].title,
                         ingredients: favorites[index].ingredients,
                         image: favorites[index].image,
-                        onTapDelete: () {},
+                        onTapDelete: () {}, mealId: '',
                       );
                     },
                     separatorBuilder: (context, index) {

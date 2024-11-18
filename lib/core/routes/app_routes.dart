@@ -67,10 +67,11 @@ class AppRoutes {
                   create: (context) => getIt<NavBarCubit>(),
                   child: NavBarPage(),
                 ));
-       case detailsPage:// Get the instance first
-         return MaterialPageRoute(
-           builder: (_) => const DetailsPage(),
-         );
+      case detailsPage:
+        final String recipeId = settings.arguments as String;
+        return MaterialPageRoute(
+          builder: (_) => DetailsPage(recipeId: recipeId),
+        );
       case addRecipes:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(

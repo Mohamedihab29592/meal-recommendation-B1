@@ -4,6 +4,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:hive/hive.dart';
+import 'package:meal_recommendation_b1/features/home/data/RepoImpl/recipe_details_repository.dart';
 import '../../features/Profile/Presentation/bloc/bloc.dart';
 import '../../features/Profile/data/Model/UserModel.dart';
 import '../../features/Profile/data/dataSource/local/LocalData.dart';
@@ -187,9 +188,9 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
   //  Add Ingrediants
   getIt.registerFactory(() => ImageCubit());
 
-    getIt.registerFactory(() => DetailsCubit());
+    getIt.registerFactory(() => DetailsCubit(getIt<RecipeDetailsRepository>()));
 
-
+  getIt.registerLazySingleton<RecipeDetailsRepository>(() => RecipeDetailsRepository());
   // Register services
   getIt.registerLazySingleton<RecipeApiService>(() => RecipeApiService(apiKey: pexelsApiKey));
   getIt.registerLazySingleton<GeminiApiService>(() => GeminiApiService(apiKey: apiGeminiKey));

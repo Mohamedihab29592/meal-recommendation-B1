@@ -37,7 +37,7 @@ class MealApp extends StatelessWidget {
         minTextAdapt: true,
           child:
           BlocProvider(
-            create: (context) => DetailsCubit(),
+            create: (context) => getIt<DetailsCubit>(),
             child: MaterialApp(
               title: 'Meal - Recommendation',
               debugShowCheckedModeBanner: false,
