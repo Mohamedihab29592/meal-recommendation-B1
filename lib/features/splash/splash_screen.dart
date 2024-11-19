@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
 import '../../core/routes/app_routes.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -56,7 +57,16 @@ class SplashScreenState extends State<SplashScreen>
   Future<void> _navigateAfterDelay() async {
     await Future.delayed(const Duration(milliseconds: 500));
     if (mounted) {
-      Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+      if(await SecureStorageHelper.getSecuredString('uid') == null)
+      {
+        Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+      }
+      else 
+      {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        Navigator.pushReplacementNamed(context, AppRoutes.navBar);
+
+      }
     }
   }
 

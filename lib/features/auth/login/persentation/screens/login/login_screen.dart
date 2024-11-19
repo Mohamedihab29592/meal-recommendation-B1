@@ -45,7 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _loadSavedUserData() async {
     final userData = await SecureStorageLoginHelper.loadUserData();
     log(
-      await SecureStorageHelper.getSecuredString('uid'),
+      await SecureStorageHelper.getSecuredString('uid').toString(),
     );
     Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');
     await HiveLocalUserDataSource(userBox).readData();
