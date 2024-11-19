@@ -7,6 +7,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
+import 'features/auth/login/persentation/bloc/auth_bloc.dart';
 import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
@@ -22,7 +23,11 @@ void main() async {
   Hive.registerAdapter(FavoritesAdapter());
   final favoriteBox = await Hive.openBox<Favorites>('favorites');
   await setup(favoriteBox);
-  runApp(const MealApp());
+  runApp(
+      BlocProvider<AuthBloc>(
+        create: (context) => getIt<AuthBloc>(),
+        child: const MealApp(),
+      ),);
 }
 
 class MealApp extends StatelessWidget {
