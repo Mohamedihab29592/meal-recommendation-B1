@@ -44,11 +44,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _loadSavedUserData() async {
     final userData = await SecureStorageLoginHelper.loadUserData();
-    log(
-      await SecureStorageHelper.getSecuredString('uid').toString(),
-    );
-    Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');
-    await HiveLocalUserDataSource(userBox).readData();
     setState(() {
       _rememberMe = userData['rememberMe'] == 'true';
       _emailController.text = userData['email'] ?? '';
@@ -82,6 +77,8 @@ class _LoginScreenState extends State<LoginScreen> {
             await SecureStorageHelper.setSecuredString('uid', state.user.uid!);
 
             Navigator.pushReplacementNamed(context, AppRoutes.home);
+            Navigator.pushReplacementNamed(context, AppRoutes.navBar);
+
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(content: Text(state.message)),

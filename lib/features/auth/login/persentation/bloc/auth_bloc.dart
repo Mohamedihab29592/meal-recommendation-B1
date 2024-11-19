@@ -55,12 +55,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
-    const secureStorage = FlutterSecureStorage();
-
     try {
       await logoutUseCase();
-     // await secureStorage.write(key: 'uid', value: '');
-    // await SecureStorageHelper.clearAllSecuredData();
+      await SecureStorageHelper.setSecuredString('uid', '');
       emit(Unauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));

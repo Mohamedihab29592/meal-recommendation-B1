@@ -22,6 +22,5 @@ class HiveLocalUserDataSource {
   }
   Future<void> readData()async{
     List users = await userBox.values.toList();
-    log(users.toString());
   }
 }

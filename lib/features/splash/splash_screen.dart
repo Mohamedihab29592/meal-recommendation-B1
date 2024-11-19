@@ -61,6 +61,10 @@ class SplashScreenState extends State<SplashScreen>
       {
         Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
       }
+      else if (await SecureStorageHelper.getSecuredString('uid') == '')
+      {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
       else 
       {
         Navigator.pushReplacementNamed(context, AppRoutes.home);
