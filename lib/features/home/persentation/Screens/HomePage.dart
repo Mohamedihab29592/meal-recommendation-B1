@@ -5,6 +5,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hive/hive.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
@@ -14,7 +15,9 @@ import 'package:meal_recommendation_b1/features/home/persentation/Screens/Detail
 import '../../../../core/components/CustomeTextRow.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/Custome_recipes_card.dart';
+import '../../../../core/components/side_bar.dart';
 import '../../../../core/utiles/assets.dart';
+import '../../../favorites/data/models/favorites.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 
@@ -38,7 +41,10 @@ class HomePage extends StatelessWidget {
               children: [
                 // Custom AppBar with profile menu and navigation
                 CustomAppbar(
-                  ontapleft: () {},
+                  ontapleft: () {
+
+                    Navigator.push(context, MaterialPageRoute(builder: (context) => SideBar(oldIndex: 0, returnedIndex: (){},),));
+                  },
                   ontapright: () {
                     context.pushNamed(AppRoutes.geminiRecipe);
                   },
