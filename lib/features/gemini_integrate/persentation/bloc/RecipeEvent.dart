@@ -9,3 +9,5 @@ class FetchRecipesEvent extends RecipeEvent {
 class SaveRecipesEvent extends RecipeEvent {}
 
 class LoadSavedRecipesEvent extends RecipeEvent {}
+
+class ClearGeneratedRecipesEvent extends RecipeEvent {}

@@ -151,7 +151,6 @@ class RecipeRepository {
     }
   }
 
-  // Fetch user's saved recipesGemini
   Future<List<Recipe>> fetchSavedRecipes() async {
     try {
       String userId = _auth.currentUser!.uid;
@@ -159,6 +158,7 @@ class RecipeRepository {
       QuerySnapshot querySnapshot = await _firestore
           .collection('recipesGemini')
           .where('userId', isEqualTo: userId)
+          .where('isArchived', isEqualTo: false)
           .get();
 
       return querySnapshot.docs.map((doc) {
@@ -169,7 +169,49 @@ class RecipeRepository {
       return [];
     }
   }
+
+  Future<void> performCompleteCleanup({
+    bool deleteGenerated = true,
+    bool archiveOld = true,
+    int daysOld = 30
+  }) async {
+    try {
+      String userId = _auth.currentUser!.uid;
+      DateTime cutoffDate = DateTime.now().subtract(Duration(days: daysOld));
+
+      WriteBatch batch = _firestore.batch();
+
+      // Query for recipes to clean up
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('recipesGemini')
+          .where('userId', isEqualTo: userId)
+          .where('generatedAt', isLessThan: cutoffDate.toIso8601String())
+          .get();
+
+      for (var doc in querySnapshot.docs) {
+        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+        if (deleteGenerated && data['isGenerated'] == true) {
+          // Completely delete generated recipes
+          batch.delete(doc.reference);
+        } else if (archiveOld) {
+          // Soft archive other old recipes
+          batch.update(doc.reference, {
+            'isArchived': true,
+            'archivedAt': FieldValue.serverTimestamp()
+          });
+        }
+      }
+
+      await batch.commit();
+    } catch (e) {
+      print('Comprehensive Cleanup Error: $e');
+      rethrow;
+    }
+  }
+
 }
+
 
 // Enhanced Extensions
 extension RecipeExtension on Recipe {

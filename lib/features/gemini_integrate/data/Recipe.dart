@@ -2,6 +2,9 @@ import 'package:meal_recommendation_b1/features/gemini_integrate/data/RecipeRepo
 
 class Recipe {
   String? id;
+  String? generatedAt;
+  bool isGenerated;
+  String? sourceQuery;
   final String name;
   final String summary;
   final String typeOfMeal;
@@ -13,6 +16,9 @@ class Recipe {
 
   Recipe({
     this.id,
+    this.generatedAt,
+    this.isGenerated = false,
+    this.sourceQuery,
     required this.name,
     required this.summary,
     required this.typeOfMeal,
@@ -33,6 +39,9 @@ class Recipe {
       summary: json['summary'] ?? 'No summary available',
       typeOfMeal: json['typeOfMeal'] ?? 'Unknown Meal Type',
       time: json['time'] ?? 'N/A',
+      generatedAt: json['generatedAt'],
+      isGenerated: json['isGenerated'] ?? false,
+      sourceQuery: json['sourceQuery'],
       imageUrl: json['imageUrl'] ?? '',
       ingredients: (json['ingredients'] as List<dynamic>?)
               ?.map((ingredientJson) => Ingredient.fromJson(ingredientJson))
@@ -55,6 +64,9 @@ class Recipe {
       'typeOfMeal': typeOfMeal,
       'time': time,
       'imageUrl': imageUrl,
+      'generatedAt': generatedAt,
+      'isGenerated': isGenerated,
+      'sourceQuery': sourceQuery,
       'ingredients':
           ingredients.map((ingredient) => ingredient.toJson()).toList(),
       'nutrition': nutrition.toJson(),
