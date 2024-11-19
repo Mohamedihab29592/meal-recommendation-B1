@@ -1,10 +1,17 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:hive/hive.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/components/custom_text_field.dart';
+import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/assets.dart';
+import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
+import 'package:meal_recommendation_b1/features/Profile/data/Model/UserModel.dart';
+import 'package:meal_recommendation_b1/features/Profile/data/dataSource/local/LocalData.dart';
 import '../../../data/data_source/local/secure_local_data.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_event.dart';
@@ -37,6 +44,11 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _loadSavedUserData() async {
     final userData = await SecureStorageLoginHelper.loadUserData();
+    log(
+      await SecureStorageHelper.getSecuredString('uid'),
+    );
+    Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');
+    await HiveLocalUserDataSource(userBox).readData();
     setState(() {
       _rememberMe = userData['rememberMe'] == 'true';
       _emailController.text = userData['email'] ?? '';
@@ -52,6 +64,8 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+// login --> email , password --> remember me ()
+//  we have user enitity inside it we have uid after login operation
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -62,9 +76,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: BlocConsumer<AuthBloc, AuthState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is Authenticated) {
             // Navigate to the home screen on successful login
+            await SecureStorageHelper.setSecuredString('uid', state.user.uid!);
+
             Navigator.pushReplacementNamed(context, AppRoutes.home);
           } else if (state is AuthError) {
             ScaffoldMessenger.of(context).showSnackBar(
@@ -99,7 +115,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           hintText: 'User Name',
                           prefixIcon: Assets.icAccount,
                           inputType: TextInputType.emailAddress,
-                          controller: _emailController, validator: (String? value) {  },
+                          controller: _emailController,
+                          validator: (String? value) {},
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         CustomTextField(
@@ -107,7 +124,8 @@ class _LoginScreenState extends State<LoginScreen> {
                           prefixIcon: Assets.icLock,
                           inputType: TextInputType.text,
                           controller: _passwordController,
-                          isPassword: true, validator: (String? value) {  },
+                          isPassword: true,
+                          validator: (String? value) {},
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         Row(
@@ -151,7 +169,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               LoginWithEmailEvent(email, password),
                             );
                             _saveUserData();
-                            Navigator.of(context).pushReplacementNamed(AppRoutes.navBar);
+                            Navigator.of(context)
+                                .pushReplacementNamed(AppRoutes.navBar);
                           },
                         ),
                         const Padding(
@@ -176,7 +195,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             FloatingActionButton(
                               onPressed: () {
                                 // Handle Google login
-                                BlocProvider.of<AuthBloc>(context).add(LoginWithGoogleEvent());
+                                BlocProvider.of<AuthBloc>(context)
+                                    .add(LoginWithGoogleEvent());
                               },
                               backgroundColor: AppColors.white,
                               shape: OutlineInputBorder(
@@ -199,7 +219,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             TextButton(
                               onPressed: () {
-                                Navigator.pushNamed(context, AppRoutes.register);
+                                Navigator.pushNamed(
+                                    context, AppRoutes.register);
                               },
                               child: const Text(
                                 'Register now',
