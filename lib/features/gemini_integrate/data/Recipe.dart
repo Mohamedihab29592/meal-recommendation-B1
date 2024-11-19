@@ -147,7 +147,14 @@ class Nutrition {
       vitamins: List<String>.from(json['vitamins'] ?? []),
     );
   }
-
+  Map<String, dynamic> toJson() {
+    return {
+      'calories': calories  ,
+      'protein': protein,
+      'carbs': carbs,
+      'vitamins': vitamins,
+    };
+  }
   // Provide default values if data is missing
   factory Nutrition.defaultValues() {
     return Nutrition(
@@ -197,7 +204,13 @@ class Directions {
       additionalSteps: List<String>.from(json['additionalSteps'] ?? []),
     );
   }
-
+  Map<String, dynamic> toJson() {
+    return {
+      'firstStep': firstStep  ,
+      'secondStep': secondStep,
+      'additionalSteps': additionalSteps,
+    };
+  }
   // Provide default values if data is missing
   factory Directions.defaultValues() {
     return Directions(

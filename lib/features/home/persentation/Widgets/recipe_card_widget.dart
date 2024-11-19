@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/components/custom_recipes_card.dart';
+import '../../../../core/components/dynamic_notification_widget.dart';
 import '../../../../core/utiles/helper.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class RecipeCardWidget extends StatelessWidget {
   final Recipe meal;
@@ -61,11 +63,16 @@ class RecipeCardWidget extends StatelessWidget {
   }
 
   void _addToFavorites(BuildContext context, String mealId) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Added $mealId to favorites'),
-        duration: const Duration(seconds: 2),
-      ),
+
+    //Logic to Add it
+    DynamicNotificationWidget.showNotification(
+      context: context,
+      title: 'Oh Hey!!',
+      message: 'Added $mealId to favorites',
+      color: Colors.green, // You can use this color if needed
+      contentType: ContentType.success,
+      inMaterialBanner: false,
     );
+
   }
 }

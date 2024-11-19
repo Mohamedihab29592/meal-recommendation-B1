@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../../core/services/GeminiApiService.dart';
 import '../../../core/services/RecipeApiService.dart';
 import 'Recipe.dart';
@@ -5,77 +7,182 @@ import 'Recipe.dart';
 class RecipeRepository {
   final RecipeApiService apiService;
   final GeminiApiService geminiApiService;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
-  RecipeRepository({required this.apiService, required this.geminiApiService});
+  RecipeRepository({
+    required this.apiService,
+    required this.geminiApiService
+  });
 
   Future<List<Recipe>> fetchRecipes(String query) async {
     try {
       // Fetch recipe data from Gemini
       final geminiResponse = await geminiApiService.fetchRecipeFromGemini(query);
 
-      // Check if the response contains necessary fields
+      // Validate response
       if (geminiResponse.isEmpty) {
-        print('No data received from Gemini API');
-        return [];
+        throw Exception('No recipe data received from Gemini API');
       }
 
-      // Prepare the recipe data structure with safe handling for missing fields
-      var recipeData = {
+      // Prepare recipe data with comprehensive error handling
+      final recipe = await _processRecipeData(query, geminiResponse);
+
+      return [recipe];
+    } catch (e) {
+      print('Recipe Fetch Error: $e');
+      return [];
+    }
+  }
+
+  Future<Recipe> _processRecipeData(String query, Map<String, dynamic> geminiResponse) async {
+    try {
+      // Fetch recipe image with fallback
+      String imageUrl = await apiService.fetchRecipeImage(query) ??
+          'https://via.placeholder.com/300x200?text=Recipe+Image';
+
+      // Process ingredients with images
+      final ingredients = await _processIngredientsWithImages(
+          geminiResponse['ingredients'] ?? []
+      );
+
+      return Recipe.fromJson({
         'name': geminiResponse['name'] ?? 'Unknown Dish',
         'summary': geminiResponse['summary'] ?? 'No summary available',
         'typeOfMeal': geminiResponse['typeOfMeal'] ?? 'General',
         'time': geminiResponse['time'] ?? 'N/A',
-        'imageUrl': await apiService.fetchRecipeImage(query) ?? 'default_recipe_image_url',
-        'ingredients': await _getIngredientsWithImages(geminiResponse['ingredients'] ?? []),
-        'nutrition': geminiResponse['nutrition'] ?? Nutrition.defaultValues().toJson(),
-        'directions': geminiResponse['directions'] ?? Directions.defaultValues().toJson()
-      };
-
-      // Return the recipe object
-      return [Recipe.fromJson(recipeData)];
+        'imageUrl': imageUrl,
+        'ingredients': ingredients,
+        'nutrition': _processNutrition(geminiResponse['nutrition']),
+        'directions': _processDirections(geminiResponse['directions']),
+        'generatedAt': DateTime.now().toIso8601String(),
+        'sourceQuery': query
+      });
     } catch (e) {
-      print('Error fetching recipes or processing data: $e');
-      return [] ;
+      print('Recipe Processing Error: $e');
+      rethrow;
     }
   }
 
-  // Helper method to fetch ingredient images
-  Future<List<Map<String, dynamic>>> _getIngredientsWithImages(List<dynamic> ingredients) async {
-    final List<Map<String, dynamic>> ingredientsWithImages = [];
+  Future<List<Map<String, dynamic>>> _processIngredientsWithImages(
+      List<dynamic> ingredients
+      ) async {
+    final List<Map<String, dynamic>> processedIngredients = [];
 
     for (var ingredient in ingredients) {
-      final ingredientName = ingredient['name'] ?? 'Unnamed Ingredient';
-      final imageUrl = await apiService.fetchIngredientImage(ingredientName) ?? 'default_image_url';
-      ingredientsWithImages.add({
-        ...ingredient,
-        'name': ingredientName,
-        'imageUrl': imageUrl,
-      });
+      try {
+        final ingredientName = ingredient['name'] ?? 'Unnamed Ingredient';
+        final imageUrl = await apiService.fetchIngredientImage(ingredientName) ??
+            'https://via.placeholder.com/100x100?text=Ingredient';
+
+        processedIngredients.add({
+          ...ingredient,
+          'name': ingredientName,
+          'imageUrl': imageUrl,
+        });
+      } catch (e) {
+        print('Ingredient Processing Error: $e');
+        // Continue processing other ingredients
+      }
     }
 
-    return ingredientsWithImages;
+    return processedIngredients;
+  }
+
+  // Robust nutrition processing with default values
+  Map<String, dynamic> _processNutrition(dynamic nutritionData) {
+    try {
+      if (nutritionData == null) {
+        return Nutrition.defaultValues().toJson();
+      }
+
+      return Nutrition(
+          calories: nutritionData['calories'] ?? 0,
+          protein: nutritionData['protein'] ?? 0,
+          carbs: nutritionData['carbs'] ?? 0,
+          fat: nutritionData['fat'] ?? 0,
+          vitamins: nutritionData['vitamins'] ?? ''
+      ).toJson();
+    } catch (e) {
+      print('Nutrition Processing Error: $e');
+      return Nutrition.defaultValues().toJson();
+    }
+  }
+
+  // Robust directions processing with default values
+  Map<String, dynamic> _processDirections(dynamic directionsData) {
+    try {
+      if (directionsData == null) {
+        return Directions.defaultValues().toJson();
+      }
+
+      return Directions(
+          firstStep: directionsData['firstStep'] ?? '',
+          secondStep: directionsData['secondStep'] ?? '',
+          additionalSteps: directionsData['additionalSteps'] ?? []
+      ).toJson();
+    } catch (e) {
+      print('Directions Processing Error: $e');
+      return Directions.defaultValues().toJson();
+    }
+  }
+
+  // Save recipes to Firestore
+  Future<void> saveRecipes(List<Recipe> recipes) async {
+    try {
+      String userId = _auth.currentUser!.uid;
+      WriteBatch batch = _firestore.batch();
+
+      for (var recipe in recipes) {
+        DocumentReference recipeDoc = _firestore.collection('recipesGemini').doc();
+
+        batch.set(recipeDoc, {
+          ...recipe.toJson(),
+          'userId': userId,
+          'savedAt': FieldValue.serverTimestamp(),
+          'isGenerated': true
+        });
+      }
+
+      await batch.commit();
+    } catch (e) {
+      print('Save Recipes Error: $e');
+      rethrow;
+    }
+  }
+
+  // Fetch user's saved recipesGemini
+  Future<List<Recipe>> fetchSavedRecipes() async {
+    try {
+      String userId = _auth.currentUser!.uid;
+
+      QuerySnapshot querySnapshot = await _firestore
+          .collection('recipesGemini')
+          .where('userId', isEqualTo: userId)
+          .get();
+
+      return querySnapshot.docs.map((doc) {
+        return Recipe.fromJson(doc.data() as Map<String, dynamic>);
+      }).toList();
+    } catch (e) {
+      print('Fetch Saved Recipes Error: $e');
+      return [];
+    }
   }
 }
 
-// Extensions for converting objects to JSON
-extension NutritionExtension on Nutrition {
+// Enhanced Extensions
+extension RecipeExtension on Recipe {
   Map<String, dynamic> toJson() {
     return {
-      'calories': calories,
-      'protein': protein,
-      'carbs': carbs,
-      'fat': fat,
-      'vitamins': vitamins,
-    };
-  }
-}
-
-extension DirectionsExtension on Directions {
-  Map<String, dynamic> toJson() {
-    return {
-      'firstStep': firstStep,
-      'secondStep': secondStep,
-      'additionalSteps': additionalSteps,
+      'name': name,
+      'summary': summary,
+      'typeOfMeal': typeOfMeal,
+      'time': time,
+      'imageUrl': imageUrl,
+      'ingredients': ingredients,
+      'nutrition': nutrition,
+      'directions': directions,
     };
   }
 }

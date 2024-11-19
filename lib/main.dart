@@ -1,11 +1,9 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
@@ -35,10 +33,7 @@ class MealApp extends StatelessWidget {
           ScreenUtilInit(
         designSize: const Size(375, 812),
         minTextAdapt: true,
-          child:
-          BlocProvider(
-            create: (context) => getIt<DetailsCubit>(),
-            child: MaterialApp(
+          child: MaterialApp(
               title: 'Meal - Recommendation',
               debugShowCheckedModeBanner: false,
               theme: AppThemes.lightTheme,
@@ -46,7 +41,6 @@ class MealApp extends StatelessWidget {
               onGenerateRoute: AppRoutes.generateRoute,
             ),
           ),
-      ),
     );
   }
 }

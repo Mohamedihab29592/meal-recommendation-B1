@@ -8,12 +8,17 @@ class RecipeLoading extends RecipeState {}
 
 class RecipeLoaded extends RecipeState {
   final List<Recipe> recipes;
-
   RecipeLoaded(this.recipes);
+}
+
+class RecipesSaved extends RecipeState {}
+
+class SavedRecipesLoaded extends RecipeState {
+  final List<Recipe> savedRecipes;
+  SavedRecipesLoaded(this.savedRecipes);
 }
 
 class RecipeError extends RecipeState {
   final String message;
-
   RecipeError(this.message);
 }

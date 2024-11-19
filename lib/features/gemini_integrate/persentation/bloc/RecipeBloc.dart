@@ -1,29 +1,59 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-
 import '../../data/Recipe.dart';
-import '../../domain/FetchRecipesUseCase.dart';
+import '../../data/RecipeRepository.dart';
 import 'RecipeEvent.dart';
 import 'RecipeState.dart';
 class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
-  final FetchRecipesUseCase fetchRecipesUseCase;
+  final RecipeRepository recipeRepository;
   final List<Recipe> _recipeList = []; // Maintain a list of all recipes
 
-  RecipeBloc({required this.fetchRecipesUseCase}) : super(RecipeInitial()) {
-    on<FetchRecipesEvent>((event, emit) async {
-      emit(RecipeLoading());
+  RecipeBloc({required this.recipeRepository}) : super(RecipeInitial()) {
+    // Register event handlers
+    on<FetchRecipesEvent>(_onFetchRecipes);
+    on<SaveRecipesEvent>(_onSaveRecipes);
+    on<LoadSavedRecipesEvent>(_onLoadSavedRecipes);
+  }
 
-      try {
-        // Fetch the new recipe from the use case
-        final newRecipe = await fetchRecipesUseCase.execute(event.query);
+  Future<void> _onFetchRecipes(
+      FetchRecipesEvent event,
+      Emitter<RecipeState> emit
+      ) async {
+    emit(RecipeLoading());
 
-        // Add the new recipe to the list
-        _recipeList.addAll(newRecipe);
+    try {
+      final newRecipes = await recipeRepository.fetchRecipes(event.query);
 
-        // Emit the updated list with old and new data
-        emit(RecipeLoaded(List<Recipe>.from(_recipeList)));
-            } catch (e) {
-        emit(RecipeError("Failed to load recipes: ${e.toString()}"));
-      }
-    });
+      _recipeList.addAll(newRecipes);
+
+      emit(RecipeLoaded(List<Recipe>.from(_recipeList)));
+    } catch (e) {
+      emit(RecipeError("Failed to load recipes: ${e.toString()}"));
+    }
+  }
+
+  Future<void> _onSaveRecipes(
+      SaveRecipesEvent event,
+      Emitter<RecipeState> emit
+      ) async {
+    try {
+      await recipeRepository.saveRecipes(_recipeList);
+
+      emit(RecipesSaved());
+    } catch (e) {
+      emit(RecipeError("Failed to save recipes: ${e.toString()}"));
+    }
+  }
+
+  Future<void> _onLoadSavedRecipes(
+      LoadSavedRecipesEvent event,
+      Emitter<RecipeState> emit
+      ) async {
+    try {
+      final savedRecipes = await recipeRepository.fetchSavedRecipes();
+
+      emit(SavedRecipesLoaded(savedRecipes));
+    } catch (e) {
+      emit(RecipeError("Failed to load saved recipes: ${e.toString()}"));
+    }
   }
 }

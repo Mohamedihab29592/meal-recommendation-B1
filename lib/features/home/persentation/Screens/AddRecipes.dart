@@ -1,16 +1,18 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/components/dynamic_notification_widget.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_state.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/custom_text_field.dart';
+import '../../../../core/services/di.dart';
 import '../../../../core/utiles/app_colors.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
-import '../../data/RepoImpl/HomeRepoImpl.dart';
-import '../Cubits/AddRecipesCubit/ImageCubit.dart';
-import '../Cubits/AddRecipesCubit/ImageState.dart';
+import '../../domain/HomeRepo/HomeRepo.dart';
 import '../Widgets/CustomeContainerWithTextField.dart';
 import '../Widgets/CustomeMultiLineTextField.dart';
 
@@ -44,7 +46,6 @@ class AddRecipes extends StatelessWidget {
   final TextEditingController secoundStep = TextEditingController();
 
   bool loading = false;
-  final HomeRepoImpl homerepoimpl = HomeRepoImpl();
 
   @override
   Widget build(BuildContext context) {
@@ -72,16 +73,21 @@ class AddRecipes extends StatelessWidget {
             const SizedBox(height: 35),
 
             // Upload Meal Image
-            BlocConsumer<ImageCubit, ImagesState>(
+            BlocConsumer<AddIngredientCubit, AddIngredientState>(
               listener: (context, state) {
-                if (state is IsLoadingState) {
+                if (state is IsLoadingImageState) {
                   loading = true;
                 } else if (state is LoadedImageState) {
                   loading = false;
                 } else if (state is FailureImageError) {
                   loading = false;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.message)),
+                  DynamicNotificationWidget.showNotification(
+                    context: context,
+                    title: 'Oh Hey!!',
+                    message: state.message,
+                    color: Colors.green, // You can use this color if needed
+                    contentType: ContentType.failure,
+                    inMaterialBanner: false,
                   );
                 }
               },
@@ -99,11 +105,11 @@ class AddRecipes extends StatelessWidget {
                         radius: screenSize.width < 600 ? 62 : 50,
                         child: InkWell(
                           onTap: () {
-                            BlocProvider.of<ImageCubit>(context)
+                            BlocProvider.of<AddIngredientCubit>(context)
                                 .pickMainImage();
                           },
                           child: ClipOval(
-                            child: BlocProvider.of<ImageCubit>(context)
+                            child: BlocProvider.of<AddIngredientCubit>(context)
                                         .mainImageUrl ==
                                     null
                                 ? Image.asset(
@@ -113,7 +119,7 @@ class AddRecipes extends StatelessWidget {
                                     height: screenSize.width < 600 ? 124 : 100,
                                   )
                                 : Image.network(
-                                    BlocProvider.of<ImageCubit>(context)
+                                    BlocProvider.of<AddIngredientCubit>(context)
                                         .mainImageUrl!,
                                     fit: BoxFit.cover,
                                     width: screenSize.width < 600 ? 124 : 100,
@@ -223,9 +229,9 @@ class AddRecipes extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    BlocConsumer<ImageCubit, ImagesState>(
+                    BlocConsumer<AddIngredientCubit, AddIngredientState>(
                       listener: (context, state) {
-                        if (state is IsLoadingState &&
+                        if (state is IsLoadingImageState &&
                             state.id == ingredient.id) {
                           ingredient.loading = true;
                         } else if (state is LoadedImageState &&
@@ -243,7 +249,7 @@ class AddRecipes extends StatelessWidget {
                                 child: InkWell(
                                   onTap: () {
                                     context
-                                        .read<ImageCubit>()
+                                        .read<AddIngredientCubit>()
                                         .pickImage(ingredient.id);
                                   },
                                   child: ClipOval(
@@ -304,31 +310,31 @@ class AddRecipes extends StatelessWidget {
                     summary: summary.text.trim(),
                     typeOfMeal: typeMeal.text.trim(),
                     time: time.text.trim(),
-                    imageUrl: BlocProvider.of<ImageCubit>(context).mainImageUrl.toString(),
+                    imageUrl: BlocProvider.of<AddIngredientCubit>(context).mainImageUrl.toString(),
                     ingredients: [
                       Ingredient(
                         name: firstingrediant.text.trim(),
                         quantity: piecesone.text.trim(),
                         unit: '', // Provide unit if applicable
-                        imageUrl: BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_0"]  ??"", // Provide image URL if applicable
+                        imageUrl: BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_0"]  ??"", // Provide image URL if applicable
                       ),
                       Ingredient(
                         name: secoundingrediant.text.trim(),
                         quantity: piecestwo.text.trim(),
                         unit: '',
-                        imageUrl: BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_1"]  ??"",
+                        imageUrl: BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_1"]  ??"",
                       ),
                       Ingredient(
                         name: thirdingrediant.text.trim(),
                         quantity: piecesthree.text.trim(),
                         unit: '',
-                        imageUrl: BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_2"]  ??"",
+                        imageUrl: BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_2"]  ??"",
                       ),
                       Ingredient(
                         name: fourthingrediant.text.trim(),
                         quantity: piecesfour.text.trim(),
                         unit: '',
-                        imageUrl:BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_3"]  ??"",
+                        imageUrl:BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_3"]  ??"",
                       ),
                     ],
                     nutrition: Nutrition(
@@ -345,13 +351,17 @@ class AddRecipes extends StatelessWidget {
                     ),
                   );
 
-                  homerepoimpl.addIngredients(recipe).then((value) {
+                  getIt<HomeRepo>().addIngredients(recipe).then((value) {
                     context.pushReplacementNamed(AppRoutes.navBar);
                   }).catchError((error) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to send data: $error')),
-                    );
-                  });
+                    DynamicNotificationWidget.showNotification(
+                      context: context,
+                      title: 'Oh Hey!!',
+                      message: 'Failed to send data: $error',
+                      color: Colors.green, // You can use this color if needed
+                      contentType: ContentType.failure,
+                      inMaterialBanner: true,
+                    );});
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
