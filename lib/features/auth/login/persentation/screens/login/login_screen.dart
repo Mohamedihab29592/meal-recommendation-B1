@@ -1,17 +1,11 @@
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:hive/hive.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/components/custom_text_field.dart';
-import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/assets.dart';
 import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
-import 'package:meal_recommendation_b1/features/Profile/data/Model/UserModel.dart';
-import 'package:meal_recommendation_b1/features/Profile/data/dataSource/local/LocalData.dart';
 import '../../../data/data_source/local/secure_local_data.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_event.dart';
@@ -44,11 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _loadSavedUserData() async {
     final userData = await SecureStorageLoginHelper.loadUserData();
-    setState(() {
       _rememberMe = userData['rememberMe'] == 'true';
       _emailController.text = userData['email'] ?? '';
       _passwordController.text = userData['password'] ?? '';
-    });
   }
 
   Future<void> _saveUserData() async {

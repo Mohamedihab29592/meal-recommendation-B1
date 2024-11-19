@@ -33,18 +33,6 @@ import '../../features/auth/register/domain/use_cases/login_with_google_use_case
 import '../../features/auth/register/domain/use_cases/register_with_email_use_case.dart';
 import '../../features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
 import '../../features/auth/register/persentation/bloc/register_bloc.dart';
-import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_firebase_data_source_impl.dart';
-import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_remote_data_source_Impl.dart';
-import 'package:meal_recommendation_b1/features/auth/register/data/repository_impl/register_repository_impl.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/repository/register_repository.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/login_with_google_use_case.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/register_with_email_use_case.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
-import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
-import '../../features/auth/OTP/data/repository/repository.dart';
-import '../../features/auth/OTP/domin/use_case/phone_authentication_use_case.dart';
-import '../../features/auth/OTP/domin/use_case/submit_otp_use_case.dart';
-import '../../features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
 import '../../features/favorites/data/models/favorites.dart';
 import '../../features/favorites/data/repository_impl/favorites_repository_impl.dart';
 import '../../features/favorites/domain/repository/favorites_repository.dart';
@@ -64,14 +52,21 @@ import 'RecipeApiService.dart';
 
 final getIt = GetIt.instance;
 
-Future<void> setup(Box<Favorites> favoriteBox) async {
+Future<void> setup() async {
 
   const apiGeminiKey = "AIzaSyBnRMY9VLpC2Y2k6m7ManTZKnkmh7NfM6Q";
   const pexelsApiKey = "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
-  if (!Hive.isAdapterRegistered(32)) {
+  if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(UserModelAdapter());
   }
   Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');
+
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(FavoritesAdapter());
+  }
+  Box<Favorites> favoriteBox =await Hive.openBox<Favorites>('favorites');
+
+  getIt.registerLazySingleton<Box<Favorites>>(() => favoriteBox);
 
   getIt.registerLazySingleton<Box<UserModel>>(() => userBox);
   getIt.registerLazySingleton(()=>FirebaseFirestore.instance);
