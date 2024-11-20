@@ -1,8 +1,6 @@
 # 🍽️ CulinaryCanvas: Your Personal Recipe Companion
-
 <p align="center">
-
-  ![ic_splash](https://github.com/user-attachments/assets/3f3ebeba-e84f-435e-aea2-cee6d7857065)
+  <img src="https://github.com/user-attachments/assets/3f3ebeba-e84f-435e-aea2-cee6d7857065" alt="ic_splash" width="200">
 </p>
 
 ## 🌟 Project Overview
