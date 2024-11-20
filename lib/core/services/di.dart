@@ -36,18 +36,6 @@ import '../../features/auth/register/domain/use_cases/login_with_google_use_case
 import '../../features/auth/register/domain/use_cases/register_with_email_use_case.dart';
 import '../../features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
 import '../../features/auth/register/persentation/bloc/register_bloc.dart';
-import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_firebase_data_source_impl.dart';
-import 'package:meal_recommendation_b1/features/auth/register/data/data_source_impl/remote_impl/register_remote_data_source_Impl.dart';
-import 'package:meal_recommendation_b1/features/auth/register/data/repository_impl/register_repository_impl.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/repository/register_repository.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/login_with_google_use_case.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/register_with_email_use_case.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
-import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
-import '../../features/auth/OTP/data/repository/repository.dart';
-import '../../features/auth/OTP/domin/use_case/phone_authentication_use_case.dart';
-import '../../features/auth/OTP/domin/use_case/submit_otp_use_case.dart';
-import '../../features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
 import '../../features/favorites/data/models/favorites.dart';
 import '../../features/favorites/data/repository_impl/favorites_repository_impl.dart';
 import '../../features/favorites/domain/repository/favorites_repository.dart';
@@ -216,7 +204,7 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
 String getCurrentUserId() {
   final user = FirebaseAuth.instance.currentUser;
   if (user == null) {
-    throw Exception('No user logged in');
+    return "";
   }
   return user.uid;
 }
