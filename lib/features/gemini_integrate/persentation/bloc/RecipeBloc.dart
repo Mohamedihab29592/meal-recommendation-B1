@@ -131,13 +131,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
       print('Fetched Recipes Count: ${_fetchedRecipes.length}');
 
       // Detailed recipe logging
-      _fetchedRecipes.forEach((recipe) {
-        print('Fetched Recipe Details:');
-        print('Name: ${recipe.name}');
-        print('ID: ${recipe.id}');
-        print('Is Name Null: ${recipe.name == null}');
-        print('Is ID Null: ${recipe.id == null}');
-      });
+      _debugPrintFetchedRecipes();
 
       // Check if there are any fetched recipes
       if (_fetchedRecipes.isEmpty) {
@@ -146,20 +140,10 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
         return;
       }
 
-      final validRecipes = _fetchedRecipes.where((recipe) {
-        bool isValid =
-            recipe.id != null && recipe.name.isNotEmpty;
-
-        if (!isValid) {
-          print('Invalid recipe found: ${recipe.name ?? 'Unnamed recipe'}');
-          print('Recipe ID: ${recipe.id}');
-        }
-
-        return isValid;
-      }).toList();
+      // Validate recipes with more comprehensive checks
+      final validRecipes = _validateRecipes(_fetchedRecipes);
 
       print('Valid Recipes Count: ${validRecipes.length}');
-
 
       if (validRecipes.isEmpty) {
         print('No valid recipes to save');
@@ -167,12 +151,88 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
         return;
       }
 
-      // Rest of the method remains the same...
+      // Attempt to save valid recipes
+      await _saveValidRecipes(validRecipes);
+
+      // Update saved recipes list
+      _savedRecipes.addAll(validRecipes);
+
+      // Clear fetched recipes after successful save
+      _fetchedRecipes.clear();
+
+      // Combine and get unique recipes
+      final combinedRecipes = _removeDuplicateRecipes([
+        ..._savedRecipes,
+        ..._fetchedRecipes
+      ]);
+
+      // Emit loaded state with combined recipes
+      emit(RecipeLoaded(combinedRecipes));
+
     } catch (e, stackTrace) {
       print("Unexpected error in save recipes: $e");
       print("Stack trace: $stackTrace");
 
       emit(RecipeError("Unexpected error: ${e.toString()}", true));
+    }
+  }
+
+  List<Recipe> _validateRecipes(List<Recipe> recipes) {
+    return recipes.where((recipe) {
+      bool isValid = _isRecipeValid(recipe);
+
+      if (!isValid) {
+        print('Invalid recipe found:');
+        _logInvalidRecipeDetails(recipe);
+      }
+
+      return isValid;
+    }).toList();
+  }
+
+  bool _isRecipeValid(Recipe recipe) {
+    return recipe.name.trim().isNotEmpty;
+  }
+
+  void _logInvalidRecipeDetails(Recipe recipe) {
+    print('  Name: ${recipe.name ?? 'N/A'}');
+    print('  Name is Null: ${recipe.name == null}');
+    print('  Name is Empty: ${recipe.name?.trim().isEmpty ?? true}');
+  }
+
+  Future<void> _saveValidRecipes(List<Recipe> validRecipes) async {
+    try {
+      print('Repository: Attempting to save ${validRecipes.length} recipes');
+
+      if (validRecipes.isEmpty) {
+        print('Repository: No recipes to save');
+        return;
+      }
+
+      // Delegate saving to repository
+      await recipeRepository.saveRecipes(validRecipes);
+
+      print('Successfully saved ${validRecipes.length} recipes');
+    } catch (e, stackTrace) {
+      print('Error saving recipes: $e');
+      print('Stack trace: $stackTrace');
+
+      // Rethrow to be caught in the bloc method
+      rethrow;
+    }
+  }
+
+  void _debugPrintFetchedRecipes() {
+    print('Fetched Recipes Count: ${_fetchedRecipes.length}');
+
+    if (_fetchedRecipes.isEmpty) {
+      print('Fetched Recipes List is Empty');
+    } else {
+      _fetchedRecipes.asMap().forEach((index, recipe) {
+        print('Fetched Recipe #${index + 1}:');
+        print('  Name: ${recipe.name}');
+        print('  Is Name Null or Empty: ${recipe.name!.trim().isEmpty}');
+      });
     }
   }
 

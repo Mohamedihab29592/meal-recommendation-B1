@@ -82,7 +82,6 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
   getIt.registerLazySingleton(() => GoogleSignIn());
   getIt.registerLazySingleton(() => const FlutterSecureStorage());
 
-  // Data Sources
   getIt
       .registerLazySingleton<BaseOTPRemoteDataSource>(() => RemoteDataSource());
   getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
