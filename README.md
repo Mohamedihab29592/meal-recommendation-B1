@@ -1,7 +1,8 @@
 # 🍽️ CulinaryCanvas: Your Personal Recipe Companion
 
 <p align="center">
-  <img src="your_app_logo_path.png" width="200" alt="CulinaryCanvas Logo">
+
+  <img src="![ic_splash](https://github.com/user-attachments/assets/3f3ebeba-e84f-435e-aea2-cee6d7857065)" width="200" alt="CulinaryCanvas Logo">
 </p>
 
 ## 🌟 Project Overview
