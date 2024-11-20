@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/AddRecipes.dart';
 import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
@@ -7,7 +8,6 @@ import '../../features/auth/login/persentation/screens/login/login_screen.dart';
 import '../../features/auth/register/persentation/screens/register/register_screen.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/gemini_recipe.dart';
-import '../../features/home/persentation/Cubits/AddRecipesCubit/ImageCubit.dart';
 import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
@@ -54,27 +54,28 @@ class AppRoutes {
         return MaterialPageRoute(builder: (_) => const OTPView());
       case geminiRecipe:
         return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                create: (context) => getIt<RecipeBloc>(),
-                child: const GeminiRecipePage()));
+            builder: (_) => const GeminiRecipePage());
       case home:
         return MaterialPageRoute(
-            builder: (_) => HomePage(),
-                );
+          builder: (_) => const HomePage(),
+        );
       case navBar:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
                   create: (context) => getIt<NavBarCubit>(),
                   child: NavBarPage(),
                 ));
-       case detailsPage:// Get the instance first
-         return MaterialPageRoute(
-           builder: (_) => const DetailsPage(),
-         );
+      case detailsPage:
+        final String recipeId = settings.arguments as String;
+        return MaterialPageRoute(
+            builder: (_) => BlocProvider(
+                  create: (context) => getIt<DetailsCubit>(),
+                  child: DetailsPage(recipeId: recipeId),
+                ));
       case addRecipes:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                create: (context) => getIt<ImageCubit>(), child: AddRecipes()));
+                create: (context) => getIt<AddIngredientCubit>(), child: AddRecipes()));
       case seeAll:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(

@@ -1,26 +1,22 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsState.dart';
-import '../../../data/data_source/data_source.dart';
+import '../../../../gemini_integrate/data/Recipe.dart';
+import '../../../data/RepoImpl/recipe_details_repository.dart';
 
-class DetailsCubit extends Cubit<DetailsState>{
-  DetailsCubit():super(InitialState());
-  List<QueryDocumentSnapshot> dataref=[];
-  DataSource dataSource=DataSource();
-  String? reff;
-  getDetailsData(context)async{
-    emit(IsLoadingDetailsState());
+class DetailsCubit extends Cubit<DetailsState> {
+  final RecipeDetailsRepository _repository;
+
+  DetailsCubit(this._repository) : super(InitialState());
+
+  Future<void> fetchRecipeDetails(String recipeId) async {
     try {
-      dataref.clear;
-      dataref=await dataSource.getdatawithid(context);
-      emit(SucessState());
-      print(dataref);
+      emit(LoadingState());
+
+      final recipe = await _repository.getRecipeDetails(recipeId);
+
+      emit(LoadedState(recipe: recipe));
     } catch (e) {
-      print(e);
-      emit(FailureState(
-        errorMessage: "$e",
-      ));
+      emit(ErrorState(message: e.toString()));
     }
   }
-
 }
