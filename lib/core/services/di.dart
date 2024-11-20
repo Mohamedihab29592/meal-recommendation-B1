@@ -67,7 +67,7 @@ import 'RecipeApiService.dart';
 final getIt = GetIt.instance;
 
 Future<void> setup(Box<Favorites> favoriteBox) async {
-  const apiGeminiKey = "AIzaSyBnRMY9VLpC2Y2k6m7ManTZKnkmh7NfM6Q";
+  const apiGeminiKey = "AIzaSyAhkA0xgcRdzyi7u9ERuKTvQ8SqfFHadaM";
   const pexelsApiKey =
       "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
 

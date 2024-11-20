@@ -7,20 +7,19 @@ import 'RecipeState.dart';
 
 class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   final RecipeRepository recipeRepository;
-  final List<Recipe> _fetchedRecipes = []; // Fetched from Gemini
-  final List<Recipe> _savedRecipes = []; // Saved recipes
+  final List<Recipe> _fetchedRecipes = [];
+  final List<Recipe> _savedRecipes = [];
 
   RecipeBloc({required this.recipeRepository}) : super(RecipeInitial()) {
     on<FetchRecipesEvent>(_onFetchRecipes);
     on<SaveRecipesEvent>(_onSaveRecipes);
     on<LoadSavedRecipesEvent>(_onLoadSavedRecipes);
-    on<CleanupRecipesEvent>(_onCleanupRecipes);
     on<CombineRecipesEvent>(_onCombineRecipes);
+    on<CleanupRecipesEvent>(_onCleanupRecipes);
   }
 
   Future<void> _onFetchRecipes(
       FetchRecipesEvent event, Emitter<RecipeState> emit) async {
-    // Validate input query
     if (event.query.trim().isEmpty) {
       emit(RecipeError("Please enter a valid recipe search query.", false));
       return;
@@ -29,12 +28,14 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
     emit(RecipeLoading());
 
     try {
+      // Clear previous fetched recipes before new fetch
+      _fetchedRecipes.clear();
+
       final newRecipes = await recipeRepository.fetchRecipes(event.query);
 
-      // Debug logging
-      _logRecipeFetchDetails(newRecipes, event.query);
+      // Enhanced logging
+      _logFetchedRecipes(newRecipes, event.query);
 
-      // Check if no recipes were found
       if (newRecipes.isEmpty) {
         emit(RecipeError(
             "No recipes found for '${event.query}'. Try a different search term.",
@@ -42,239 +43,230 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
         return;
       }
 
-      _fetchedRecipes.addAll(newRecipes);
+      // Validate and add recipes
+      final validRecipes = _validateRecipes(newRecipes);
+      _fetchedRecipes.addAll(validRecipes);
 
-      // Combine fetched and saved recipes
-      final combinedRecipes = [..._savedRecipes, ..._fetchedRecipes];
+      // Debug print to verify fetched recipes
+      print('Fetched Recipes After Validation: ${_fetchedRecipes.length}');
 
-      // Ensure unique recipes (if needed)
-      final uniqueRecipes = _removeDuplicateRecipes(combinedRecipes);
-
-      // Emit loaded state with recipes
-      emit(RecipeLoaded(uniqueRecipes));
+      // Emit loaded state with fetched recipes
+      emit(RecipeLoaded(_fetchedRecipes));
     } on ServerException catch (e) {
-      // Comprehensive server error handling
-      _handleServerException(e, emit);
+      emit(RecipeError(e.message, true));
     } catch (e) {
-      // Catch-all for unexpected errors
-      _handleUnexpectedError(e, emit);
-    }
-  }
-
-  void _logRecipeFetchDetails(List<Recipe> recipes, String query) {
-    print('Fetched Recipes for Query: $query');
-    print('Total Recipes Found: ${recipes.length}');
-
-    recipes.asMap().forEach((index, recipe) {
-      print('Recipe #${index + 1}:');
-      print('  Name: ${recipe.name}');
-      print('  ID: ${recipe.id}');
-      // Add more detailed logging as needed
-    });
-  }
-
-  List<Recipe> _removeDuplicateRecipes(List<Recipe> recipes) {
-    return recipes.toSet().toList();
-  }
-
-  void _handleServerException(ServerException e, Emitter<RecipeState> emit) {
-    switch (e.statusCode) {
-      case 503:
-        emit(RecipeError(
-            "Service is temporarily unavailable. Please try again later.",
-            true));
-        break;
-      case 404:
-        emit(RecipeError(
-            "No recipes found. Please try a different query.", false));
-        break;
-      case 401:
-        emit(RecipeError("Authentication failed. Please log in again.", false));
-        break;
-      case 500:
-        emit(RecipeError(
-            "Internal server error. Our team has been notified.", true));
-        break;
-      default:
-        emit(RecipeError("An error occurred: ${e.message}", true));
-    }
-  }
-
-
-  void _handleUnexpectedError(Object e, Emitter<RecipeState> emit) {
-    print('Unexpected Error: $e');
-
-    emit(RecipeError("An unexpected error occurred. Please try again.", true));
-  }
-
-  Future<void> _onLoadSavedRecipes(
-      LoadSavedRecipesEvent event, Emitter<RecipeState> emit) async {
-    emit(RecipeLoading());
-
-    try {
-      // Fetch saved recipes
-      _savedRecipes.clear();
-      final savedRecipes = await recipeRepository.fetchSavedRecipes();
-      _savedRecipes.addAll(savedRecipes);
-
-      emit(SavedRecipesLoaded(_savedRecipes));
-    } catch (e) {
-      emit(RecipeError("Failed to load saved recipes: ${e.toString()}", true));
+      emit(RecipeError("An unexpected error occurred: $e", true));
     }
   }
 
   Future<void> _onSaveRecipes(
       SaveRecipesEvent event, Emitter<RecipeState> emit) async {
     try {
-      // Comprehensive logging
-      print('Save Recipes Event triggered');
-      print('Fetched Recipes Count: ${_fetchedRecipes.length}');
+      print('Attempting to save recipes');
+      print('Fetched Recipes Count Before Save: ${_fetchedRecipes.length}');
 
-      // Detailed recipe logging
-      _debugPrintFetchedRecipes();
+      List<Recipe> recipesToSave = _fetchedRecipes;
 
-      // Check if there are any fetched recipes
-      if (_fetchedRecipes.isEmpty) {
-        print('No recipes to save');
-        emit(RecipeError("No recipes to save", true));
-        return;
+      // If fetched recipes are empty, check the current state
+      if (recipesToSave.isEmpty) {
+        final currentState = state;
+        if (currentState is RecipeLoaded) {
+          recipesToSave = currentState.recipes;
+        }
       }
 
-      // Validate recipes with more comprehensive checks
-      final validRecipes = _validateRecipes(_fetchedRecipes);
+      // Validate recipes
+      final validRecipes = _validateRecipes(recipesToSave);
 
       print('Valid Recipes Count: ${validRecipes.length}');
 
       if (validRecipes.isEmpty) {
-        print('No valid recipes to save');
         emit(RecipeError("No valid recipes to save", false));
         return;
       }
 
-      // Attempt to save valid recipes
-      await _saveValidRecipes(validRecipes);
-
-      // Update saved recipes list
-      _savedRecipes.addAll(validRecipes);
-
-      // Clear fetched recipes after successful save
-      _fetchedRecipes.clear();
-
-      // Combine and get unique recipes
-      final combinedRecipes = _removeDuplicateRecipes([
-        ..._savedRecipes,
-        ..._fetchedRecipes
-      ]);
-
-      // Emit loaded state with combined recipes
-      emit(RecipeLoaded(combinedRecipes));
-
-    } catch (e, stackTrace) {
-      print("Unexpected error in save recipes: $e");
-      print("Stack trace: $stackTrace");
-
-      emit(RecipeError("Unexpected error: ${e.toString()}", true));
-    }
-  }
-
-  List<Recipe> _validateRecipes(List<Recipe> recipes) {
-    return recipes.where((recipe) {
-      bool isValid = _isRecipeValid(recipe);
-
-      if (!isValid) {
-        print('Invalid recipe found:');
-        _logInvalidRecipeDetails(recipe);
-      }
-
-      return isValid;
-    }).toList();
-  }
-
-  bool _isRecipeValid(Recipe recipe) {
-    return recipe.name.trim().isNotEmpty;
-  }
-
-  void _logInvalidRecipeDetails(Recipe recipe) {
-    print('  Name: ${recipe.name ?? 'N/A'}');
-    print('  Name is Null: ${recipe.name == null}');
-    print('  Name is Empty: ${recipe.name?.trim().isEmpty ?? true}');
-  }
-
-  Future<void> _saveValidRecipes(List<Recipe> validRecipes) async {
-    try {
-      print('Repository: Attempting to save ${validRecipes.length} recipes');
-
-      if (validRecipes.isEmpty) {
-        print('Repository: No recipes to save');
-        return;
-      }
-
-      // Delegate saving to repository
+      // Save recipes
       await recipeRepository.saveRecipes(validRecipes);
 
-      print('Successfully saved ${validRecipes.length} recipes');
-    } catch (e, stackTrace) {
+      // Update saved recipes
+      _savedRecipes.addAll(validRecipes);
+
+      // Optionally, remove saved recipes from fetched recipes
+      _fetchedRecipes.removeWhere((fetchedRecipe) =>
+          validRecipes.any((savedRecipe) =>
+          savedRecipe.id == fetchedRecipe.id ||
+              savedRecipe.name == fetchedRecipe.name
+          )
+      );
+      _debugRecipeState();
+      // Emit updated state
+      emit(SavedRecipesLoaded(_savedRecipes));
+
+      // Trigger combine to update overall view
+      add(CombineRecipesEvent());
+
+    } catch (e) {
       print('Error saving recipes: $e');
-      print('Stack trace: $stackTrace');
-
-      // Rethrow to be caught in the bloc method
-      rethrow;
+      emit(RecipeError("Failed to save recipes: $e", true));
     }
   }
 
-  void _debugPrintFetchedRecipes() {
-    print('Fetched Recipes Count: ${_fetchedRecipes.length}');
+  Future<void> _onLoadSavedRecipes(
+      LoadSavedRecipesEvent event, Emitter<RecipeState> emit) async {
+    try {
+      emit(RecipeLoading());
 
-    if (_fetchedRecipes.isEmpty) {
-      print('Fetched Recipes List is Empty');
-    } else {
-      _fetchedRecipes.asMap().forEach((index, recipe) {
-        print('Fetched Recipe #${index + 1}:');
-        print('  Name: ${recipe.name}');
-        print('  Is Name Null or Empty: ${recipe.name!.trim().isEmpty}');
-      });
+      final savedRecipes = await recipeRepository.fetchSavedRecipes();
+
+      _savedRecipes.clear();
+      _savedRecipes.addAll(savedRecipes);
+
+      emit(SavedRecipesLoaded(savedRecipes));
+    } catch (e) {
+      emit(RecipeError("Failed to load saved recipes: $e", true));
     }
   }
+
+  Future<void> _onCombineRecipes(
+      CombineRecipesEvent event, Emitter<RecipeState> emit) async {
+    try {
+      // Create a combined list of saved and fetched recipes
+      final combinedRecipes = [
+        ..._savedRecipes,
+        ..._fetchedRecipes
+      ];
+
+      // Remove duplicates
+      final uniqueRecipes = _removeDuplicateRecipes(combinedRecipes);
+
+      // Log combination details
+      print('Combining Recipes:');
+      print('Saved Recipes: ${_savedRecipes.length}');
+      print('Fetched Recipes: ${_fetchedRecipes.length}');
+      print('Combined Unique Recipes: ${uniqueRecipes.length}');
+
+      // Emit the combined recipes
+      emit(RecipeLoaded(uniqueRecipes));
+    } catch (e) {
+      print('Error combining recipes: $e');
+      emit(RecipeError('Failed to combine recipes: $e', true));
+    }
+  }
+
 
   Future<void> _onCleanupRecipes(
       CleanupRecipesEvent event, Emitter<RecipeState> emit) async {
-    emit(RecipeLoading());
-
     try {
+      // Emit loading state
+      emit(RecipeLoading());
+
+      // Perform cleanup with repository method
       await recipeRepository.performCompleteCleanup(
         deleteGenerated: event.deleteGenerated,
         archiveOld: event.archiveOld,
         daysOld: event.daysOld,
       );
 
+      // Fetch updated saved recipes
       final updatedRecipes = await recipeRepository.fetchSavedRecipes();
+
+      // Update local saved recipes list
       _savedRecipes.clear();
       _savedRecipes.addAll(updatedRecipes);
 
+      // Log cleanup details
+      print('Recipes Cleanup:');
+      print('Delete Generated: ${event.deleteGenerated}');
+      print('Archive Old: ${event.archiveOld}');
+      print('Days Old: ${event.daysOld}');
+      print('Updated Saved Recipes: ${updatedRecipes.length}');
+
+      // Emit updated saved recipes state
       emit(SavedRecipesLoaded(updatedRecipes));
     } catch (e) {
-      emit(RecipeError('Failed to cleanup recipes: ${e.toString()}', true));
+      print('Cleanup Recipes Error: $e');
+      emit(RecipeError('Failed to cleanup recipes: $e', true));
     }
   }
 
-  Future<void> _onCombineRecipes(
-      CombineRecipesEvent event, Emitter<RecipeState> emit) async {
-    final combinedRecipes = [..._savedRecipes, ..._fetchedRecipes];
-    emit(RecipeLoaded(combinedRecipes));
+  List<Recipe> _removeDuplicateRecipes(List<Recipe> recipes) {
+    // Remove duplicates based on a unique identifier (e.g., name or custom ID)
+    final uniqueRecipes = <Recipe>[];
+    final seenRecipes = <String>{};
+
+    for (final recipe in recipes) {
+      // Use a unique identifier - adjust based on your Recipe model
+      final identifier = recipe.id ?? recipe.name;
+
+      if (identifier != null && !seenRecipes.contains(identifier)) {
+        uniqueRecipes.add(recipe);
+        seenRecipes.add(identifier);
+      }
+    }
+
+    return uniqueRecipes;
   }
 
-  // Utility methods
-  void addRecipe(Recipe recipe) {
-    _fetchedRecipes.add(recipe);
-    add(SaveRecipesEvent());
+  void clearFetchedRecipes() {
+    _fetchedRecipes.clear();
+    add(CombineRecipesEvent());
   }
 
-  void removeRecipe(Recipe recipe) {
-    _savedRecipes.remove(recipe);
-    add(SaveRecipesEvent());
+  void clearSavedRecipes() {
+    _savedRecipes.clear();
+    add(CombineRecipesEvent());
+  }
+  List<Recipe> _validateRecipes(List<Recipe> recipes) {
+    return recipes.where((recipe) {
+      bool isValid = recipe.name.trim().isNotEmpty &&
+          recipe.ingredients.isNotEmpty;
+
+      if (!isValid) {
+        print('Invalid Recipe Detected:');
+        print('  Name: ${recipe.name}');
+        print('  Ingredients: ${recipe.ingredients?.length ?? 0}');
+      }
+
+      return isValid;
+    }).toList();
+  }
+
+  void _debugRecipeState() {
+    print('Current Recipe State:');
+    print('Fetched Recipes: ${_fetchedRecipes.length}');
+    print('Saved Recipes: ${_savedRecipes.length}');
+
+    if (_fetchedRecipes.isNotEmpty) {
+      _fetchedRecipes.forEach((recipe) {
+        print('Fetched Recipe: ${recipe.name}');
+      });
+    }
+
+    if (_savedRecipes.isNotEmpty) {
+      _savedRecipes.forEach((recipe) {
+        print('Saved Recipe: ${recipe.name}');
+      });
+    }
+  }
+
+  void _logFetchedRecipes(List<Recipe> recipes, String query) {
+    print('Fetched Recipes for Query: $query');
+    print('Total Recipes Found: ${recipes.length}');
+
+    if (recipes.isEmpty) {
+      print('No recipes were fetched');
+      return;
+    }
+
+    recipes.asMap().forEach((index, recipe) {
+      print('Recipe #${index + 1}:');
+      print('  Name: ${recipe.name ?? 'N/A'}');
+      print('  Ingredients: ${recipe.ingredients?.length ?? 0}');
+    });
+
   }
 
   List<Recipe> get fetchedRecipes => List.unmodifiable(_fetchedRecipes);
-
   List<Recipe> get savedRecipes => List.unmodifiable(_savedRecipes);
 }
+
