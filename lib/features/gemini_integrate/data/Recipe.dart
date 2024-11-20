@@ -31,29 +31,88 @@ class Recipe {
     _validate();
   }
 
-  // Factory constructor to parse JSON data
+  // Enhanced factory constructor with detailed error handling and logging
   factory Recipe.fromJson(Map<String, dynamic> json) {
-    return Recipe(
-      id: json['id'],
-      name: json['name'] ?? 'Unnamed Recipe',
-      summary: json['summary'] ?? 'No summary available',
-      typeOfMeal: json['typeOfMeal'] ?? 'Unknown Meal Type',
-      time: json['time'] ?? 'N/A',
-      generatedAt: json['generatedAt'],
-      isGenerated: json['isGenerated'] ?? false,
-      sourceQuery: json['sourceQuery'],
-      imageUrl: json['imageUrl'] ?? '',
-      ingredients: (json['ingredients'] as List<dynamic>?)
-              ?.map((ingredientJson) => Ingredient.fromJson(ingredientJson))
-              .toList() ??
-          [],
-      nutrition: json['nutrition'] != null
-          ? Nutrition.fromJson(json['nutrition'])
-          : Nutrition.defaultValues(),
-      directions: json['directions'] != null
-          ? Directions.fromJson(json['directions'])
-          : Directions.defaultValues(),
-    );
+    try {
+      // Debug print to see the entire JSON structure
+      print('Full Recipe JSON: $json');
+
+      // Detailed type checking and conversion
+      return Recipe(
+        id: _safeParseString(json['id']),
+        name: _safeParseString(json['name'], defaultValue: 'Unnamed Recipe'),
+        summary: _safeParseString(json['summary'], defaultValue: 'No summary available'),
+        typeOfMeal: _safeParseString(json['typeOfMeal'], defaultValue: 'Unknown Meal Type'),
+        time: _safeParseString(json['time'], defaultValue: 'N/A'),
+        generatedAt: _safeParseString(json['generatedAt']),
+        isGenerated: _safeParseBoolean(json['isGenerated']),
+        sourceQuery: _safeParseString(json['sourceQuery']),
+        imageUrl: _safeParseString(json['imageUrl'], defaultValue: ''),
+
+        // Detailed parsing for ingredients
+        ingredients: _parseIngredients(json['ingredients']),
+
+        // Detailed parsing for nutrition
+        nutrition: json['nutrition'] != null
+            ? Nutrition.fromJson(json['nutrition'])
+            : Nutrition.defaultValues(),
+
+        // Detailed parsing for directions
+        directions: json['directions'] != null
+            ? Directions.fromJson(json['directions'])
+            : Directions.defaultValues(),
+      );
+    } catch (e, stackTrace) {
+      // Comprehensive error logging
+      print('Error parsing Recipe JSON: $e');
+      print('JSON causing error: $json');
+      print('Stacktrace: $stackTrace');
+
+      // Rethrow or return a default Recipe
+      throw ArgumentError('Failed to parse Recipe: $e');
+    }
+  }
+
+  // Safe string parsing method
+  static String _safeParseString(dynamic value, {String defaultValue = ''}) {
+    if (value == null) return defaultValue;
+    return value.toString().trim().isEmpty ? defaultValue : value.toString();
+  }
+
+  // Safe boolean parsing method
+  static bool _safeParseBoolean(dynamic value) {
+    if (value == null) return false;
+    if (value is bool) return value;
+    if (value is String) return value.toLowerCase() == 'true';
+    return false;
+  }
+
+  // Safe ingredients parsing method
+  static List<Ingredient> _parseIngredients(dynamic ingredientsJson) {
+    try {
+      if (ingredientsJson == null) return [];
+
+      if (ingredientsJson is List) {
+        return ingredientsJson
+            .map((ingredientJson) =>
+        ingredientJson is Map
+            ? Ingredient.fromJson(ingredientJson as Map<String, dynamic>)
+            : Ingredient(
+            name: ingredientJson.toString(),
+            quantity: 'N/A',
+            unit: 'N/A',
+            imageUrl: ''
+        )
+        )
+            .toList();
+      }
+
+      print('Unexpected ingredients type: ${ingredientsJson.runtimeType}');
+      return [];
+    } catch (e) {
+      print('Error parsing ingredients: $e');
+      return [];
+    }
   }
 
   Map<String, dynamic> toJson() {
@@ -109,14 +168,27 @@ class Ingredient {
     required this.imageUrl,
   });
 
-  // Factory constructor to parse JSON data
   factory Ingredient.fromJson(Map<String, dynamic> json) {
-    return Ingredient(
-      name: json['name'] ?? 'Unknown Ingredient',
-      quantity: json['quantity'] ?? 'N/A',
-      unit: json['unit'] ?? 'N/A',
-      imageUrl: json['imageUrl'] ?? '', // Fallback if image URL is missing
-    );
+    try {
+      // Debug print for ingredient parsing
+      print('Parsing Ingredient JSON: $json');
+
+      return Ingredient(
+        name: _safeParseString(json['name'], defaultValue: 'Unknown Ingredient'),
+        quantity: _safeParseString(json['quantity'], defaultValue: 'N/A'),
+        unit: _safeParseString(json['unit'], defaultValue: 'N/A'),
+        imageUrl: _safeParseString(json['imageUrl'], defaultValue: ''),
+      );
+    } catch (e) {
+      print('Error parsing Ingredient: $e');
+      throw ArgumentError('Failed to parse Ingredient: $e');
+    }
+  }
+
+  // Safe string parsing method (same as in Recipe)
+  static String _safeParseString(dynamic value, {String defaultValue = ''}) {
+    if (value == null) return defaultValue;
+    return value.toString().trim().isEmpty ? defaultValue : value.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -152,21 +224,24 @@ class Nutrition {
   // Factory constructor to parse JSON data
   factory Nutrition.fromJson(Map<String, dynamic> json) {
     return Nutrition(
-      calories: _parseInt(json['calories']),
-      protein: _parseDouble(json['protein']),
-      carbs: _parseDouble(json['carbs']),
-      fat: _parseDouble(json['fat']),
+      calories: _safeParseInt(json['calories']),
+      protein: _safeParseDouble(json['protein']),
+      carbs: _safeParseDouble(json['carbs']),
+      fat: _safeParseDouble(json['fat']),
       vitamins: List<String>.from(json['vitamins'] ?? []),
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
-      'calories': calories  ,
+      'calories': calories,
       'protein': protein,
       'carbs': carbs,
+      'fat': fat,
       'vitamins': vitamins,
     };
   }
+
   // Provide default values if data is missing
   factory Nutrition.defaultValues() {
     return Nutrition(
@@ -178,17 +253,33 @@ class Nutrition {
     );
   }
 
-  static int _parseInt(dynamic value) {
+  // Enhanced parsing methods
+  static int _safeParseInt(dynamic value) {
+    if (value == null) return 0;
+
     if (value is int) return value;
-    if (value is String) return int.tryParse(value) ?? 0;
-    return 0; // Default to 0 if unable to parse
+
+    if (value is double) return value.toInt();
+
+    if (value is String) {
+      return int.tryParse(value) ?? 0;
+    }
+
+    return 0;
   }
 
-  static double _parseDouble(dynamic value) {
+  static double _safeParseDouble(dynamic value) {
+    if (value == null) return 0.0;
+
     if (value is double) return value;
+
     if (value is int) return value.toDouble();
-    if (value is String) return double.tryParse(value) ?? 0.0;
-    return 0.0; // Default to 0.0 if unable to parse
+
+    if (value is String) {
+      return double.tryParse(value) ?? 0.0;
+    }
+
+    return 0.0;
   }
 
   @override
