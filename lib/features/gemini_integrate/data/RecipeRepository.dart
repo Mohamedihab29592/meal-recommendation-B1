@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_generative_ai/google_generative_ai.dart' as gemini;
+import '../../../core/networking/ServerException.dart';
 import '../../../core/services/GeminiApiService.dart';
 import '../../../core/services/RecipeApiService.dart';
 import 'Recipe.dart';
@@ -22,20 +24,52 @@ class RecipeRepository {
 
       // Validate response
       if (geminiResponse.isEmpty) {
-        throw Exception('No recipe data received from Gemini API');
+        throw ServerException(
+            message: 'No recipe data received from Gemini API',
+            statusCode: 404
+        );
       }
 
       // Prepare recipe data with comprehensive error handling
-      final recipe = await _processRecipeData(query, geminiResponse);
+      final recipe = await _processRecipeData(query, geminiResponse, id: null);
+
+      // Additional validation
+      if (recipe.name!.isEmpty) {
+        throw ServerException(
+            message: 'Invalid recipe: Missing name',
+            statusCode: 400
+        );
+      }
 
       return [recipe];
+    } on gemini.GenerativeAIException catch (e) {
+      // Handle Gemini-specific exceptions
+      if (e.toString().contains('503') || e.toString().contains('UNAVAILABLE')) {
+        throw ServerException(
+            message: 'AI service is currently overloaded. Please try again later.',
+            statusCode: 503
+        );
+      }
+
+      // For other Generative AI exceptions
+      throw ServerException(
+          message: 'Generative AI error: ${e.toString()}',
+          statusCode: 500
+      );
+    } on ServerException {
+      // Re-throw local ServerException
+      rethrow;
     } catch (e) {
-      print('Recipe Fetch Error: $e');
-      return [];
+      // Catch-all for unexpected errors
+      throw ServerException(
+          message: 'Unexpected error fetching recipes: ${e.toString()}',
+          statusCode: 500
+      );
     }
   }
 
-  Future<Recipe> _processRecipeData(String query, Map<String, dynamic> geminiResponse) async {
+  Future<Recipe> _processRecipeData(String query,
+      Map<String, dynamic> geminiResponse,{String? id}) async {
     try {
       // Fetch recipe image with fallback
       String imageUrl = await apiService.fetchRecipeImage(query) ??
@@ -47,6 +81,7 @@ class RecipeRepository {
       );
 
       return Recipe.fromJson({
+        'id' : id,
         'name': geminiResponse['name'] ?? 'Unknown Dish',
         'summary': geminiResponse['summary'] ?? 'No summary available',
         'typeOfMeal': geminiResponse['typeOfMeal'] ?? 'General',
@@ -89,7 +124,6 @@ class RecipeRepository {
     return processedIngredients;
   }
 
-  // Robust nutrition processing with default values
   Map<String, dynamic> _processNutrition(dynamic nutritionData) {
     try {
       if (nutritionData == null) {
@@ -109,7 +143,6 @@ class RecipeRepository {
     }
   }
 
-  // Robust directions processing with default values
   Map<String, dynamic> _processDirections(dynamic directionsData) {
     try {
       if (directionsData == null) {
@@ -127,13 +160,33 @@ class RecipeRepository {
     }
   }
 
-  // Save recipes to Firestore
   Future<void> saveRecipes(List<Recipe> recipes) async {
     try {
-      String userId = _auth.currentUser!.uid;
+      print('Repository: Attempting to save ${recipes.length} recipes');
+
+      if (recipes.isEmpty) {
+        print('Repository: No recipes to save');
+        throw Exception('No recipes to save');
+      }
+
+      String userId;
+      if (_auth.currentUser == null) {
+        print('Repository: User not authenticated');
+        throw Exception('User not authenticated');
+      } else {
+        userId = _auth.currentUser!.uid;
+        print('Repository: User ID - $userId');
+      }
+
       WriteBatch batch = _firestore.batch();
 
       for (var recipe in recipes) {
+        // Additional validation
+        if (recipe.id == null || recipe.name == null) {
+          print('Repository: Skipping invalid recipe: ${recipe.name}');
+          continue;
+        }
+
         DocumentReference recipeDoc = _firestore.collection('recipesGemini').doc();
 
         batch.set(recipeDoc, {
@@ -144,9 +197,15 @@ class RecipeRepository {
         });
       }
 
+      print('Repository: Committing batch');
       await batch.commit();
-    } catch (e) {
-      print('Save Recipes Error: $e');
+      print('Repository: Batch committed successfully');
+    } on FirebaseException catch (e) {
+      print('Repository: Firebase Save Recipes Error: ${e.code} - ${e.message}');
+      rethrow;
+    } catch (e, stackTrace) {
+      print('Repository: Save Recipes Error: $e');
+      print('Repository: Stack Trace: $stackTrace');
       rethrow;
     }
   }

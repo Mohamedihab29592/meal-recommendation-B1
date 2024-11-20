@@ -1,16 +1,33 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/quick_stats_row.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_card_content.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_delete_button.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_header.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_image.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
+import '../../../../core/components/dynamic_notification_widget.dart';
+import '../../../../core/services/di.dart';
+import '../../../../core/utiles/app_colors.dart';
 import '../../data/Recipe.dart';
+import '../bloc/RecipeBloc.dart';
+import '../bloc/RecipeEvent.dart';
 import 'add_ingredients_button.dart';
 
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
+  final bool isSaved;
+  final VoidCallback? onDelete;
 
-  const RecipeCard({super.key, required this.recipe});
+  const RecipeCard({
+    super.key,
+    required this.recipe,
+    this.isSaved = false,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -31,26 +48,14 @@ class RecipeCard extends StatelessWidget {
         child: Material(
           color: Colors.white,
           child: InkWell(
-            onTap: () => {
-              context.pushNamed(AppRoutes.detailsPage,arguments: recipe.id)
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            onTap: () => _handleRecipeTap(context),
+            child: Stack(
               children: [
-                RecipeImage(recipe: recipe),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RecipeHeader(recipe: recipe),
-                      const SizedBox(height: 12),
-                      QuickStatsRow(recipe: recipe),
-                      const SizedBox(height: 16),
-                      AddIngredientsButton(recipe: recipe),
-                    ],
-                  ),
+                RecipeCardContent(
+                  recipe: recipe,
+                  isSaved: isSaved,
                 ),
+
               ],
             ),
           ),
@@ -58,9 +63,22 @@ class RecipeCard extends StatelessWidget {
       ),
     );
   }
+
+  void _handleRecipeTap(BuildContext context) {
+    if (!isSaved) {
+      DynamicNotificationWidget.showNotification(
+        context: context,
+        title: 'Oh Hey!!',
+        message: "You Must Save it To Show Details!",
+        color: Colors.red,
+        contentType: ContentType.failure,
+        inMaterialBanner: false,
+      );
+    } else {
+      context.pushNamed(AppRoutes.detailsPage, arguments: recipe.id);
+    }
+  }
 }
-
-
 
 
 

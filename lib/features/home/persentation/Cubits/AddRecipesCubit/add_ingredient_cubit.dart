@@ -24,6 +24,17 @@ class AddIngredientCubit extends Cubit<AddIngredientState> {
     }
   }
 
+  Future<bool> checkIngredientsAdded(Recipe recipe) async {
+    try {
+       emit(AddIngredientAlreadyAdded());
+      return await homeRepo.checkRecipeIngredientsAdded(recipe.id);
+    } catch (error) {
+      emit(AddIngredientAlreadyFailed(error.toString()));
+      print('Error checking ingredients: $error');
+      return false;
+    }
+  }
+
   Future<void> pickMainImage() async {
     try {
       emit(IsLoadingImageState("main")); // Use "main" as the ID for the main image

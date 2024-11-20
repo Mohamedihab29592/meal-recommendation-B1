@@ -8,8 +8,8 @@ class Recipe {
   final String name;
   final String summary;
   final String typeOfMeal;
-  final String time; // Preparation time
-  final String imageUrl; // Main image for the dish
+  final String time;
+  final String imageUrl;
   final List<Ingredient> ingredients;
   final Nutrition nutrition;
   final Directions directions;

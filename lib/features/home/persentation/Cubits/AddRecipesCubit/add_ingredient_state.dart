@@ -9,26 +9,36 @@ class AddIngredientLoading extends AddIngredientState {}
 
 class AddIngredientSuccess extends AddIngredientState {}
 
+class AddIngredientAlreadyAdded extends AddIngredientState {}
+
+class AddIngredientAlreadyFailed extends AddIngredientState {
+  final String error;
+
+  AddIngredientAlreadyFailed(this.error);
+}
+
 class AddIngredientFailure extends AddIngredientState {
   final String error;
 
   AddIngredientFailure(this.error);
 }
 
-
 class IsLoadingImageState extends AddIngredientState {
   final String id;
+
   IsLoadingImageState(this.id); // Identify the ingredient being updated
 }
 
 class LoadedImageState extends AddIngredientState {
   final String id;
   final String imageUrl;
+
   LoadedImageState(this.id, this.imageUrl);
 }
 
 class FailureImageError extends AddIngredientState {
   final String id;
   final String message;
+
   FailureImageError(this.id, this.message);
 }

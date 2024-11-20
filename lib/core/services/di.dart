@@ -70,6 +70,7 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
   const apiGeminiKey = "AIzaSyBnRMY9VLpC2Y2k6m7ManTZKnkmh7NfM6Q";
   const pexelsApiKey =
       "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
+
   if (!Hive.isAdapterRegistered(32)) {
     Hive.registerAdapter(UserModelAdapter());
   }
@@ -157,9 +158,11 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
       updateUserProfile: getIt(),
     ),
   );
+  final currentUserId = getCurrentUserId();
   getIt.registerLazySingleton<HomeRepo>(
-    () => HomeRepoImpl(),
+    () => HomeRepoImpl(FirebaseFirestore.instance, currentUserId),
   );
+
   // Blocs
   getIt.registerFactory(() => AuthBloc(
         loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
@@ -206,9 +209,15 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
         geminiApiService: getIt<GeminiApiService>(),
       ));
 
-
-
   // Register BLoC
   getIt.registerFactory<RecipeBloc>(
       () => RecipeBloc(recipeRepository: getIt<RecipeRepository>()));
+}
+
+String getCurrentUserId() {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) {
+    throw Exception('No user logged in');
+  }
+  return user.uid;
 }

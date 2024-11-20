@@ -20,5 +20,7 @@ class SavedRecipesLoaded extends RecipeState {
 
 class RecipeError extends RecipeState {
   final String message;
-  RecipeError(this.message);
+  final bool canRetry;
+
+  RecipeError(this.message, this.canRetry);
 }

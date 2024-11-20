@@ -2,23 +2,48 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
-import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/loading_chat_widget.dart';
-
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_buttons.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_list_view.dart';
 import '../../../../core/components/Custome_Appbar.dart';
-import '../../../../core/components/dynamic_notification_widget.dart';
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/services/di.dart';
 import '../../../../core/utiles/app_colors.dart';
 import '../../../../core/utiles/assets.dart';
+import '../../../../core/utiles/helper.dart';
+import '../../../home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
 import '../bloc/RecipeBloc.dart';
 import '../bloc/RecipeEvent.dart';
 import '../bloc/RecipeState.dart';
 import 'CustomSearchBar.dart';
-import 'RecipeCard.dart';
 
-class RecipeSearchScreen extends StatelessWidget {
+class RecipeSearchScreen extends StatefulWidget {
+  const RecipeSearchScreen({super.key});
+
+  @override
+  RecipeSearchScreenState createState() => RecipeSearchScreenState();
+}
+
+class RecipeSearchScreenState extends State<RecipeSearchScreen> {
   final TextEditingController _controller = TextEditingController();
+  bool _showSavedRecipes = false;
 
-  RecipeSearchScreen({super.key});
+  @override
+  void initState() {
+    super.initState();
+    try {
+      context.read<RecipeBloc>().add(CombineRecipesEvent());
+    } catch (e) {
+      debugPrint('Error in initState: $e');
+      // Optionally show an error dialog or snackbar
+    }
+
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,50 +52,57 @@ class RecipeSearchScreen extends StatelessWidget {
         body: BlocConsumer<RecipeBloc, RecipeState>(
           listener: (context, state) {
             if (state is RecipesSaved) {
-              DynamicNotificationWidget.showNotification(
-                context: context,
-                title: 'Oh Hey!!',
-                message: 'Recipes saved successfully!',
-                color: Colors.green, // You can use this color if needed
-                contentType: ContentType.success,
-                inMaterialBanner: false,
-              );
+              showNotification(
+                  context, 'Recipes saved successfully!', ContentType.success);
             } else if (state is RecipeError) {
-              DynamicNotificationWidget.showNotification(
-                context: context,
-                title: 'Oh Hey!!',
-                message: state.message,
-                color: Colors.green, // You can use this color if needed
-                contentType: ContentType.failure,
-                inMaterialBanner: false,
-              );
+              showNotification(context, state.message, ContentType.failure);
             }
           },
           builder: (context, state) {
+            int newRecipesCount = _getNewRecipesCount(context.read<RecipeBloc>());
+
+
             return Padding(
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 children: [
                   CustomAppbar(
-                    ontapleft: () {},
+                    ontapleft: () => showCleanupOptions(context),
                     ontapright: () {
                       context.pushNamed(AppRoutes.geminiRecipe);
                     },
-                    rightChild: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white
-                      ),
-                      onPressed: () {
-                        _showSaveConfirmationDialog(context);
+                    leftChild: IconButton(
+                      iconSize: 30,
+                      icon: const Icon(Icons.cleaning_services,
+                          color: AppColors.primary),
+                      onPressed: () => showCleanupOptions(context),
+                    ),
+                    rightChild: RecipeButtons(
+                      recipesCount: newRecipesCount,
+                      showSavedRecipes: _showSavedRecipes,
+                      onSave: () => showSaveConfirmationDialog(context),
+                      onToggleSavedRecipes: () {
+                        setState(() {
+                          _showSavedRecipes = !_showSavedRecipes;
+                        });
+                        if (_showSavedRecipes) {
+                          context.read<RecipeBloc>().add(LoadSavedRecipesEvent());
+                        } else {
+                          context.read<RecipeBloc>().add(CombineRecipesEvent());
+                        }
                       },
-                      child: const Text('Save Recipes'),
                     ),
                     leftImage: Assets.icProfileMenu,
                   ),
                   const SizedBox(height: 20),
                   Expanded(
-                    child: _buildRecipeList(state),
+                    child: BlocProvider.value(
+                      value: getIt<AddIngredientCubit>(),
+                      child: RecipeListView(
+                        state: state,
+                        showSavedRecipes: _showSavedRecipes,
+                      ),
+                    ),
                   ),
                   CustomSearchBar(
                     controller: _controller,
@@ -90,53 +122,15 @@ class RecipeSearchScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecipeList(RecipeState state) {
-    if (state is RecipeLoading) {
-      return const LoadingChatWidget();
-    } else if (state is RecipeLoaded) {
-      return ListView.builder(
-        itemCount: state.recipes.length,
-        padding: const EdgeInsets.only(bottom: 16),
-        itemBuilder: (context, index) {
-          final recipe = state.recipes[index];
-          return RecipeCard(recipe: recipe);
-        },
-      );
-    } else if (state is RecipeError) {
-      return Center(
-        child: Text(
-          state.message,
-          style: const TextStyle(color: Colors.red),
-        ),
-      );
-    }
-    return Image.asset(Assets.noFoodFound);
+  int _getNewRecipesCount(RecipeBloc recipeBloc) {
+    return recipeBloc.fetchedRecipes
+        .where((fetchedRecipe) => !recipeBloc.savedRecipes
+        .any((savedRecipe) => savedRecipe.id == fetchedRecipe.id))
+        .length;
   }
 
-  void _showSaveConfirmationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Save Recipes'),
-        content: const Text('Do you want to save these recipes?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white
-            ),
-            onPressed: () {
-              context.read<RecipeBloc>().add(SaveRecipesEvent());
-              Navigator.of(context).pop();
-            },
-            child: const Text('Save'),
-          ),
-        ],
-      ),
-    );
-  }
 }
+
+
+
+

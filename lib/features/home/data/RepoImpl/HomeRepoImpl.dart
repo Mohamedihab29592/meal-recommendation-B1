@@ -4,6 +4,10 @@ import 'package:meal_recommendation_b1/features/home/domain/HomeRepo/HomeRepo.da
 import '../../../gemini_integrate/data/Recipe.dart';
 
 class HomeRepoImpl extends HomeRepo {
+  final FirebaseFirestore _firestore;
+  final String userId;
+
+  HomeRepoImpl(this._firestore, this.userId);
   @override
   Future<void> addIngredients(Recipe recipe) async {
     try {
@@ -23,7 +27,7 @@ class HomeRepoImpl extends HomeRepo {
 
       // Create a new recipe object to add
       Map<String, dynamic> recipeData = {
-        "id": FirebaseFirestore.instance.collection("users").doc().id, // Generate a unique ID
+        "id": FirebaseFirestore.instance.collection("users").doc().id,
         "name": recipe.name,
         "summary": recipe.summary,
         "typeOfMeal": recipe.typeOfMeal,
@@ -86,5 +90,29 @@ class HomeRepoImpl extends HomeRepo {
       throw ArgumentError("First step of recipe cannot be empty");
     }
   }
-}
+
+
+    @override
+    Future<bool> checkRecipeIngredientsAdded(String? recipeId) async {
+      if (recipeId == null) return false;
+
+      try {
+        // Query ingredients collection to check if ingredients from this recipe exist
+        final querySnapshot = await _firestore
+            .collection('users')
+            .doc(userId)
+            .collection('ingredients')
+            .where('recipeId', isEqualTo: recipeId)
+            .limit(1)
+            .get();
+
+        return querySnapshot.docs.isNotEmpty;
+      } catch (error) {
+        print('Error checking added ingredients: $error');
+        return false;
+      }
+    }
+
+  }
+
 
