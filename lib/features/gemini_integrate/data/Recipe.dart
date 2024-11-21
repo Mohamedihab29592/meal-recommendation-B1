@@ -1,4 +1,5 @@
-import 'package:meal_recommendation_b1/features/gemini_integrate/data/RecipeRepository.dart';
+
+import '../../../core/utiles/helper.dart';
 
 class Recipe {
   String? id;
@@ -178,21 +179,15 @@ class Ingredient {
       print('Parsing Ingredient JSON: $json');
 
       return Ingredient(
-        name: _safeParseString(json['name'], defaultValue: 'Unknown Ingredient'),
-        quantity: _safeParseString(json['quantity'], defaultValue: 'N/A'),
-        unit: _safeParseString(json['unit'], defaultValue: 'N/A'),
-        imageUrl: _safeParseString(json['imageUrl'], defaultValue: ''),
+        name: safeParseString(json['name'], defaultValue: 'Unknown Ingredient'),
+        quantity: safeParseString(json['quantity'], defaultValue: 'N/A'),
+        unit: safeParseString(json['unit'], defaultValue: 'N/A'),
+        imageUrl: safeParseString(json['imageUrl'], defaultValue: ''),
       );
     } catch (e) {
       print('Error parsing Ingredient: $e');
       throw ArgumentError('Failed to parse Ingredient: $e');
     }
-  }
-
-  // Safe string parsing method (same as in Recipe)
-  static String _safeParseString(dynamic value, {String defaultValue = ''}) {
-    if (value == null) return defaultValue;
-    return value.toString().trim().isEmpty ? defaultValue : value.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -227,62 +222,16 @@ class Nutrition {
 
   // Factory constructor to parse JSON data
   factory Nutrition.fromJson(Map<String, dynamic> json) {
+    print('Parsing JSON: $json'); // Debugging line
     return Nutrition(
-      calories: _safeParseInt(json['calories']),
-      protein: _safeParseDouble(json['protein']),
-      carbs: _safeParseDouble(json['carbs']),
-      fat: _safeParseDouble(json['fat']),
-      vitamins: _parseSafeStringList(json['vitamins']),
+      calories: safeParseInt(json['calories']),
+      protein: safeParseDouble(json['protein']),
+      carbs: safeParseDouble(json['carbs']),
+      fat: safeParseDouble(json['fat']),
+      vitamins: parseSafeStringList(json['vitamins']),
     );
   }
 
-  // Enhanced parsing method for lists
-  static List<String> _parseSafeStringList(dynamic value) {
-    if (value == null) return [];
-
-    // If it's already a list of strings, return it
-    if (value is List<String>) return value;
-
-    // If it's a list of dynamic, convert to strings
-    if (value is List) {
-      return value.map((e) => e?.toString() ?? '').toList();
-    }
-
-    // If it's a single string, wrap it in a list
-    if (value is String) return [value];
-
-    // Default to empty list
-    return [];
-  }
-
-  // Enhanced parsing methods
-  static int _safeParseInt(dynamic value) {
-    if (value == null) return 0;
-
-    if (value is int) return value;
-
-    if (value is double) return value.toInt();
-
-    if (value is String) {
-      return int.tryParse(value.replaceAll(RegExp(r'[^\d-]'), '')) ?? 0;
-    }
-
-    return 0;
-  }
-
-  static double _safeParseDouble(dynamic value) {
-    if (value == null) return 0.0;
-
-    if (value is double) return value;
-
-    if (value is int) return value.toDouble();
-
-    if (value is String) {
-      return double.tryParse(value.replaceAll(RegExp(r'[^\d.-]'), '')) ?? 0.0;
-    }
-
-    return 0.0;
-  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -303,6 +252,7 @@ class Nutrition {
       vitamins: [],
     );
   }
+
   @override
   String toString() {
     return 'Nutrition{calories: $calories, protein: $protein, carbs: $carbs, fat: $fat, vitamins: $vitamins}';
@@ -323,38 +273,10 @@ class Directions {
   // Factory constructor to parse JSON data
   factory Directions.fromJson(Map<String, dynamic> json) {
     return Directions(
-      firstStep: _parseSafeString(json['firstStep']),
-      secondStep: _parseSafeString(json['secondStep']),
-      additionalSteps: _parseSafeStringList(json['additionalSteps']),
+      firstStep: parseSafeString(json['firstStep']),
+      secondStep: parseSafeString(json['secondStep']),
+      additionalSteps: parseSafeStringList(json['additionalSteps']),
     );
-  }
-
-  // Safe string parsing method
-  static String _parseSafeString(dynamic value) {
-    if (value == null) return 'N/A';
-    return value.toString().trim().isEmpty ? 'N/A' : value.toString();
-  }
-
-  // Enhanced parsing method for lists
-  static List<String> _parseSafeStringList(dynamic value) {
-    if (value == null) return [];
-
-    // If it's already a list of strings, return it
-    if (value is List<String>) return value;
-
-    // If it's a list of dynamic, convert to strings
-    if (value is List) {
-      return value
-          .map((e) => e?.toString() ?? '')
-          .where((s) => s.isNotEmpty)
-          .toList();
-    }
-
-    // If it's a single string, wrap it in a list
-    if (value is String) return [value];
-
-    // Default to empty list
-    return [];
   }
 
   Map<String, dynamic> toJson() {
@@ -377,5 +299,4 @@ class Directions {
   String toString() {
     return 'Directions{firstStep: $firstStep, secondStep: $secondStep, additionalSteps: $additionalSteps}';
   }
-
 }

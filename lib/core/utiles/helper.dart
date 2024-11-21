@@ -45,17 +45,6 @@ Future<void> showDeleteDialog({
       HapticFeedback.lightImpact(); // Add subtle vibration feedback
     },
     btnOkOnPress: () async {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
-      );
-
       try {
         print("Attempting to delete document with ID: $mealId");
 
@@ -346,3 +335,66 @@ List<Recipe> getCurrentRecipes(BuildContext context) {
   // If no recipes are available, return an empty list
   return recipeBloc.fetchedRecipes;
 }
+
+int safeParseInt(dynamic value) {
+  if (value == null) return 0;
+
+  if (value is int) return value;
+
+  if (value is double) return value.toInt();
+
+  if (value is String) {
+// Debugging line to check the string value
+    print('Parsing int from string: $value');
+    return int.tryParse(value.replaceAll(RegExp(r'[^\d-]'), '')) ?? 0;
+  }
+
+  print('Unexpected type for int: ${value.runtimeType}'); // Debugging line
+  return 0;
+}
+
+double safeParseDouble(dynamic value) {
+  if (value == null) return 0.0;
+
+  if (value is double) return value;
+
+  if (value is int) return value.toDouble();
+
+  if (value is String) {
+// Debugging line to check the string value
+    print('Parsing double from string: $value');
+    return double.tryParse(value.replaceAll(RegExp(r'[^\d.-]'), '')) ?? 0.0;
+  }
+
+  print('Unexpected type for double: ${value.runtimeType}'); // Debugging line
+  return 0.0;
+}
+
+List<String> parseSafeStringList(dynamic value) {
+  if (value == null) return [];
+
+// If it's already a list of strings, return it
+  if (value is List<String>) return value;
+
+// If it's a list of dynamic, convert to strings
+  if (value is List) {
+    return value.map((e) => e?.toString() ?? '').toList();
+  }
+
+// If it's a single string, wrap it in a list
+  if (value is String) return [value];
+
+// Default to empty list
+  return [];
+}
+String safeParseString(dynamic value, {String defaultValue = ''}) {
+if (value == null) return defaultValue;
+return value.toString().trim().isEmpty ? defaultValue : value.toString();
+}
+
+
+ String parseSafeString(dynamic value) {
+if (value == null) return 'N/A';
+return value.toString().trim().isEmpty ? 'N/A' : value.toString();
+}
+

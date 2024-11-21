@@ -4,6 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart' as gemini;
 import '../../../core/networking/ServerException.dart';
 import '../../../core/services/GeminiApiService.dart';
 import '../../../core/services/RecipeApiService.dart';
+import '../../../core/utiles/helper.dart';
 import 'Recipe.dart';
 
 class RecipeRepository {
@@ -114,7 +115,6 @@ class RecipeRepository {
         });
       } catch (e) {
         print('Ingredient Processing Error: $e');
-        // Continue processing other ingredients
       }
     }
 
@@ -128,11 +128,11 @@ class RecipeRepository {
       }
 
       return Nutrition(
-          calories: nutritionData['calories'] ?? 0,
-          protein: nutritionData['protein'] ?? 0,
-          carbs: nutritionData['carbs'] ?? 0,
-          fat: nutritionData['fat'] ?? 0,
-          vitamins: nutritionData['vitamins'] ?? ''
+        calories: safeParseInt(nutritionData['calories']),
+        protein: safeParseDouble(nutritionData['protein']),
+        carbs: safeParseDouble(nutritionData['carbs']),
+        fat: safeParseDouble(nutritionData['fat']),
+        vitamins: parseSafeStringList(nutritionData['vitamins']),
       ).toJson();
     } catch (e) {
       print('Nutrition Processing Error: $e');
@@ -147,9 +147,9 @@ class RecipeRepository {
       }
 
       return Directions(
-          firstStep: directionsData['firstStep'] ?? '',
-          secondStep: directionsData['secondStep'] ?? '',
-          additionalSteps: directionsData['additionalSteps'] ?? []
+        firstStep: parseSafeString(directionsData['firstStep']),
+        secondStep: parseSafeString(directionsData['secondStep']),
+        additionalSteps: parseSafeStringList(directionsData['additionalSteps']),
       ).toJson();
     } catch (e) {
       print('Directions Processing Error: $e');
@@ -179,7 +179,7 @@ class RecipeRepository {
       List<Map<String, dynamic>> recipesToAdd = [];
       for (var recipe in recipes) {
         // Additional validation
-        if (recipe.id == null || recipe.name == null) {
+        if (recipe.id == null) {
           print('Repository: Skipping invalid recipe: ${recipe.name}');
           continue;
         }
@@ -350,6 +350,8 @@ class RecipeRepository {
       rethrow;
     }
   }
+
+
 
 }
 
