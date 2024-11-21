@@ -43,52 +43,11 @@ class RecipeDetailsRepository {
       }
 
       // Convert the recipe data to a Recipe object
-      return _mapToRecipe(recipeData);
+      return Recipe.fromJson(recipeData);
     } catch (e) {
       print('Error fetching recipe details: $e');
       rethrow;
     }
-  }
-
-  // Helper method to convert map to Recipe object
-  Recipe _mapToRecipe(Map<String, dynamic> recipeData) {
-    return Recipe(
-      name: recipeData['name'] ?? '',
-      summary: recipeData['summary'] ?? '',
-      imageUrl: recipeData['imageUrl'] ?? '',
-      time: recipeData['time'] ?? 0,
-      typeOfMeal: recipeData['typeOfMeal'] ?? '',
-
-      // Directions mapping
-      directions: Directions(
-        firstStep: recipeData['directions']?['firstStep'] ?? '',
-        secondStep: recipeData['directions']?['secondStep'] ?? '',
-        additionalSteps: List<String>.from(
-            recipeData['directions']?['additionalSteps'] ?? []
-        ),
-      ),
-
-      // Ingredients mapping
-      ingredients: (recipeData['ingredients'] as List?)?.map((ingredientData) {
-        return Ingredient(
-          name: ingredientData['name'] ?? '',
-          quantity: ingredientData['quantity'] ?? 0,
-          unit: ingredientData['unit'] ?? '',
-          imageUrl: ingredientData['imageUrl'] ?? '',
-        );
-      }).toList() ?? [],
-
-      // Nutrition mapping
-      nutrition: Nutrition(
-        protein: recipeData['nutrition']?['protein'] ?? 0,
-        carbs: recipeData['nutrition']?['carb'] ?? 0,
-        fat: recipeData['nutrition']?['fat'] ?? 0,
-        calories: recipeData['nutrition']?['kcal'] ?? 0,
-        vitamins: List<String>.from(
-            recipeData['nutrition']?['vitamins'] ?? []
-        ),
-      ),
-    );
   }
 }
 

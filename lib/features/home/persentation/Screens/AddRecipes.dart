@@ -1,15 +1,18 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/components/dynamic_notification_widget.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_state.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/components/custom_text_field.dart';
+import '../../../../core/services/di.dart';
 import '../../../../core/utiles/app_colors.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
-import '../../data/RepoImpl/HomeRepoImpl.dart';
-import '../Cubits/AddRecipesCubit/ImageCubit.dart';
-import '../Cubits/AddRecipesCubit/ImageState.dart';
+import '../../domain/HomeRepo/HomeRepo.dart';
 import '../Widgets/CustomeContainerWithTextField.dart';
 import '../Widgets/CustomeMultiLineTextField.dart';
 
@@ -43,7 +46,6 @@ class AddRecipes extends StatelessWidget {
   final TextEditingController secoundStep = TextEditingController();
 
   bool loading = false;
-  final HomeRepoImpl homerepoimpl = HomeRepoImpl();
 
   @override
   Widget build(BuildContext context) {
@@ -71,53 +73,61 @@ class AddRecipes extends StatelessWidget {
             const SizedBox(height: 35),
 
             // Upload Meal Image
-            BlocConsumer<ImageCubit, ImagesState>(
+            BlocConsumer<AddIngredientCubit, AddIngredientState>(
               listener: (context, state) {
-                if (state is IsLoadingState) {
+                if (state is IsLoadingImageState) {
                   loading = true;
                 } else if (state is LoadedImageState) {
                   loading = false;
                 } else if (state is FailureImageError) {
                   loading = false;
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text(state.message)),
+                  DynamicNotificationWidget.showNotification(
+                    context: context,
+                    title: 'Oh Hey!!',
+                    message: state.message,
+                    color: Colors.green, // You can use this color if needed
+                    contentType: ContentType.failure,
+                    inMaterialBanner: false,
                   );
                 }
               },
               builder: (context, state) {
                 return loading
                     ? const Center(
-                  child: SizedBox(
-                    width: 40,
-                    height: 40,
-                    child: CircularProgressIndicator(),
-                  ),
-                )
-                    : CircleAvatar(
-                  backgroundColor: Colors.black,
-                  radius: screenSize.width < 600 ? 62 : 50,
-                  child: InkWell(
-                    onTap: () {
-                      BlocProvider.of<ImageCubit>(context).pickMainImage();
-                    },
-                    child: ClipOval(
-                      child: BlocProvider.of<ImageCubit>(context).mainImageUrl == null
-                          ? Image.asset(
-                        Assets.icSplash,
-                        fit: BoxFit.cover,
-                        width: screenSize.width < 600 ? 124 : 100,
-                        height: screenSize.width < 600 ? 124 : 100,
+                        child: SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: CircularProgressIndicator(),
+                        ),
                       )
-                          : Image.network(
-                        BlocProvider.of<ImageCubit>(context).mainImageUrl!,
-                        fit: BoxFit.cover,
-                        width: screenSize.width < 600 ? 124 : 100,
-                        height: screenSize.width < 600 ? 124 : 100,
-                      ),
-                    ),
-                  ),
-                )
-                ;
+                    : CircleAvatar(
+                        backgroundColor: Colors.black,
+                        radius: screenSize.width < 600 ? 62 : 50,
+                        child: InkWell(
+                          onTap: () {
+                            BlocProvider.of<AddIngredientCubit>(context)
+                                .pickMainImage();
+                          },
+                          child: ClipOval(
+                            child: BlocProvider.of<AddIngredientCubit>(context)
+                                        .mainImageUrl ==
+                                    null
+                                ? Image.asset(
+                                    Assets.icSplash,
+                                    fit: BoxFit.cover,
+                                    width: screenSize.width < 600 ? 124 : 100,
+                                    height: screenSize.width < 600 ? 124 : 100,
+                                  )
+                                : Image.network(
+                                    BlocProvider.of<AddIngredientCubit>(context)
+                                        .mainImageUrl!,
+                                    fit: BoxFit.cover,
+                                    width: screenSize.width < 600 ? 124 : 100,
+                                    height: screenSize.width < 600 ? 124 : 100,
+                                  ),
+                          ),
+                        ),
+                      );
               },
             ),
             const SizedBox(height: 10),
@@ -219,9 +229,9 @@ class AddRecipes extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    BlocConsumer<ImageCubit, ImagesState>(
+                    BlocConsumer<AddIngredientCubit, AddIngredientState>(
                       listener: (context, state) {
-                        if (state is IsLoadingState &&
+                        if (state is IsLoadingImageState &&
                             state.id == ingredient.id) {
                           ingredient.loading = true;
                         } else if (state is LoadedImageState &&
@@ -234,29 +244,39 @@ class AddRecipes extends StatelessWidget {
                         return ingredient.loading
                             ? const CircularProgressIndicator()
                             : CircleAvatar(
-                          backgroundColor: Colors.black,
-                          radius: screenSize.width < 600 ? 40 : 50,
-                          child: InkWell(
-                            onTap: () {
-                              context.read<ImageCubit>().pickImage(ingredient.id);
-                            },
-                            child: ClipOval(
-                              child: ingredient.imageUrl == null
-                                  ? Image.asset(
-                                Assets.icSplash,
-                                fit: BoxFit.cover,
-                                width: screenSize.width < 600 ? 80 : 100,
-                                height: screenSize.width < 600 ? 80 : 100,
-                              )
-                                  : Image.network(
-                                ingredient.imageUrl!,
-                                fit: BoxFit.cover,
-                                width: screenSize.width < 600 ? 80 : 100,
-                                height: screenSize.width < 600 ? 80 : 100,
-                              ),
-                            ),
-                          ),
-                        );
+                                backgroundColor: Colors.black,
+                                radius: screenSize.width < 600 ? 40 : 50,
+                                child: InkWell(
+                                  onTap: () {
+                                    context
+                                        .read<AddIngredientCubit>()
+                                        .pickImage(ingredient.id);
+                                  },
+                                  child: ClipOval(
+                                    child: ingredient.imageUrl == null
+                                        ? Image.asset(
+                                            Assets.icSplash,
+                                            fit: BoxFit.cover,
+                                            width: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                            height: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                          )
+                                        : Image.network(
+                                            ingredient.imageUrl!,
+                                            fit: BoxFit.cover,
+                                            width: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                            height: screenSize.width < 600
+                                                ? 80
+                                                : 100,
+                                          ),
+                                  ),
+                                ),
+                              );
                       },
                     ),
                     CustomContainerWithTextfield(
@@ -274,8 +294,7 @@ class AddRecipes extends StatelessWidget {
 
             // Directions
             const SizedBox(height: 20),
-            CustomMultilineTextfield(
-                hintText: "Step 1", controller: firstStep),
+            CustomMultilineTextfield(hintText: "Step 1", controller: firstStep),
             const SizedBox(height: 10),
             CustomMultilineTextfield(
                 hintText: "Step 2", controller: secoundStep),
@@ -286,37 +305,36 @@ class AddRecipes extends StatelessWidget {
               margin: const EdgeInsets.only(bottom: 16),
               child: ElevatedButton(
                 onPressed: () {
-                  print( BlocProvider.of<ImageCubit>(context).imageUrls);
                   final recipe = Recipe(
                     name: mealName.text.trim(),
                     summary: summary.text.trim(),
                     typeOfMeal: typeMeal.text.trim(),
                     time: time.text.trim(),
-                    imageUrl: BlocProvider.of<ImageCubit>(context).mainImageUrl.toString(),
+                    imageUrl: BlocProvider.of<AddIngredientCubit>(context).mainImageUrl.toString(),
                     ingredients: [
                       Ingredient(
                         name: firstingrediant.text.trim(),
                         quantity: piecesone.text.trim(),
                         unit: '', // Provide unit if applicable
-                        imageUrl: BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_0"]  ??"", // Provide image URL if applicable
+                        imageUrl: BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_0"]  ??"", // Provide image URL if applicable
                       ),
                       Ingredient(
                         name: secoundingrediant.text.trim(),
                         quantity: piecestwo.text.trim(),
                         unit: '',
-                        imageUrl: BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_1"]  ??"",
+                        imageUrl: BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_1"]  ??"",
                       ),
                       Ingredient(
                         name: thirdingrediant.text.trim(),
                         quantity: piecesthree.text.trim(),
                         unit: '',
-                        imageUrl: BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_2"]  ??"",
+                        imageUrl: BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_2"]  ??"",
                       ),
                       Ingredient(
                         name: fourthingrediant.text.trim(),
                         quantity: piecesfour.text.trim(),
                         unit: '',
-                        imageUrl:BlocProvider.of<ImageCubit>(context).imageUrls["ingredient_3"]  ??"",
+                        imageUrl:BlocProvider.of<AddIngredientCubit>(context).imageUrls["ingredient_3"]  ??"",
                       ),
                     ],
                     nutrition: Nutrition(
@@ -333,13 +351,17 @@ class AddRecipes extends StatelessWidget {
                     ),
                   );
 
-                  homerepoimpl.addIngredients(recipe).then((value) {
+                  getIt<HomeRepo>().addIngredients(recipe).then((value) {
                     context.pushReplacementNamed(AppRoutes.navBar);
                   }).catchError((error) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Failed to send data: $error')),
-                    );
-                  });
+                    DynamicNotificationWidget.showNotification(
+                      context: context,
+                      title: 'Oh Hey!!',
+                      message: 'Failed to send data: $error',
+                      color: Colors.green, // You can use this color if needed
+                      contentType: ContentType.failure,
+                      inMaterialBanner: true,
+                    );});
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: AppColors.primary,
@@ -372,3 +394,4 @@ class IngredientUI {
         quantityController = TextEditingController(),
         loading = false;
 }
+

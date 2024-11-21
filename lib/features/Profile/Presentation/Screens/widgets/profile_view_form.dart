@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/profile_button.dart';
 import 'package:meal_recommendation_b1/core/services/form_input_validation.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/widgets/profile_text_field.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/bloc.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/event.dart';
@@ -147,11 +148,11 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
     );
   }
 
-  void updateBlocProvider(BuildContext context) {
+  Future<void> updateBlocProvider(BuildContext context) async{
     BlocProvider.of<UserProfileBloc>(context).add(
       UpdateUserProfile(
         User(
-          id: '9uXQoT0sMkfqwhqevcJpfhJSEbm1',
+          id: await SecureStorageHelper.getSecuredString('uid'),
           name: nameTextEditingController.text,
           email: emailTextEditingController.text,
           phone: phoneTextEditingController.text,
@@ -174,7 +175,7 @@ class _ProfileViewFormState extends State<ProfileViewForm> {
     emailTextEditingController = TextEditingController();
     phoneTextEditingController = TextEditingController();
     BlocProvider.of<UserProfileBloc>(context).add(
-      LoadUserProfile('9uXQoT0sMkfqwhqevcJpfhJSEbm1'),
+      LoadUserProfile(await SecureStorageHelper.getSecuredString('uid')),
     );
   }
 }

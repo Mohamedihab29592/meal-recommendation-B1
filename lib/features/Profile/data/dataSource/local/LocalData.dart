@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:hive/hive.dart';
 
 import '../../Model/UserModel.dart';
@@ -17,5 +19,8 @@ class HiveLocalUserDataSource {
 
   Future<void> deleteUser(String userId) async {
     await userBox.delete(userId);
+  }
+  Future<void> readData()async{
+    List users = await userBox.values.toList();
   }
 }

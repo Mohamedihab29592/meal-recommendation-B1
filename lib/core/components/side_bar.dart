@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/side_bar_items.dart';
+import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
+import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+import 'package:meal_recommendation_b1/features/auth/login/domain/use_cases/logout_use_case.dart';
+import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
+import '../../features/auth/login/persentation/bloc/auth_event.dart';
 import '../utiles/app_strings.dart';
 import '../utiles/assets.dart';
 
@@ -152,7 +158,11 @@ class _SideBarState extends State<SideBar> {
                           color: AppColors.primary,
                           fontWeight: FontWeight.bold,
                           fontSize: 18.sp)),
-                  onTap: () {},
+                  onTap: () {
+                    context.read<AuthBloc>().add(LogoutEvent());
+                    Navigator.pushReplacementNamed(context, AppRoutes.login);
+
+                  },
                 ),
               ],
             ),

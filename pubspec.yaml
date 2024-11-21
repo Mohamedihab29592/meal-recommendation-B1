@@ -60,6 +60,7 @@ dependencies:
   http: ^1.2.2
   shimmer: ^3.0.0
   dio: ^5.7.0
+  awesome_snackbar_content: ^0.1.4
   cached_network_image: ^3.4.1
   pexels_client: ^2.0.0 #An unofficial dart wrapper for the [Pexels API](https://www.pexels.com/api/).
   google_generative_ai: ^0.4.6 #The Google AI Dart SDK enables developers to use Google's state-of-the-art generative AI models (like Gemini).

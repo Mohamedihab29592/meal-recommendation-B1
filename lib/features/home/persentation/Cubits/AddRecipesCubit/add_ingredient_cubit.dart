@@ -1,21 +1,43 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
-import 'package:path/path.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/ImageState.dart';
+import '../../../../gemini_integrate/data/Recipe.dart';
+import '../../../domain/HomeRepo/HomeRepo.dart';
+import 'add_ingredient_state.dart';
+import 'package:path/path.dart';
 
-class ImageCubit extends Cubit<ImagesState> {
+class AddIngredientCubit extends Cubit<AddIngredientState> {
+  final HomeRepo homeRepo;
   String? mainImageUrl;
-   Map<String, String?> imageUrls = {};
+  Map<String, String?> imageUrls = {};
 
-  ImageCubit() : super(ImagesInitial());
+  AddIngredientCubit(this.homeRepo) : super(AddIngredientInitial());
 
-  // Picking the main image
+  Future<void> addIngredients(Recipe recipe) async {
+    emit(AddIngredientLoading());
+    try {
+      await homeRepo.addIngredients(recipe);
+      emit(AddIngredientSuccess());
+    } catch (error) {
+      emit(AddIngredientFailure(error.toString()));
+    }
+  }
+
+  Future<bool> checkIngredientsAdded(Recipe recipe) async {
+    try {
+       emit(AddIngredientAlreadyAdded());
+      return await homeRepo.checkRecipeIngredientsAdded(recipe.id);
+    } catch (error) {
+      emit(AddIngredientAlreadyFailed(error.toString()));
+      print('Error checking ingredients: $error');
+      return false;
+    }
+  }
+
   Future<void> pickMainImage() async {
     try {
-      emit(IsLoadingState("main")); // Use "main" as the ID for the main image
+      emit(IsLoadingImageState("main")); // Use "main" as the ID for the main image
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
@@ -38,10 +60,9 @@ class ImageCubit extends Cubit<ImagesState> {
     }
   }
 
-  // Picking ingredient-specific images
   Future<void> pickImage(String id) async {
     try {
-      emit(IsLoadingState(id)); // Emit loading state with ID
+      emit(IsLoadingImageState(id)); // Emit loading state with ID
       final ImagePicker picker = ImagePicker();
       final XFile? image = await picker.pickImage(source: ImageSource.gallery);
 
@@ -64,7 +85,6 @@ class ImageCubit extends Cubit<ImagesState> {
     }
   }
 
-  // Retrieve image URLs
   String? getImageUrl(String id) {
     if (id == "main") {
       return mainImageUrl;

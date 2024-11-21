@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
 
 class CustomRecipesCardShimmer extends StatelessWidget {
-  const CustomRecipesCardShimmer({Key? key}) : super(key: key);
+  const CustomRecipesCardShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {

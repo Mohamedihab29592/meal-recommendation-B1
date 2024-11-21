@@ -1,153 +1,85 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/quick_stats_row.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_card_content.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_delete_button.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_header.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_image.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
+import '../../../../core/components/dynamic_notification_widget.dart';
+import '../../../../core/services/di.dart';
+import '../../../../core/utiles/app_colors.dart';
 import '../../data/Recipe.dart';
+import '../bloc/RecipeBloc.dart';
+import '../bloc/RecipeEvent.dart';
+import 'add_ingredients_button.dart';
 
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
+  final bool isSaved;
+  final VoidCallback? onDelete;
 
-  const RecipeCard({super.key, required this.recipe});
+  const RecipeCard({
+    super.key,
+    required this.recipe,
+    this.isSaved = false,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        // Add functionality for tapping the card (e.g., navigate to details)
-      },
-      child: Card(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        margin: const EdgeInsets.only(bottom: 16),
-        elevation: 5,
-        shadowColor: Colors.black45,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Image Section with overlay gradient
-            Stack(
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 5),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Material(
+          color: Colors.white,
+          child: InkWell(
+            onTap: () => _handleRecipeTap(context),
+            child: Stack(
               children: [
-                ClipRRect(
-                  borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-                  child: Image.network(
-                    recipe.imageUrl,
-                    height: 180,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                    loadingBuilder: (context, child, loadingProgress) {
-                      if (loadingProgress == null) return child;
-                      return Center(
-                        child: CircularProgressIndicator(
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                              loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      );
-                    },
-                    errorBuilder: (context, error, stackTrace) {
-                      return Container(
-                        height: 180,
-                        width: double.infinity,
-                        color: Colors.grey[300],
-                        child: const Icon(Icons.broken_image, size: 50, color: Colors.grey),
-                      );
-                    },
-                  ),
+                RecipeCardContent(
+                  recipe: recipe,
+                  isSaved: isSaved,
                 ),
-                Positioned(
-                  bottom: 10,
-                  left: 10,
-                  right: 10, // Ensure the text doesn't overflow out of bounds
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: Colors.black54,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Text(
-                        recipe.name,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 20,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis, // Ensures text overflow works
-                      ),
-                    ),
-                  ),
-                ),
+
               ],
             ),
-            // Text Section with padding and new styles
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Ingredients Count with Icon
-                  Row(
-                    children: [
-                      const Icon(Icons.kitchen, size: 18, color: Colors.blueAccent),
-                      const SizedBox(width: 4),
-                      Text(
-                        '${recipe.ingredients.length} Ingredients',
-                        style: const TextStyle(
-                          color: Colors.black54,
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold
-                        ),
-                      ),
-                      const Spacer(),
-                      Row(
-                        children: [
-                           const Icon(Icons.timer, size: 18, color: Colors.orangeAccent),
-                          const SizedBox(width: 4),
-                          Text(
-                            '${recipe.time} min',
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            // Center the button
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 16.0), // Padding for spacing
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF001A3F), // Button color
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12), // Optional padding for button size
-                  ),
-                  onPressed: () {
-                    // Add functionality for button (e.g., navigate to recipe)
-                  },
-                  child: const Text(
-                    'Add Ingredients',
-                    style: TextStyle(
-                      color: Colors.white, // Text color
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
+          ),
         ),
       ),
     );
   }
+
+  void _handleRecipeTap(BuildContext context) {
+    if (!isSaved) {
+      DynamicNotificationWidget.showNotification(
+        context: context,
+        title: 'Oh Hey!!',
+        message: "You Must Save it To Show Details!",
+        color: Colors.red,
+        contentType: ContentType.failure,
+        inMaterialBanner: false,
+      );
+    } else {
+      context.pushNamed(AppRoutes.detailsPage, arguments: recipe.id);
+    }
+  }
 }
+
+
 
 

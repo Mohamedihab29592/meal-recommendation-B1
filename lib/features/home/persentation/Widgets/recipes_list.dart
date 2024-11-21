@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipe_card_widget.dart';
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utiles/assets.dart';
-import '../Cubits/DetailsCubit/DetailsCubit.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 import 'custom_recipes_card_shimmer.dart';
@@ -46,14 +46,31 @@ class RecipesList extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: successState.data.length,
         itemBuilder: (context, index) {
-          var meal = successState.data[index];
+          var recipe = successState.data[index];
+
+          // Add debug prints
+          print('Recipe at index $index: ${recipe.id}');
+          print('Recipe name: ${recipe.name}');
 
           return RecipeCardWidget(
-            meal: meal,
-            onTap: () =>  context.pushNamed(AppRoutes.detailsPage,arguments: meal["id"]),
+            meal: recipe,
+            onTap: () {
+              // More robust ID handling
+              final recipeId = recipe.id ?? '';
+              print('Attempting to navigate with ID: $recipeId');
+
+              if (recipeId.isNotEmpty) {
+                context.pushNamed(AppRoutes.detailsPage, arguments: recipeId);
+              } else {
+                // Fallback or error handling
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Invalid recipe ID')),
+                );
+              }
+            },
           );
         },
-      );
+      );;
     }
 
     if (state is FailureState) {

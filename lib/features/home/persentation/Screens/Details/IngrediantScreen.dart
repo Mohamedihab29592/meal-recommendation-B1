@@ -1,7 +1,7 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
-import 'package:meal_recommendation_b1/core/utiles/assets.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../../../gemini_integrate/data/Recipe.dart';
 
@@ -81,7 +81,7 @@ class IngredientsScreen extends StatelessWidget {
     );
   }
 
-  // Ingredient Card
+
   Widget _buildIngredientCard(BuildContext context, Size screenSize, Ingredient ingredient) {
     return Container(
       decoration: BoxDecoration(
@@ -101,15 +101,9 @@ class IngredientsScreen extends StatelessWidget {
           // Ingredient Image
           Expanded(
             flex: 3,
-            child: Container(
-              margin: const EdgeInsets.all(10),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                image: DecorationImage(
-                  image: _getIngredientImage(ingredient),
-                  fit: BoxFit.cover,
-                ),
-              ),
+            child: ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(15)),
+              child: _buildIngredientImage(ingredient, screenSize),
             ),
           ),
 
@@ -117,12 +111,12 @@ class IngredientsScreen extends StatelessWidget {
           Expanded(
             flex: 2,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    ingredient.name ,
+                    ingredient.name,
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: screenSize.width * 0.04,
@@ -133,7 +127,7 @@ class IngredientsScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 5),
                   Text(
-                    "${ingredient.quantity } ${ingredient.unit}",
+                    "${ingredient.quantity} ${ingredient.unit}",
                     style: TextStyle(
                       color: Colors.grey,
                       fontSize: screenSize.width * 0.035,
@@ -148,19 +142,74 @@ class IngredientsScreen extends StatelessWidget {
     );
   }
 
-  // Image handling with fallback
-  ImageProvider _getIngredientImage(Ingredient ingredient) {
-    try {
-      // Try network image first
-      if (ingredient.imageUrl.isNotEmpty) {
-        return NetworkImage(ingredient.imageUrl);
-      }
-      // Fallback to asset image
-      return const AssetImage(Assets.icSplash);
-    } catch (e) {
-      // Fallback to asset image if any error occurs
-      return const AssetImage(Assets.icSplash);
+  Widget _buildIngredientImage(Ingredient ingredient, Size screenSize) {
+    // If no image URL, return default image
+    if (ingredient.imageUrl.isEmpty) {
+      return _buildDefaultImage(screenSize);
     }
+
+    return CachedNetworkImage(
+      imageUrl: ingredient.imageUrl,
+      fit: BoxFit.cover,
+      width: double.infinity,
+      height: double.infinity,
+      placeholder: (context, url) => _buildLoadingPlaceholder(screenSize),
+      errorWidget: (context, url, error) => _buildErrorImage(screenSize),
+      imageBuilder: (context, imageProvider) => Container(
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: imageProvider,
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(
+              AppColors.primary.withOpacity(0.3),
+              BlendMode.srcATop,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDefaultImage(Size screenSize) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Icon(
+          Icons.food_bank_outlined,
+          color: Colors.grey.shade400,
+          size: screenSize.width * 0.1,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildLoadingPlaceholder(Size screenSize) {
+    return Shimmer.fromColors(
+      baseColor: Colors.grey.shade300,
+      highlightColor: Colors.grey.shade100,
+      child: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  Widget _buildErrorImage(Size screenSize) {
+    return Container(
+      width: double.infinity,
+      height: double.infinity,
+      color: Colors.grey.shade200,
+      child: Center(
+        child: Icon(
+          Icons.error_outline,
+          color: Colors.red.shade300,
+          size: screenSize.width * 0.1,
+        ),
+      ),
+    );
   }
 
   // No Ingredients Placeholder

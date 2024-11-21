@@ -14,36 +14,36 @@ class GeminiApiService {
     );
 
     final prompt = '''
-Provide detailed recipe information for a dish named "$dishName" in JSON format with the following structure. Do not include image URLs.
-    {
+Provide a recipe for "$dishName" in JSON format with this structure:
+{
   "name": "Dish name",
-  "summary": "A summary or brief note about the dish",
-  "typeOfMeal": "Type of meal (e.g., Breakfast, Lunch, Dinner, Snack)",
+  "summary": "A summary of the dish",
+  "typeOfMeal": "Meal type (e.g., Breakfast, Lunch)",
   "time": "Preparation time in minutes",
-  "imageUrl":""
+  "imageUrl": "",
   "ingredients": [
     {
       "name": "Ingredient name",
-      "quantity": "Quantity of ingredient",
-      "unit": "Unit of measurement",
-      "imageUrl" : ""
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "imageUrl": ""
     }
   ],
   "nutrition": {
     "calories": "Calories per serving",
-    "protein": "Protein content in grams",
-    "carbs": "Carbohydrate content in grams",
-    "fat": "Fat content in grams",
-    "vitamins": ["List of vitamins (e.g., Vitamin A, Vitamin C, etc.)"]
+    "protein": "Protein in grams",
+    "carbs": "Carbs in grams",
+    "fat": "Fat in grams",
+    "vitamins": ["List of vitamins"]
   },
   "directions": {
-    "firstStep": "Detailed description of the first step",
-    "secondStep": "Detailed description of the second step",
-    "additionalSteps": ["Additional steps as necessary"]
+    "firstStep": "First step description",
+    "secondStep": "Second step description",
+    "additionalSteps": ["Additional steps"]
   }
 }
-    Return the response as JSON.
-    ''';
+Return the response as JSON.
+''';
 
     final response = await model.generateContent([Content.text(prompt)]);
     final cleanedResponse = response.text?.trim().replaceAll('```json', '').replaceAll('```', '').trim();

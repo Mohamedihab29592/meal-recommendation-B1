@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
@@ -83,56 +84,49 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
               child: NestedScrollView(
                 controller: _scrollController,
                 headerSliverBuilder: (context, innerBoxIsScrolled) => [
-                  // Sliver App Bar
-                  SliverAppBar(
-                    expandedHeight: screenSize.height * 0.35,
-                    pinned: true,
-                    floating: false,
-                    backgroundColor: AppColors.primary,
-                    leading: IconButton(
-                      icon: const Icon(Icons.arrow_back, color: Colors.white),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    actions: [
-                      IconButton(
-                        icon: const Icon(Icons.favorite_border, color: Colors.white),
-                        onPressed: () {
-                          // Add to favorites logic
-                        },
-                      ),
-                    ],
-                    flexibleSpace: FlexibleSpaceBar(
-                      title: Text(
-                        recipe.name[0].toUpperCase() + recipe.name.substring(1),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                SliverAppBar(
+                expandedHeight: screenSize.height * 0.35,
+                pinned: true,
+                floating: false,
+                backgroundColor: AppColors.primary,
+                leading: IconButton(
+                  icon: const Icon(Icons.arrow_back, color: Colors.white),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                actions: [
+                  IconButton(
+                    icon: const Icon(Icons.favorite_border, color: Colors.white),
+                    onPressed: () {
+                      // Add to favorites logic
+                    },
+                  ),
+                ],
+                title: _buildScrolledTitleWidget(recipe, screenSize),
+                centerTitle: false,
+                flexibleSpace: FlexibleSpaceBar(
+                  title: _buildFlexibleTitle(recipe, screenSize),
+                  background: Stack(
+                    fit: StackFit.expand,
+                    children: [
+
+                      _buildRecipeImage(recipe.imageUrl),
+
+                      DecoratedBox(
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Colors.black.withOpacity(0.7),
+                              Colors.transparent,
+                            ],
+                          ),
                         ),
                       ),
-                      background: Stack(
-                        fit: StackFit.expand,
-                        children: [
-                          // Image loading with error handling
-                          _buildRecipeImage(recipe.imageUrl),
-
-                          // Gradient overlay
-                          DecoratedBox(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                                colors: [
-                                  Colors.black.withOpacity(0.7),
-                                  Colors.transparent,
-                                ],
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    ],
                   ),
+                ),
+              ),
 
                   // Recipe Info Sliver
                   SliverToBoxAdapter(
@@ -203,7 +197,33 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
     );
   }
 
-  // Separate method for image loading
+  Widget _buildFlexibleTitle(Recipe recipe, Size screenSize) {
+    return AnimatedBuilder(
+      animation: _scrollController,
+      builder: (context, child) {
+        final scrollOffset = _scrollController.hasClients
+            ? _scrollController.offset
+            : 0.0;
+        final maxScrollExtent = screenSize.height * 0.35 - kToolbarHeight;
+
+        // Calculate opacity based on scroll position
+        final opacity = max(0.0, min(1.0, 1.0 - (scrollOffset / maxScrollExtent)));
+
+        return Opacity(
+          opacity: opacity,
+          child: Text(
+            recipe.name[0].toUpperCase() + recipe.name.substring(1),
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   Widget _buildRecipeImage(String imageUrl) {
     return imageUrl.isNotEmpty
         ? Image.network(
@@ -245,7 +265,6 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
     );
   }
 
-  // Error handling widget
   Widget _buildErrorWidget(BuildContext context, String errorMessage) {
     return Center(
       child: Column(
@@ -279,6 +298,47 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
       ),
     );
   }
+
+  Widget _buildScrolledTitleWidget(Recipe recipe, Size screenSize) {
+    return AnimatedBuilder(
+      animation: _scrollController,
+      builder: (context, child) {
+
+        bool showCircularImage = _scrollController.hasClients &&
+            _scrollController.offset > (screenSize.height * 0.35 - kToolbarHeight);
+
+        return showCircularImage
+            ? Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 24,
+              backgroundImage: recipe.imageUrl.isNotEmpty
+                  ? NetworkImage(recipe.imageUrl)
+                  : null,
+              child: recipe.imageUrl.isEmpty
+                  ? const Icon(Icons.restaurant, color: Colors.white)
+                  : null,
+            ),
+            const SizedBox(width: 10),
+            Flexible(
+              child: Text(
+                recipe.name[0].toUpperCase() + recipe.name.substring(1),
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        )
+            : const SizedBox.shrink();
+      },
+    );
+  }
+
 }
 
 class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {

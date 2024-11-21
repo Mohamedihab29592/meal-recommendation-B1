@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+
+import '../../../../core/routes/app_routes.dart';
 
 class RecommendedRecipeCard extends StatefulWidget {
+  final String recipeId;
+
   final String imageUrl;
   final String duration;
   final String numberOfIngredients;
@@ -12,7 +17,7 @@ class RecommendedRecipeCard extends StatefulWidget {
     required this.duration,
     required this.numberOfIngredients,
     required this.typeOfMeal,
-    required this.imageUrl,
+    required this.imageUrl, required this.recipeId,
   });
 
   @override
@@ -28,34 +33,40 @@ class RecommendedRecipeCardState extends State<RecommendedRecipeCard> {
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        return Container(
-          margin: EdgeInsets.symmetric(
-            vertical: screenSize.height * 0.01,
-            horizontal: screenSize.width * 0.02,
-          ),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12.withOpacity(0.1),
-                blurRadius: 10,
-                spreadRadius: 2,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Image Section
-              _buildRecipeImage(screenSize),
+        return GestureDetector(
+          onTap: (){
+            context.pushNamed(AppRoutes.detailsPage, arguments: widget.recipeId);
 
-              // Recipe Details Section
-              Expanded(
-                child: _buildRecipeDetails(constraints),
-              ),
-            ],
+          },
+          child: Container(
+            margin: EdgeInsets.symmetric(
+              vertical: screenSize.height * 0.01,
+              horizontal: screenSize.width * 0.02,
+            ),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(15),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12.withOpacity(0.1),
+                  blurRadius: 10,
+                  spreadRadius: 2,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image Section
+                _buildRecipeImage(screenSize),
+
+                // Recipe Details Section
+                Expanded(
+                  child: _buildRecipeDetails(constraints),
+                ),
+              ],
+            ),
           ),
         );
       },

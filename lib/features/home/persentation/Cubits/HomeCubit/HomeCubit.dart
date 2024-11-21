@@ -1,11 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../gemini_integrate/data/Recipe.dart';
 import 'HomeState.dart';
 class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(InitialState());
 
-  List<dynamic> homeRecipes = [];
+  List<Recipe> homeRecipes = [];
 
   Future<void> getdata() async {
     emit(IsLoadingHome());
@@ -22,9 +23,26 @@ class HomeCubit extends Cubit<HomeState> {
           .get();
 
       if (userDoc.exists) {
-        // Safely fetch the recipes or default to an empty list
-        homeRecipes =
-            (userDoc.data() as Map<String, dynamic>?)?["recipes"] ?? [];
+        // Convert the recipes data to List<Recipe>
+        Map<String, dynamic>? userData = userDoc.data() as Map<String, dynamic>?;
+
+        if (userData != null && userData.containsKey("recipes")) {
+          homeRecipes = (userData["recipes"] as List)
+              .map((recipeData) {
+            // Ensure recipeData is a Map and include the ID
+            Map<String, dynamic> recipeMap = Map<String, dynamic>.from(recipeData);
+
+            // Add ID to the recipe map if not already present
+            if (!recipeMap.containsKey('id')) {
+              recipeMap['id'] = ''; // Or generate a unique ID if needed
+            }
+
+            return Recipe.fromJson(recipeMap);
+          })
+              .toList();
+        } else {
+          homeRecipes = []; // Initialize empty if no recipes
+        }
 
         print('Fetched recipes: $homeRecipes'); // Debug print
 
@@ -53,12 +71,31 @@ class HomeCubit extends Cubit<HomeState> {
       DocumentSnapshot snapshot = await userDoc.get();
 
       if (snapshot.exists) {
-        List<dynamic> recipes =
-            (snapshot.data() as Map<String, dynamic>?)?["recipes"] ?? [];
+        Map<String, dynamic>? userData = snapshot.data() as Map<String, dynamic>?;
 
-        recipes.removeWhere((recipe) => recipe["id"] == id);
+        List<Recipe> recipes = userData != null && userData.containsKey("recipes")
+            ? (userData["recipes"] as List)
+            .map((recipeData) {
+          // Ensure recipeData is a Map and include the ID
+          Map<String, dynamic> recipeMap = Map<String, dynamic>.from(recipeData);
 
-        await userDoc.update({"recipes": recipes});
+          // Add ID to the recipe map if not already present
+          if (!recipeMap.containsKey('id')) {
+            recipeMap['id'] = ''; // Or generate a unique ID if needed
+          }
+
+          return Recipe.fromJson(recipeMap);
+        })
+            .toList()
+            : [];
+
+        recipes.removeWhere((recipe) => recipe.id == id);
+
+        // Convert recipes back to a list of maps for Firestore
+        List<Map<String, dynamic>> recipesData =
+        recipes.map((recipe) => recipe.toJson()).toList();
+
+        await userDoc.update({"recipes": recipesData});
 
         // Directly update the state after deletion
         homeRecipes = recipes;
@@ -71,3 +108,4 @@ class HomeCubit extends Cubit<HomeState> {
     }
   }
 }
+

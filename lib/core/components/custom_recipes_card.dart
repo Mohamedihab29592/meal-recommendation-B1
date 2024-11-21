@@ -97,9 +97,13 @@ class CustomRecipesCard extends StatelessWidget {
                       children: [
                         const Icon(Icons.kitchen, size: 16, color: Colors.blueAccent),
                         const SizedBox(width: 4),
-                        Text(
-                          ingredients ?? "0 ingredients",
-                          style: const TextStyle(fontSize: 13, color: Colors.black54),
+                        Expanded(
+                          child: Text(
+                            ingredients ?? "0 ingredients",
+                            style: const TextStyle(fontSize: 13, color: Colors.black54),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
                         ),
                         const SizedBox(width: 16),
                         const Icon(Icons.timer, size: 16, color: Colors.orangeAccent),
@@ -111,6 +115,8 @@ class CustomRecipesCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.black87,
                           ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
                         ),
                       ],
                     ),
