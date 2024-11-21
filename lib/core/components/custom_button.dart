@@ -1,16 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+
+import 'package:flutter/material.dart';
 
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final Color? textColor;
+  final Color? backgroundColor;
+  final double elevation;
+  final double borderRadius;
+  final EdgeInsetsGeometry padding;
+  final double fontSize;
 
   const CustomButton({
-    super.key,
+    Key? key,
     required this.text,
     required this.onPressed,
-  });
+    this.textColor,
+    this.backgroundColor,
+    this.elevation = 3.0,
+    this.borderRadius = 45.0,
+    this.padding = const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+    this.fontSize = 21.0,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -19,23 +32,23 @@ class CustomButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          backgroundColor: Colors.white,
+          foregroundColor: textColor ?? AppColors.primary,
+          backgroundColor: backgroundColor ?? Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(45.r),
+            borderRadius: BorderRadius.circular(borderRadius),
           ),
-          // Padding for better touch area
-          shadowColor: Colors.black.withOpacity(0.2), // Subtle shadow for depth
-          elevation: 3, // Slight elevation for a modern look
+          shadowColor: Colors.black.withOpacity(0.2),
+          elevation: elevation,
         ),
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+          padding: padding,
           child: Text(
             text,
             style: TextStyle(
-                fontSize: 21.sp,
-                fontWeight: FontWeight.bold,
-                color: AppColors.primary),
+              fontSize: fontSize,
+              fontWeight: FontWeight.bold,
+              color: textColor ?? AppColors.primary,
+            ),
           ),
         ),
       ),

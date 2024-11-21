@@ -34,7 +34,7 @@ class RecipeRepository {
       final recipe = await _processRecipeData(query, geminiResponse, id: null);
 
       // Additional validation
-      if (recipe.name!.isEmpty) {
+      if (recipe.name.isEmpty) {
         throw ServerException(
             message: 'Invalid recipe: Missing name',
             statusCode: 400
@@ -43,24 +43,21 @@ class RecipeRepository {
 
       return [recipe];
     } on gemini.GenerativeAIException catch (e) {
-      // Handle Gemini-specific exceptions
+
       if (e.toString().contains('503') || e.toString().contains('UNAVAILABLE')) {
         throw ServerException(
             message: 'AI service is currently overloaded. Please try again later.',
             statusCode: 503
         );
       }
-
-      // For other Generative AI exceptions
       throw ServerException(
           message: 'Generative AI error: ${e.toString()}',
           statusCode: 500
       );
     } on ServerException {
-      // Re-throw local ServerException
       rethrow;
     } catch (e) {
-      // Catch-all for unexpected errors
+
       throw ServerException(
           message: 'Unexpected error fetching recipes: ${e.toString()}',
           statusCode: 500

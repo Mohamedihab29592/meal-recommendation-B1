@@ -34,7 +34,6 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
       context.read<RecipeBloc>().add(CombineRecipesEvent());
     } catch (e) {
       debugPrint('Error in initState: $e');
-      // Optionally show an error dialog or snackbar
     }
 
   }

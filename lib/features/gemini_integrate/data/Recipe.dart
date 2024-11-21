@@ -228,29 +228,27 @@ class Nutrition {
       protein: _safeParseDouble(json['protein']),
       carbs: _safeParseDouble(json['carbs']),
       fat: _safeParseDouble(json['fat']),
-      vitamins: List<String>.from(json['vitamins'] ?? []),
+      vitamins: _parseSafeStringList(json['vitamins']),
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'calories': calories,
-      'protein': protein,
-      'carbs': carbs,
-      'fat': fat,
-      'vitamins': vitamins,
-    };
-  }
+  // Enhanced parsing method for lists
+  static List<String> _parseSafeStringList(dynamic value) {
+    if (value == null) return [];
 
-  // Provide default values if data is missing
-  factory Nutrition.defaultValues() {
-    return Nutrition(
-      calories: 0,
-      protein: 0.0,
-      carbs: 0.0,
-      fat: 0.0,
-      vitamins: [],
-    );
+    // If it's already a list of strings, return it
+    if (value is List<String>) return value;
+
+    // If it's a list of dynamic, convert to strings
+    if (value is List) {
+      return value.map((e) => e?.toString() ?? '').toList();
+    }
+
+    // If it's a single string, wrap it in a list
+    if (value is String) return [value];
+
+    // Default to empty list
+    return [];
   }
 
   // Enhanced parsing methods
@@ -262,7 +260,7 @@ class Nutrition {
     if (value is double) return value.toInt();
 
     if (value is String) {
-      return int.tryParse(value) ?? 0;
+      return int.tryParse(value.replaceAll(RegExp(r'[^\d-]'), '')) ?? 0;
     }
 
     return 0;
@@ -276,12 +274,31 @@ class Nutrition {
     if (value is int) return value.toDouble();
 
     if (value is String) {
-      return double.tryParse(value) ?? 0.0;
+      return double.tryParse(value.replaceAll(RegExp(r'[^\d.-]'), '')) ?? 0.0;
     }
 
     return 0.0;
   }
 
+  Map<String, dynamic> toJson() {
+    return {
+      'calories': calories,
+      'protein': protein,
+      'carbs': carbs,
+      'fat': fat,
+      'vitamins': vitamins,
+    };
+  }
+
+  factory Nutrition.defaultValues() {
+    return Nutrition(
+      calories: 0,
+      protein: 0.0,
+      carbs: 0.0,
+      fat: 0.0,
+      vitamins: [],
+    );
+  }
   @override
   String toString() {
     return 'Nutrition{calories: $calories, protein: $protein, carbs: $carbs, fat: $fat, vitamins: $vitamins}';
@@ -302,19 +319,48 @@ class Directions {
   // Factory constructor to parse JSON data
   factory Directions.fromJson(Map<String, dynamic> json) {
     return Directions(
-      firstStep: json['firstStep'] ?? 'No first step provided',
-      secondStep: json['secondStep'] ?? 'No second step provided',
-      additionalSteps: List<String>.from(json['additionalSteps'] ?? []),
+      firstStep: _parseSafeString(json['firstStep']),
+      secondStep: _parseSafeString(json['secondStep']),
+      additionalSteps: _parseSafeStringList(json['additionalSteps']),
     );
   }
+
+  // Safe string parsing method
+  static String _parseSafeString(dynamic value) {
+    if (value == null) return 'N/A';
+    return value.toString().trim().isEmpty ? 'N/A' : value.toString();
+  }
+
+  // Enhanced parsing method for lists
+  static List<String> _parseSafeStringList(dynamic value) {
+    if (value == null) return [];
+
+    // If it's already a list of strings, return it
+    if (value is List<String>) return value;
+
+    // If it's a list of dynamic, convert to strings
+    if (value is List) {
+      return value
+          .map((e) => e?.toString() ?? '')
+          .where((s) => s.isNotEmpty)
+          .toList();
+    }
+
+    // If it's a single string, wrap it in a list
+    if (value is String) return [value];
+
+    // Default to empty list
+    return [];
+  }
+
   Map<String, dynamic> toJson() {
     return {
-      'firstStep': firstStep  ,
+      'firstStep': firstStep,
       'secondStep': secondStep,
       'additionalSteps': additionalSteps,
     };
   }
-  // Provide default values if data is missing
+
   factory Directions.defaultValues() {
     return Directions(
       firstStep: 'N/A',
@@ -327,4 +373,5 @@ class Directions {
   String toString() {
     return 'Directions{firstStep: $firstStep, secondStep: $secondStep, additionalSteps: $additionalSteps}';
   }
+
 }
