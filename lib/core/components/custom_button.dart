@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
- import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 
 class CustomButton extends StatelessWidget {
@@ -24,20 +24,21 @@ class CustomButton extends StatelessWidget {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(45.r),
           ),
-          padding: EdgeInsets.symmetric(
-              vertical: 16.h), // Padding for better touch area
+          // Padding for better touch area
           shadowColor: Colors.black.withOpacity(0.2), // Subtle shadow for depth
           elevation: 3, // Slight elevation for a modern look
         ),
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
           child: Text(
             text,
-            style: TextStyle(fontSize: 21.sp,fontWeight: FontWeight.bold,color: AppColors.primary),
+            style: TextStyle(
+                fontSize: 21.sp,
+                fontWeight: FontWeight.bold,
+                color: AppColors.primary),
           ),
-
+        ),
       ),
-    ),
     );
   }
 }

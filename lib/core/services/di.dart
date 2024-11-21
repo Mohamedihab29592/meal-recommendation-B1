@@ -54,6 +54,7 @@ import 'RecipeApiService.dart';
 
 final getIt = GetIt.instance;
 
+
 Future<void> setup(Box<Favorites> favoriteBox) async {
   const apiGeminiKey = "AIzaSyAhkA0xgcRdzyi7u9ERuKTvQ8SqfFHadaM";
   const pexelsApiKey =
@@ -63,6 +64,13 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
     Hive.registerAdapter(UserModelAdapter());
   }
   Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');
+
+  if (!Hive.isAdapterRegistered(1)) {
+    Hive.registerAdapter(FavoritesAdapter());
+  }
+  Box<Favorites> favoriteBox =await Hive.openBox<Favorites>('favorites');
+
+  getIt.registerLazySingleton<Box<Favorites>>(() => favoriteBox);
 
   getIt.registerLazySingleton<Box<UserModel>>(() => userBox);
   getIt.registerLazySingleton(() => FirebaseFirestore.instance);

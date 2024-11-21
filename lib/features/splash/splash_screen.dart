@@ -1,11 +1,10 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 import '../../core/routes/app_routes.dart';
 import '../../core/utiles/app_colors.dart';
-
 import 'package:flutter/material.dart';
+import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/routes/app_routes.dart';
@@ -96,6 +95,27 @@ class SplashScreenState extends State<SplashScreen>
       }
     });
   }
+
+  Future<void> _navigateAfterDelay() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (mounted) {
+      if(await SecureStorageHelper.getSecuredString('uid') == null)
+      {
+        Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+      }
+      else if (await SecureStorageHelper.getSecuredString('uid') == '')
+      {
+        Navigator.pushReplacementNamed(context, AppRoutes.login);
+      }
+      else 
+      {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        Navigator.pushReplacementNamed(context, AppRoutes.navBar);
+
+      }
+    }
+  }
+
 
   @override
   void dispose() {

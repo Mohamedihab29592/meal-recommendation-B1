@@ -1,12 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:get_it/get_it.dart';
+import 'package:hive/hive.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipes_list.dart';
 import '../../../../core/components/Custome_Appbar.dart';
+import '../../../../core/components/Custome_recipes_card.dart';
+import '../../../../core/components/side_bar.dart';
 import '../../../../core/utiles/assets.dart';
+import '../../../favorites/data/models/favorites.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 
@@ -30,6 +35,7 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       body: SafeArea(
+
         child: RefreshIndicator(
           onRefresh: () async {
             // Implement refresh logic
@@ -132,6 +138,7 @@ class _HomePageState extends State<HomePage> {
                         width: 25,
                       ),
                     ),
+
                     trailing: [
                       Tooltip(
                         message: 'Filter Recipes',
@@ -224,3 +231,56 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+Future<void> showDeleteDialog({
+  required BuildContext context,
+  required String mealId,
+  required VoidCallback onSuccess,
+}) async {
+  AwesomeDialog(
+    context: context,
+    dialogType: DialogType.warning,
+    animType: AnimType.rightSlide,
+    title: 'Delete Meal',
+    desc: 'Are you sure you want to delete this meal?',
+    btnCancelOnPress: () {
+      // Optional: Perform actions on cancel
+    },
+    btnOkOnPress: () async {
+      try {
+        print("Attempting to delete document with ID: $mealId");
+
+        // Query the Firestore collection for the document matching the given ID
+        QuerySnapshot snapshot = await FirebaseFirestore.instance
+            .collection("Recipes")
+            .where("id", isEqualTo: mealId) // Match the field 'id'
+            .get();
+
+        if (snapshot.docs.isNotEmpty) {
+          // Delete all matching documents
+          for (var doc in snapshot.docs) {
+            await doc.reference.delete();
+            print("Successfully deleted document ID: ${doc.id}");
+          }
+          // Show success message
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Meal deleted successfully!')),
+          );
+          // Trigger success callback to refresh UI or perform navigation
+          onSuccess();
+        } else {
+          print("No document found with ID: $mealId");
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No meal found to delete!')),
+          );
+        }
+      } catch (e) {
+        print("Error deleting document: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to delete meal: $e')),
+        );
+      }
+    },
+  ).show();
+}
+
