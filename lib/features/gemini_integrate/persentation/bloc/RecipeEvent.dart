@@ -1,4 +1,6 @@
 
+import '../../data/Recipe.dart';
+
 abstract class RecipeEvent {}
 
 class FetchRecipesEvent extends RecipeEvent {
@@ -7,8 +9,10 @@ class FetchRecipesEvent extends RecipeEvent {
   FetchRecipesEvent(this.query);
 }
 
-class SaveRecipesEvent extends RecipeEvent {}
-
+class SaveRecipesEvent extends RecipeEvent {
+  final List<Recipe> recipesToSave;
+  SaveRecipesEvent(this.recipesToSave);
+}
 class LoadSavedRecipesEvent extends RecipeEvent {}
 
 class CleanupRecipesEvent extends RecipeEvent {

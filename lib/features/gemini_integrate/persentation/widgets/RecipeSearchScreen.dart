@@ -35,7 +35,6 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
     } catch (e) {
       debugPrint('Error in initState: $e');
     }
-
   }
 
   @override
@@ -58,8 +57,8 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
             }
           },
           builder: (context, state) {
-            int newRecipesCount = _getNewRecipesCount(context.read<RecipeBloc>());
-
+            int newRecipesCount =
+                _getNewRecipesCount(context.read<RecipeBloc>());
 
             return Padding(
               padding: const EdgeInsets.all(16.0),
@@ -79,13 +78,18 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                     rightChild: RecipeButtons(
                       recipesCount: newRecipesCount,
                       showSavedRecipes: _showSavedRecipes,
-                      onSave: () => showSaveConfirmationDialog(context),
+                      onSave: () {
+                        final recipes = getCurrentRecipes(context);
+                        showSaveConfirmationDialog(context, recipes);
+                      },
                       onToggleSavedRecipes: () {
                         setState(() {
                           _showSavedRecipes = !_showSavedRecipes;
                         });
                         if (_showSavedRecipes) {
-                          context.read<RecipeBloc>().add(LoadSavedRecipesEvent());
+                          context
+                              .read<RecipeBloc>()
+                              .add(LoadSavedRecipesEvent());
                         } else {
                           context.read<RecipeBloc>().add(CombineRecipesEvent());
                         }
@@ -107,7 +111,9 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                     controller: _controller,
                     onSearch: (query) {
                       if (query.isNotEmpty) {
-                        context.read<RecipeBloc>().add(FetchRecipesEvent(query));
+                        context
+                            .read<RecipeBloc>()
+                            .add(FetchRecipesEvent(query));
                       }
                     },
                   ),
@@ -124,12 +130,7 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
   int _getNewRecipesCount(RecipeBloc recipeBloc) {
     return recipeBloc.fetchedRecipes
         .where((fetchedRecipe) => !recipeBloc.savedRecipes
-        .any((savedRecipe) => savedRecipe.id == fetchedRecipe.id))
+            .any((savedRecipe) => savedRecipe.id == fetchedRecipe.id))
         .length;
   }
-
 }
-
-
-
-

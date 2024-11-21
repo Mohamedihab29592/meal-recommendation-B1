@@ -27,7 +27,7 @@ class SaveRecipeButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(30),
         ),
       ),
-      onPressed: () => showSaveConfirmationDialog(context),
+      onPressed: () => showSaveConfirmationDialog(context,[recipe]),
       child: const Center(
         child: Icon(
           Icons.save_rounded,

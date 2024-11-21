@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/networking/ServerException.dart';
 import '../../data/Recipe.dart';
@@ -7,8 +8,7 @@ import 'RecipeState.dart';
 
 class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   final RecipeRepository recipeRepository;
-
-  // Use mutable lists with proper state management
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   List<Recipe> _fetchedRecipes = [];
   List<Recipe> _savedRecipes = [];
 
@@ -28,6 +28,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
     try {
       final initialSavedRecipes = await recipeRepository.fetchSavedRecipes();
       _savedRecipes = _validateRecipes(initialSavedRecipes);
+      print('Initial saved recipes loaded: ${_savedRecipes.length}');
     } catch (e) {
       print('Failed to load initial saved recipes: $e');
     }
@@ -35,7 +36,11 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
 
   Future<void> _onFetchRecipes(
       FetchRecipesEvent event, Emitter<RecipeState> emit) async {
+    // Extensive logging for fetch process
+    print('Fetching recipes for query: ${event.query}');
+
     if (event.query.trim().isEmpty) {
+      print('Empty query provided');
       emit(RecipeError("Please enter a valid recipe search query.", false));
       return;
     }
@@ -45,7 +50,10 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
     try {
       final newRecipes = await recipeRepository.fetchRecipes(event.query);
 
+      print('Raw fetched recipes count: ${newRecipes.length}');
+
       if (newRecipes.isEmpty) {
+        print('No recipes found for query');
         emit(RecipeError(
             "No recipes found for '${event.query}'. Try a different search term.",
             true));
@@ -54,13 +62,24 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
 
       final validRecipes = _validateRecipes(newRecipes);
 
+      print('Valid recipes count after validation: ${validRecipes.length}');
+
+      // Detailed logging of recipe details
+      for (var recipe in validRecipes) {
+        print('Fetched Recipe: ${recipe.name}, Ingredients: ${recipe.ingredients.length}');
+      }
+
       // Replace instead of adding to maintain state consistency
       _fetchedRecipes = validRecipes;
 
+      print('_fetchedRecipes after assignment: ${_fetchedRecipes.length}');
+
       emit(RecipeLoaded(_fetchedRecipes));
     } on ServerException catch (e) {
+      print('Server Exception during fetch: ${e.message}');
       emit(RecipeError(e.message, true));
     } catch (e) {
+      print('Unexpected error during fetch: $e');
       emit(RecipeError("An unexpected error occurred: $e", true));
     }
   }
@@ -68,37 +87,90 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   Future<void> _onSaveRecipes(
       SaveRecipesEvent event, Emitter<RecipeState> emit) async {
     try {
-      // Validate recipes to save
-      if (_fetchedRecipes.isEmpty) {
+
+      // Check authentication before saving
+      if (_auth.currentUser == null) {
+        emit(RecipeError("Please log in to save recipes", false));
+        return;
+      }
+
+      final recipesToSave = event.recipesToSave.isNotEmpty
+          ? event.recipesToSave
+          : _fetchedRecipes;
+
+      if (recipesToSave.isEmpty) {
         emit(RecipeError("No valid recipes to save", false));
         return;
       }
 
-      // Save recipes to repository
-      await recipeRepository.saveRecipes(_fetchedRecipes);
+      await recipeRepository.saveRecipes(recipesToSave);
 
-      _savedRecipes =
-          _removeDuplicateRecipes([..._savedRecipes, ..._fetchedRecipes]);
+      _savedRecipes = _removeDuplicateRecipes([..._savedRecipes, ...recipesToSave]);
 
-      // Clear fetched recipes after saving
-      _fetchedRecipes = [];
-
-      // Emit saved recipes state
       emit(SavedRecipesLoaded(_savedRecipes));
     } catch (e) {
-      emit(RecipeError("Failed to save recipes: $e", true));
+      String errorMessage = 'Failed to save recipes';
+
+      if (e.toString().contains('permission-denied')) {
+        errorMessage = 'Permission denied. Please log in or check your account.';
+      }
+
+      emit(RecipeError(errorMessage, true));
     }
   }
 
   Future<void> _onLoadSavedRecipes(
       LoadSavedRecipesEvent event, Emitter<RecipeState> emit) async {
     try {
+      // Check authentication before loading saved recipes
+      if (_auth.currentUser == null) {
+        emit(RecipeError("Please log in to view saved recipes", false));
+        return;
+      }
+
+      // Emit loading state
       emit(RecipeLoading());
+
+      // Fetch saved recipes
       final savedRecipes = await recipeRepository.fetchSavedRecipes();
+
+      // Validate and process recipes
+      if (savedRecipes.isEmpty) {
+        // No saved recipes found
+        emit(NoSavedRecipes());
+        return;
+      }
+
+      // Validate and clean recipes
       _savedRecipes = _validateRecipes(savedRecipes);
+
+      // Emit loaded state with validated recipes
       emit(SavedRecipesLoaded(_savedRecipes));
+    } on FirebaseException catch (e) {
+      // Specific Firebase-related error handling
+      String errorMessage = 'Failed to load saved recipes';
+
+      switch (e.code) {
+        case 'permission-denied':
+          errorMessage = 'Permission denied. Please log in or check your account.';
+          break;
+        case 'unavailable':
+          errorMessage = 'Network is unavailable. Please check your connection.';
+          break;
+        default:
+          errorMessage = 'Firebase error: ${e.message}';
+      }
+
+      emit(RecipeError(errorMessage, true));
     } catch (e) {
-      emit(RecipeError("Failed to load saved recipes: $e", true));
+      // Generic error handling
+      String errorMessage = 'Unexpected error loading saved recipes';
+
+      if (e.toString().contains('permission-denied')) {
+        errorMessage = 'Permission denied. Please log in or check your account.';
+      }
+
+      emit(RecipeError(errorMessage, true));
     }
   }
 
@@ -106,7 +178,6 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
       CombineRecipesEvent event, Emitter<RecipeState> emit) async {
     final combinedRecipes =
         _removeDuplicateRecipes([..._savedRecipes, ..._fetchedRecipes]);
-    print("COMBINED LIST $combinedRecipes");
     emit(RecipeLoaded(combinedRecipes));
   }
 

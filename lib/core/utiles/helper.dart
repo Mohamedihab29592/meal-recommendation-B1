@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 
+import '../../features/gemini_integrate/data/Recipe.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeEvent.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeState.dart';
@@ -182,7 +184,7 @@ void showNotification(
   );
 }
 
-void showSaveConfirmationDialog(BuildContext context) {
+void showSaveConfirmationDialog(BuildContext context,List<Recipe> recipesToSave) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -215,9 +217,9 @@ void showSaveConfirmationDialog(BuildContext context) {
               foregroundColor: Colors.white,
             ),
             onPressed: () {
-              // Directly dispatch the event
+              Navigator.of(context).pop(); // Close dialog
               print('Attempting to save recipes');
-              context.read<RecipeBloc>().add(SaveRecipesEvent());
+              context.read<RecipeBloc>().add(SaveRecipesEvent(recipesToSave));
             },
             child: const Text('Save'),
           ),
@@ -316,4 +318,17 @@ void showCleanupConfirmationDialog(BuildContext context, String title,
       ],
     ),
   );
+}
+List<Recipe> getCurrentRecipes(BuildContext context) {
+  final recipeBloc = context.read<RecipeBloc>();
+  final state = recipeBloc.state;
+
+  if (state is RecipeLoaded) {
+    return state.recipes;
+  } else if (state is SavedRecipesLoaded) {
+    return state.savedRecipes;
+  }
+
+  // If no recipes are available, return an empty list
+  return recipeBloc.fetchedRecipes;
 }

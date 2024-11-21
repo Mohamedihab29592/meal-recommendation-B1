@@ -159,6 +159,10 @@ class RecipeRepository {
 
   Future<void> saveRecipes(List<Recipe> recipes) async {
     try {
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        throw Exception('User must be signed in to save recipes');
+      }
       print('Repository: Attempting to save ${recipes.length} recipes');
 
       if (recipes.isEmpty) {
@@ -184,14 +188,17 @@ class RecipeRepository {
           continue;
         }
 
-        DocumentReference recipeDoc = _firestore.collection('recipesGemini').doc();
+        // Use a combination of user ID and a unique identifier
+        String recipeDocId = '$userId-${recipe.id ?? DateTime.now().toIso8601String()}';
+
+        DocumentReference recipeDoc = _firestore.collection('recipesGemini').doc(recipeDocId);
 
         batch.set(recipeDoc, {
           ...recipe.toJson(),
           'userId': userId,
           'savedAt': FieldValue.serverTimestamp(),
           'isGenerated': true
-        });
+        }, SetOptions(merge: true)); // Use merge to prevent overwriting existing data
       }
 
       print('Repository: Committing batch');
@@ -199,6 +206,12 @@ class RecipeRepository {
       print('Repository: Batch committed successfully');
     } on FirebaseException catch (e) {
       print('Repository: Firebase Save Recipes Error: ${e.code} - ${e.message}');
+
+      // More detailed error handling
+      if (e.code == 'permission-denied') {
+        throw Exception('You do not have permission to save recipes. Please check your authentication.');
+      }
+
       rethrow;
     } catch (e, stackTrace) {
       print('Repository: Save Recipes Error: $e');
@@ -206,10 +219,16 @@ class RecipeRepository {
       rethrow;
     }
   }
-
   Future<List<Recipe>> fetchSavedRecipes() async {
     try {
-      String userId = _auth.currentUser!.uid;
+      // Check if user is authenticated
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        print('Fetch Saved Recipes: No authenticated user');
+        return [];
+      }
+
+      String userId = currentUser.uid;
 
       QuerySnapshot querySnapshot = await _firestore
           .collection('recipesGemini')
@@ -217,11 +236,29 @@ class RecipeRepository {
           .where('isArchived', isEqualTo: false)
           .get();
 
-      return querySnapshot.docs.map((doc) {
-        return Recipe.fromJson(doc.data() as Map<String, dynamic>);
-      }).toList();
+      // Validate and transform recipes
+      List<Recipe> savedRecipes = querySnapshot.docs.map((doc) {
+        try {
+          // Ensure doc data is a Map and contains necessary fields
+          Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+
+          // Add document ID to the recipe data
+          data['id'] = doc.id;
+
+          return Recipe.fromJson(data);
+        } catch (e) {
+          print('Error parsing individual recipe: $e');
+          return null;
+        }
+      }).whereType<Recipe>().toList(); // Filter out any null values
+
+      print('Fetched ${savedRecipes.length} saved recipes');
+      return savedRecipes;
+    } on FirebaseException catch (e) {
+      print('Firebase Fetch Saved Recipes Error: ${e.code} - ${e.message}');
+      return [];
     } catch (e) {
-      print('Fetch Saved Recipes Error: $e');
+      print('Unexpected Fetch Saved Recipes Error: $e');
       return [];
     }
   }
@@ -232,34 +269,75 @@ class RecipeRepository {
     int daysOld = 30
   }) async {
     try {
-      String userId = _auth.currentUser!.uid;
+      // Validate user authentication
+      User? currentUser = _auth.currentUser;
+      if (currentUser == null) {
+        print('Cleanup Error: No authenticated user');
+        throw Exception('User must be authenticated to perform cleanup');
+      }
+
+      String userId = currentUser.uid;
       DateTime cutoffDate = DateTime.now().subtract(Duration(days: daysOld));
 
+      // Validate cleanup parameters
+      if (daysOld <= 0) {
+        print('Invalid days old parameter: $daysOld');
+        return;
+      }
+
       WriteBatch batch = _firestore.batch();
+      int batchOperationsCount = 0;
+      int maxBatchOperations = 500; // Firestore batch limit
 
       // Query for recipes to clean up
       QuerySnapshot querySnapshot = await _firestore
           .collection('recipesGemini')
           .where('userId', isEqualTo: userId)
-          .where('generatedAt', isLessThan: cutoffDate.toIso8601String())
+          .where('savedAt', isLessThan: cutoffDate.toIso8601String())
           .get();
+
+      int deleteCount = 0;
+      int archiveCount = 0;
 
       for (var doc in querySnapshot.docs) {
         Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
 
-        if (deleteGenerated && data['isGenerated'] == true) {
-          // Completely delete generated recipes
-          batch.delete(doc.reference);
-        } else if (archiveOld) {
-          // Soft archive other old recipes
-          batch.update(doc.reference, {
-            'isArchived': true,
-            'archivedAt': FieldValue.serverTimestamp()
-          });
+        try {
+          if (deleteGenerated && (data['isGenerated'] == true || data['isTemporary'] == true)) {
+            // Completely delete generated or temporary recipes
+            batch.delete(doc.reference);
+            deleteCount++;
+          } else if (archiveOld) {
+            // Soft archive other old recipes
+            batch.update(doc.reference, {
+              'isArchived': true,
+              'archivedAt': FieldValue.serverTimestamp()
+            });
+            archiveCount++;
+          }
+
+          batchOperationsCount++;
+
+          // Commit batch when it reaches max operations
+          if (batchOperationsCount >= maxBatchOperations) {
+            await batch.commit();
+            batch = _firestore.batch();
+            batchOperationsCount = 0;
+          }
+        } catch (e) {
+          print('Error processing individual recipe during cleanup: $e');
         }
       }
 
-      await batch.commit();
+      // Commit any remaining batch operations
+      if (batchOperationsCount > 0) {
+        await batch.commit();
+      }
+
+      print('Cleanup complete: Deleted $deleteCount, Archived $archiveCount recipes');
+    } on FirebaseException catch (e) {
+      print('Firebase Cleanup Error: ${e.code} - ${e.message}');
+      rethrow;
     } catch (e) {
       print('Comprehensive Cleanup Error: $e');
       rethrow;

@@ -24,3 +24,4 @@ class RecipeError extends RecipeState {
 
   RecipeError(this.message, this.canRetry);
 }
+class NoSavedRecipes extends RecipeState {}
