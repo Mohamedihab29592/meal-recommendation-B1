@@ -92,26 +92,38 @@ class HomeRepoImpl extends HomeRepo {
   }
 
 
-    @override
-    Future<bool> checkRecipeIngredientsAdded(String? recipeId) async {
-      if (recipeId == null) return false;
+  @override
+  Future<bool> checkRecipeIngredientsAdded(String? imageUrl) async {
+    if (imageUrl == null) return false;
 
-      try {
-        // Query ingredients collection to check if ingredients from this recipe exist
-        final querySnapshot = await _firestore
-            .collection('users')
-            .doc(userId)
-            .collection('ingredients')
-            .where('recipeId', isEqualTo: recipeId)
-            .limit(1)
-            .get();
+    try {
+      // Fetch the user document
+      final userDoc = await _firestore.collection('users').doc(userId).get();
 
-        return querySnapshot.docs.isNotEmpty;
-      } catch (error) {
-        print('Error checking added ingredients: $error');
+      // Check if the document exists
+      if (!userDoc.exists) {
+        print('User  document does not exist.');
         return false;
       }
+
+      List<dynamic>? recipes = userDoc.data()?['recipes'];
+
+      if (recipes != null) {
+        for (var recipe in recipes) {
+          if (recipe is Map<String, dynamic>) {
+            if ((recipe['imageUrl'] == imageUrl)) {
+              return true;
+            }
+          }
+        }
+      }
+
+      return false; // No match found
+    } catch (error) {
+      print('Error checking recipe existence: $error');
+      return false;
     }
+  }
 
   }
 

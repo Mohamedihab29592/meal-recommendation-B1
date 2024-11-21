@@ -49,11 +49,12 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
       child: Scaffold(
         body: BlocConsumer<RecipeBloc, RecipeState>(
           listener: (context, state) {
-            if (state is RecipesSaved) {
-              showNotification(
-                  context, 'Recipes saved successfully!', ContentType.success);
+            if (state is SavedRecipesLoaded) {
+              showNotification(context, 'Operation completed successfully!',
+                  ContentType.success, Colors.greenAccent);
             } else if (state is RecipeError) {
-              showNotification(context, state.message, ContentType.failure);
+              showNotification(context, state.message, ContentType.failure,
+                  Colors.redAccent);
             }
           },
           builder: (context, state) {
@@ -65,7 +66,8 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
               child: Column(
                 children: [
                   CustomAppbar(
-                    ontapleft: () => showCleanupOptions(context),
+                    ontapleft: () =>
+                        showCleanupOptions(context, context.read<RecipeBloc>()),
                     ontapright: () {
                       context.pushNamed(AppRoutes.geminiRecipe);
                     },
@@ -73,7 +75,8 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                       iconSize: 30,
                       icon: const Icon(Icons.cleaning_services,
                           color: AppColors.primary),
-                      onPressed: () => showCleanupOptions(context),
+                      onPressed: () => showCleanupOptions(
+                          context, context.read<RecipeBloc>()),
                     ),
                     rightChild: RecipeButtons(
                       recipesCount: newRecipesCount,
@@ -110,10 +113,16 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                   CustomSearchBar(
                     controller: _controller,
                     onSearch: (query) {
-                      if (query.isNotEmpty) {
+                      if (query.isNotEmpty && !_showSavedRecipes) {
                         context
                             .read<RecipeBloc>()
                             .add(FetchRecipesEvent(query));
+                      } else {
+                        showNotification(
+                            context,
+                            "You Must add food name in other section",
+                            ContentType.warning,
+                            Colors.orangeAccent);
                       }
                     },
                   ),
@@ -128,9 +137,6 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
   }
 
   int _getNewRecipesCount(RecipeBloc recipeBloc) {
-    return recipeBloc.fetchedRecipes
-        .where((fetchedRecipe) => !recipeBloc.savedRecipes
-            .any((savedRecipe) => savedRecipe.id == fetchedRecipe.id))
-        .length;
+    return recipeBloc.fetchedRecipes.length;
   }
 }

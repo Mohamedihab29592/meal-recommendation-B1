@@ -27,7 +27,7 @@ class AddIngredientCubit extends Cubit<AddIngredientState> {
   Future<bool> checkIngredientsAdded(Recipe recipe) async {
     try {
        emit(AddIngredientAlreadyAdded());
-      return await homeRepo.checkRecipeIngredientsAdded(recipe.id);
+      return await homeRepo.checkRecipeIngredientsAdded(recipe.imageUrl);
     } catch (error) {
       emit(AddIngredientAlreadyFailed(error.toString()));
       print('Error checking ingredients: $error');

@@ -172,19 +172,20 @@ String _getErrorMessage(Object error) {
       : error.toString();
 }
 
-void showNotification(
-    BuildContext context, String message, ContentType contentType) {
+void showNotification(BuildContext context, String message,
+    ContentType contentType, Color color) {
   DynamicNotificationWidget.showNotification(
     context: context,
     title: "Recipe Management",
     message: message,
-    color: Colors.redAccent,
-    contentType: ContentType.failure,
+    color: color,
+    contentType: contentType,
     inMaterialBanner: false,
   );
 }
 
-void showSaveConfirmationDialog(BuildContext context,List<Recipe> recipesToSave) {
+void showSaveConfirmationDialog(
+    BuildContext context, List<Recipe> recipesToSave) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -201,14 +202,15 @@ void showSaveConfirmationDialog(BuildContext context,List<Recipe> recipesToSave)
               // Successfully saved
               Navigator.of(context).pop(); // Close dialog
 
-              showNotification(
-                  context, 'Recipes saved successfully!', ContentType.success);
+              showNotification(context, 'Recipes saved successfully!',
+                  ContentType.success, Colors.greenAccent);
             } else if (state is RecipeError) {
               Navigator.of(context).pop(); // Close dialog
               showNotification(
                   context,
                   'Failed to save recipes: ${state.message}',
-                  ContentType.failure);
+                  ContentType.failure,
+                  Colors.redAccent);
             }
           },
           child: ElevatedButton(
@@ -229,7 +231,7 @@ void showSaveConfirmationDialog(BuildContext context,List<Recipe> recipesToSave)
   );
 }
 
-void showCleanupOptions(BuildContext context) {
+void showCleanupOptions(BuildContext context, RecipeBloc recipeBloc) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
@@ -244,15 +246,16 @@ void showCleanupOptions(BuildContext context) {
               onTap: () {
                 Navigator.pop(context);
                 showCleanupConfirmationDialog(
-                    context,
-                    'Delete Generated Recipes',
-                    'Are you sure you want to delete all generated recipes?',
-                    () {
-                  context.read<RecipeBloc>().add(CleanupRecipesEvent(
-                        deleteGenerated: true,
-                        archiveOld: false,
-                      ));
-                });
+                  context,
+                  'Delete Generated Recipes',
+                  'Are you sure you want to delete all generated recipes?',
+                  () {
+                    recipeBloc.add(CleanupRecipesEvent(
+                      deleteGenerated: true,
+                      archiveOld: false,
+                    ));
+                  },
+                );
               },
             ),
             ListTile(
@@ -261,14 +264,18 @@ void showCleanupOptions(BuildContext context) {
               subtitle: const Text('Archive recipes older than 30 days'),
               onTap: () {
                 Navigator.pop(context);
-                showCleanupConfirmationDialog(context, 'Archive Old Recipes',
-                    'Archive recipes older than 30 days?', () {
-                  context.read<RecipeBloc>().add(CleanupRecipesEvent(
-                        deleteGenerated: false,
-                        archiveOld: true,
-                        daysOld: 30,
-                      ));
-                });
+                showCleanupConfirmationDialog(
+                  context,
+                  'Archive Old Recipes',
+                  'Archive recipes older than 30 days?',
+                  () {
+                    recipeBloc.add(CleanupRecipesEvent(
+                      deleteGenerated: false,
+                      archiveOld: true,
+                      daysOld: 30,
+                    ));
+                  },
+                );
               },
             ),
             ListTile(
@@ -277,14 +284,18 @@ void showCleanupOptions(BuildContext context) {
               subtitle: const Text('Delete generated and archive old recipes'),
               onTap: () {
                 Navigator.pop(context);
-                showCleanupConfirmationDialog(context, 'Complete Cleanup',
-                    'Perform a complete cleanup of recipes?', () {
-                  context.read<RecipeBloc>().add(CleanupRecipesEvent(
-                        deleteGenerated: true,
-                        archiveOld: true,
-                        daysOld: 30,
-                      ));
-                });
+                showCleanupConfirmationDialog(
+                  context,
+                  'Complete Cleanup',
+                  'Perform a complete cleanup of recipes?',
+                  () {
+                    recipeBloc.add(CleanupRecipesEvent(
+                      deleteGenerated: true,
+                      archiveOld: true,
+                      daysOld: 30,
+                    ));
+                  },
+                );
               },
             ),
           ],
@@ -319,6 +330,7 @@ void showCleanupConfirmationDialog(BuildContext context, String title,
     ),
   );
 }
+
 List<Recipe> getCurrentRecipes(BuildContext context) {
   final recipeBloc = context.read<RecipeBloc>();
   final state = recipeBloc.state;
@@ -327,6 +339,8 @@ List<Recipe> getCurrentRecipes(BuildContext context) {
     return state.recipes;
   } else if (state is SavedRecipesLoaded) {
     return state.savedRecipes;
+  } else if (state is RetrieveRecipesLoaded) {
+    state.savedRecipes;
   }
 
   // If no recipes are available, return an empty list

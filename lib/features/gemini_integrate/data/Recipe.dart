@@ -4,6 +4,7 @@ class Recipe {
   String? id;
   String? generatedAt;
   bool isGenerated;
+  bool isArchived;
   String? sourceQuery;
   final String name;
   final String summary;
@@ -18,6 +19,7 @@ class Recipe {
     this.id,
     this.generatedAt,
     this.isGenerated = false,
+    this.isArchived = false,
     this.sourceQuery,
     required this.name,
     required this.summary,
@@ -46,6 +48,7 @@ class Recipe {
         time: _safeParseString(json['time'], defaultValue: 'N/A'),
         generatedAt: _safeParseString(json['generatedAt']),
         isGenerated: _safeParseBoolean(json['isGenerated']),
+        isArchived: _safeParseBoolean(json['isArchived']),
         sourceQuery: _safeParseString(json['sourceQuery']),
         imageUrl: _safeParseString(json['imageUrl'], defaultValue: ''),
 
@@ -125,6 +128,7 @@ class Recipe {
       'imageUrl': imageUrl,
       'generatedAt': generatedAt,
       'isGenerated': isGenerated,
+      'isArchived':isArchived,
       'sourceQuery': sourceQuery,
       'ingredients':
           ingredients.map((ingredient) => ingredient.toJson()).toList(),

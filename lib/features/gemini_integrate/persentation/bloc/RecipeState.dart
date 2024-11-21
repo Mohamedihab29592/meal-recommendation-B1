@@ -18,6 +18,11 @@ class SavedRecipesLoaded extends RecipeState {
   SavedRecipesLoaded(this.savedRecipes);
 }
 
+class RetrieveRecipesLoaded extends RecipeState {
+  final List<Recipe> savedRecipes;
+  RetrieveRecipesLoaded(this.savedRecipes);
+}
+
 class RecipeError extends RecipeState {
   final String message;
   final bool canRetry;

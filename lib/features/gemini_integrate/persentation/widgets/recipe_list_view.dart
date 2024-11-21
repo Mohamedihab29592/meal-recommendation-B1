@@ -51,10 +51,9 @@ class RecipeListView extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: 16),
       itemBuilder: (context, index) {
         final recipe = recipes[index];
-        context.read<AddIngredientCubit>().checkIngredientsAdded(recipe);
         return RecipeCard(
           recipe: recipe,
-          isSaved: showSavedRecipes || state is SavedRecipesLoaded,
+          isSaved: showSavedRecipes || state is RetrieveRecipesLoaded,
         );
       },
     );
@@ -63,6 +62,7 @@ class RecipeListView extends StatelessWidget {
   List<Recipe> _extractRecipes(RecipeState state) {
     if (state is RecipeLoaded) return state.recipes;
     if (state is SavedRecipesLoaded) return state.savedRecipes;
+    if (state is RetrieveRecipesLoaded) return state.savedRecipes;
     return [];
   }
 }

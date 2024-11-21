@@ -145,7 +145,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
       _savedRecipes = _validateRecipes(savedRecipes);
 
       // Emit loaded state with validated recipes
-      emit(SavedRecipesLoaded(_savedRecipes));
+      emit(RetrieveRecipesLoaded(_savedRecipes));
     } on FirebaseException catch (e) {
       // Specific Firebase-related error handling
       String errorMessage = 'Failed to load saved recipes';
@@ -177,7 +177,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
   Future<void> _onCombineRecipes(
       CombineRecipesEvent event, Emitter<RecipeState> emit) async {
     final combinedRecipes =
-        _removeDuplicateRecipes([..._savedRecipes, ..._fetchedRecipes]);
+        _removeDuplicateRecipes([..._fetchedRecipes]);
     emit(RecipeLoaded(combinedRecipes));
   }
 
@@ -205,7 +205,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
     final seenRecipes = <String>{}; // Set
 
     for (final recipe in recipes) {
-      final identifier = recipe.id ?? recipe.name;
+      final identifier = recipe.name ?? recipe.name;
       if (!seenRecipes.contains(identifier)) {
         uniqueRecipes.add(recipe);
         seenRecipes.add(identifier);
