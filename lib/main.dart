@@ -5,50 +5,47 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
-import 'features/auth/login/persentation/bloc/auth_bloc.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
 
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await ScreenUtil.ensureScreenSize();
   await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+    options: DefaultFirebaseOptions.currentPlatform,);
   await Hive.initFlutter();
+  Hive.registerAdapter(FavoritesAdapter());
+  final favoriteBox = await Hive.openBox<Favorites>('favorites');
 
-  await setup();
-  runApp(
-      BlocProvider<AuthBloc>(
-        create: (context) => getIt<AuthBloc>(),
-        child: const MealApp(),
-      ),);
+  await setup(favoriteBox);
+  runApp(const MealApp());
 }
 
 class MealApp extends StatelessWidget {
   const MealApp({super.key});
   @override
   Widget build(BuildContext context) {
-    return DevicePreview(
-      builder: (context) => ScreenUtilInit(
-        designSize: const Size(375, 812),
-        minTextAdapt: true,
-        child: BlocProvider(
-          create: (context) => getIt<DetailsCubit>(),
-          child: MaterialApp(
-            title: 'Meal - Recommendation',
-            debugShowCheckedModeBanner: false,
-            theme: AppThemes.lightTheme,
-            initialRoute: AppRoutes.splash,
-            onGenerateRoute: AppRoutes.generateRoute,
-          ),
-        ),
-      ),
-
-    );
+    return
+      DevicePreview(
+        builder: (context) =>
+            ScreenUtilInit(
+              designSize: const Size(375, 812),
+              minTextAdapt: true,
+              child: BlocProvider(
+                create:(context) =>  getIt<RecipeBloc>(),
+                child: MaterialApp(
+                  title: 'Meal - Recommendation',
+                  debugShowCheckedModeBanner: false,
+                  theme: AppThemes.lightTheme,
+                  initialRoute: AppRoutes.splash,
+                  onGenerateRoute: AppRoutes.generateRoute,
+                ),
+              ),
+            ),
+      );
   }
 }
