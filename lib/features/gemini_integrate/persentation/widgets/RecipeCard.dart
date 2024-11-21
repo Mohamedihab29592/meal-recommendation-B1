@@ -1,102 +1,85 @@
-import 'package:flutter/cupertino.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:meal_recommendation_b1/core/utiles/assets.dart';
-
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/quick_stats_row.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_card_content.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_delete_button.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_header.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_image.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
+import '../../../../core/components/dynamic_notification_widget.dart';
+import '../../../../core/services/di.dart';
+import '../../../../core/utiles/app_colors.dart';
 import '../../data/Recipe.dart';
+import '../bloc/RecipeBloc.dart';
+import '../bloc/RecipeEvent.dart';
+import 'add_ingredients_button.dart';
 
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;
+  final bool isSaved;
+  final VoidCallback? onDelete;
 
-  const RecipeCard({super.key, required this.recipe});
+  const RecipeCard({
+    super.key,
+    required this.recipe,
+    this.isSaved = false,
+    this.onDelete,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 4,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image section with a fallback placeholder
-          recipe.imageUrl.isNotEmpty
-              ? Image.network(recipe.imageUrl, fit: BoxFit.cover)
-              : Image.asset(Assets.icSplash, fit: BoxFit.cover),
-
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Recipe name with improved text styling
-                Text(
-                  recipe.name,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20,
-                    color: Colors.black87,
-                  ),
-                ),
-                const SizedBox(height: 6),
-
-                // Recipe description
-                Text(
-                  recipe.description,
-                  style: const TextStyle(fontSize: 16, color: Colors.grey),
-                ),
-                const SizedBox(height: 12),
-
-                // Ingredients section with bold title
-                const Text(
-                  'Ingredients:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: recipe.ingredients.map((ingredient) {
-                    return Row(
-                      children: [
-                        // Ingredient image with a fallback placeholder
-                        ingredient.imageUrl.isNotEmpty
-                            ? Image.network(ingredient.imageUrl, width: 40, height: 40, fit: BoxFit.cover)
-                            : Image.asset(Assets.icSplash, width: 40, height: 40),
-                        const SizedBox(width: 8),
-                        Text(
-                          '${ingredient.quantity} ${ingredient.unit} ${ingredient.name}',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    );
-                  }).toList(),
-                ),
-                const SizedBox(height: 12),
-
-                // Instructions section with bold title
-                const Text(
-                  'Instructions:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: recipe.instructions
-                      .map((instruction) => Text('- $instruction', style: const TextStyle(fontSize: 14)))
-                      .toList(),
-                ),
-                const SizedBox(height: 12),
-
-                // Nutrition section with bold title
-                const Text(
-                  'Nutrition Info:',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                ),
-                Text('Calories: ${recipe.nutrition.calories} kcal'),
-                Text('Protein: ${recipe.nutrition.protein} g'),
-                Text('Carbs: ${recipe.nutrition.carbs} g'),
-                Text('Fat: ${recipe.nutrition.fat} g'),
-              ],
-            ),
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 10,
+            offset: Offset(0, 5),
           ),
         ],
       ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: Material(
+          color: Colors.white,
+          child: InkWell(
+            onTap: () => _handleRecipeTap(context),
+            child: Stack(
+              children: [
+                RecipeCardContent(
+                  recipe: recipe,
+                  isSaved: isSaved,
+                ),
+
+              ],
+            ),
+          ),
+        ),
+      ),
     );
   }
+
+  void _handleRecipeTap(BuildContext context) {
+    if (!isSaved) {
+      DynamicNotificationWidget.showNotification(
+        context: context,
+        title: 'Oh Hey!!',
+        message: "You Must Save it To Show Details!",
+        color: Colors.red,
+        contentType: ContentType.failure,
+        inMaterialBanner: false,
+      );
+    } else {
+      context.pushNamed(AppRoutes.detailsPage, arguments: recipe.id);
+    }
+  }
 }
+
+
+
+

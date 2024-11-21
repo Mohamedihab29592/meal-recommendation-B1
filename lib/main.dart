@@ -7,6 +7,8 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import 'features/auth/login/persentation/bloc/auth_bloc.dart';
+import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
+import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
@@ -36,18 +38,17 @@ class MealApp extends StatelessWidget {
           ScreenUtilInit(
         designSize: const Size(375, 812),
         minTextAdapt: true,
-          child:
-          BlocProvider(
-            create: (context) => DetailsCubit(),
+          child: BlocProvider(
+            create:(context) =>  getIt<RecipeBloc>(),
             child: MaterialApp(
-              title: 'Meal - Recommendation',
-              debugShowCheckedModeBanner: false,
-              theme: AppThemes.lightTheme,
-              initialRoute: AppRoutes.splash,
-              onGenerateRoute: AppRoutes.generateRoute,
-            ),
+                title: 'Meal - Recommendation',
+                debugShowCheckedModeBanner: false,
+                theme: AppThemes.lightTheme,
+                initialRoute: AppRoutes.splash,
+                onGenerateRoute: AppRoutes.generateRoute,
+              ),
           ),
-      ),
+          ),
     );
   }
 }

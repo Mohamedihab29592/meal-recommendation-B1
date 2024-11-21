@@ -1,11 +1,14 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/custom_button.dart';
+import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/components/custom_text_field.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/assets.dart';
 import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
+import '../../../../../../core/components/dynamic_notification_widget.dart';
 import '../../../data/data_source/local/secure_local_data.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_event.dart';
@@ -68,18 +71,22 @@ class _LoginScreenState extends State<LoginScreen> {
             // Navigate to the home screen on successful login
             await SecureStorageHelper.setSecuredString('uid', state.user.uid!);
 
-            Navigator.pushReplacementNamed(context, AppRoutes.home);
             Navigator.pushReplacementNamed(context, AppRoutes.navBar);
 
           } else if (state is AuthError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message)),
+            DynamicNotificationWidget.showNotification(
+              context: context,
+              title: 'Oh Hey!!',
+              message: state.message,
+              color: Colors.green, // You can use this color if needed
+              contentType: ContentType.failure,
+              inMaterialBanner: false,
             );
           }
         },
         builder: (context, state) {
           if (state is AuthLoading) {
-            return const Center(child: CircularProgressIndicator());
+            return const LoadingDialog();
           }
 
           return Stack(
@@ -160,6 +167,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             _saveUserData();
                             Navigator.of(context)
                                 .pushReplacementNamed(AppRoutes.navBar);
+
                           },
                         ),
                         const Padding(

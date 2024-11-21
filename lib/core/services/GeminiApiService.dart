@@ -14,29 +14,36 @@ class GeminiApiService {
     );
 
     final prompt = '''
-Provide detailed recipe information for a dish named "$dishName" in JSON format with the following structure. Do not include image URLs.
+Provide a recipe for "$dishName" in JSON format with this structure:
+{
+  "name": "Dish name",
+  "summary": "A summary of the dish",
+  "typeOfMeal": "Meal type (e.g., Breakfast, Lunch)",
+  "time": "Preparation time in minutes",
+  "imageUrl": "",
+  "ingredients": [
     {
-      "name": "Dish name",
-      "description": "Brief description of the dish",
-        "imageUrl" : ""
-      "ingredients": [
-        {
-          "name": "Ingredient name",
-          "quantity": "Quantity of ingredient",
-          "unit": "Unit of measurement"
-          "imageUrl" : ""
-        }
-      ],
-      "instructions": ["Step 1", "Step 2", "Step 3"]  ,
-      "nutrition": {
-        "calories": "Calories per serving",
-        "protein": "Protein content",
-        "carbs": "Carbohydrate content",
-        "fat": "Fat content"
-      }
+      "name": "Ingredient name",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "imageUrl": ""
     }
-    Return the response as JSON.
-    ''';
+  ],
+  "nutrition": {
+    "calories": "Calories per serving",
+    "protein": "Protein in grams",
+    "carbs": "Carbs in grams",
+    "fat": "Fat in grams",
+    "vitamins": ["List of vitamins"]
+  },
+  "directions": {
+    "firstStep": "First step description",
+    "secondStep": "Second step description",
+    "additionalSteps": ["Additional steps"]
+  }
+}
+Return the response as JSON.
+''';
 
     final response = await model.generateContent([Content.text(prompt)]);
     final cleanedResponse = response.text?.trim().replaceAll('```json', '').replaceAll('```', '').trim();

@@ -1,0 +1,16 @@
+Why WriteBatch?
+
+When you need to delete multiple documents in a Firestore collection, using WriteBatch can be more efficient than deleting each document individually. Here are some benefits:
+
+Batching reduces the number of write operations: By grouping multiple delete operations into a single batch, you reduce the number of write operations sent to Firestore. This can lead to significant performance improvements, especially when dealing with a large number of documents.
+Improved performance: Batching delete operations can be faster than deleting each document individually, as it reduces the overhead of individual write operations.
+Atomicity: When using WriteBatch, all operations in the batch are executed as a single, atomic unit. If any operation in the batch fails, the entire batch is rolled back, ensuring consistency and integrity of your data.
+How WriteBatch works
+
+Here's a high-level overview of how WriteBatch works:
+
+You create a WriteBatch object, which is a container for multiple write operations.
+You add multiple delete operations to the batch using the delete() method.
+When you're ready to execute the batch, you call the commit() method.
+Firestore executes the batch as a single, atomic unit, deleting all the specified documents.
+By using WriteBatch, you can efficiently delete multiple generated recipes in a single operation, which can improve the performance and responsiveness of your app.

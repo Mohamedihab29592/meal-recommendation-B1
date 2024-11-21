@@ -39,5 +39,7 @@ class Assets {
   static const String settingsWhite = 'assets/images/settings_white.svg';
   static const String icSearch = 'assets/images/Search.png';
   static const String gemini = 'assets/images/gemini.png';
+  static const String geminiSVG = 'assets/images/gemini.svg';
+  static const String noFoodFound = 'assets/images/no_food.png';
 
 }

@@ -1,94 +1,152 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rating_bar/flutter_rating_bar.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import '../utiles/app_colors.dart';
 import '../utiles/assets.dart';
+import '../utiles/helper.dart';
 
 class CustomRecipesCard extends StatelessWidget {
-  CustomRecipesCard(
-      {super.key,
-      required this.ontap,
-      this.time,
-      this.firsttext,
-      this.ingrediantes,
-      this.middleText,
-      this.image,
-      this.rating,
-        this.isFavorite
-      });
-  String? firsttext, middleText, ingrediantes, time, image;
-  double? rating;
-  bool? isFavorite;
+  const CustomRecipesCard({
+    super.key,
+    required this.onTapFav,
+    this.time,
+    this.firstText,
+    this.ingredients,
+    this.middleText,
+    this.image,
+    required this.onTapDelete, required this.mealId,
+  });
 
-  final VoidCallback ontap;
+  final String? firstText, middleText, ingredients, time, image;
+  final VoidCallback onTapFav;
+  final VoidCallback onTapDelete;
+  final String mealId; // Add mealId to the constructor
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-      color: Colors.white,
-      elevation: 25,
-      shadowColor: Colors.black,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(left: 8.0),
-            child: CircleAvatar(
-              radius: 40,
-              backgroundImage: AssetImage("$image"),
+    return Dismissible(
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
+      confirmDismiss: (direction) async {
+        // Call your existing delete dialog method
+        _showDeleteDialog( context,mealId);
+        return false; // Prevent automatic dismissal
+      },
+      background: Container(
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Align(
+          alignment: Alignment.centerRight,
+          child: Padding(
+            padding: EdgeInsets.only(right: 20),
+            child: Icon(
+              Icons.delete,
+              color: Colors.white,
+              size: 30,
             ),
           ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+        ),
+      ),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        color: Colors.white,
+        elevation: 5,
+        margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 8),
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                "$firsttext",
-                style: const TextStyle(fontWeight: FontWeight.w400),
+              CircleAvatar(
+                radius: 40,
+                backgroundImage: image != null && image!.isNotEmpty
+                    ? NetworkImage(image!)
+                    : const AssetImage(Assets.icSplash) as ImageProvider,
+                backgroundColor: Colors.grey[200],
               ),
-              Text(
-                "$middleText",
-                style: const TextStyle(fontWeight: FontWeight.bold),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      firstText![0].toUpperCase() + firstText!.substring(1),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 14,
+                        color: Colors.black,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      middleText![0].toUpperCase() + middleText!.substring(1) ?? "Meal Name",
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 18,
+                        color: AppColors.primary,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.kitchen, size: 16, color: Colors.blueAccent),
+                        const SizedBox(width: 4),
+                        Expanded(
+                          child: Text(
+                            ingredients ?? "0 ingredients",
+                            style: const TextStyle(fontSize: 13, color: Colors.black54),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        const Icon(Icons.timer, size: 16, color: Colors.orangeAccent),
+                        const SizedBox(width: 4),
+                        Text(
+                          time ?? "0 min",
+                          style: const TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
-              Row(
+              // Action Buttons Section
+              Column(
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("$ingrediantes"),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  Text(
-                    "$time",
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                  IconButton(
+                    icon: const Icon(Icons.favorite_border, color: AppColors.primary, size: 32),
+                    onPressed: onTapFav,
                   ),
                 ],
               ),
-              SizedBox(
-                width: MediaQuery.sizeOf(context).width / 2,
-                child: RatingBar.builder(
-                  initialRating: rating!,
-                  direction: Axis.horizontal,
-                  allowHalfRating: true,
-                  itemSize: 25.w,
-                  itemCount: 5,
-                  itemPadding: const EdgeInsets.symmetric(horizontal: 0.0),
-                  itemBuilder: (context, _) => const Icon(
-                    Icons.star,
-                    color: Colors.amber,
-                  ),
-                  onRatingUpdate: (rating) {
-                  },
-                ),
-              )
             ],
           ),
-          Container(
-              padding: const EdgeInsets.all(10),
-              alignment: Alignment.topRight,
-              width: 50,
-              height: 100,
-              child: InkWell(
-                  onTap: ontap, child: Image.asset(isFavorite! ? Assets.icFilledHeart : Assets.icFavorite))),
-        ],
+        ),
       ),
     );
   }
+}
+
+void _showDeleteDialog(BuildContext context, String mealId) {
+  showDeleteDialog(
+    context: context,
+    mealId: mealId,
+    onSuccess: () {
+      BlocProvider.of<HomeCubit>(context).getdata();
+    },
+  );
 }
