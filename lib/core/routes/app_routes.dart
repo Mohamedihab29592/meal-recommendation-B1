@@ -53,7 +53,10 @@ class AppRoutes {
       case register:
         return MaterialPageRoute(
             builder: (_) => MultiBlocProvider(providers: [
-                  BlocProvider(create: (context) => getIt<RegisterBloc>()),
+                  BlocProvider(
+                    create: (context) => getIt<RegisterBloc>(),
+                  ),
+
                   BlocProvider(
                     create: (context) => getIt<PhoneAuthBloc>(),
                   )

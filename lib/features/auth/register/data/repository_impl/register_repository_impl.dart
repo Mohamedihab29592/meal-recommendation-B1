@@ -20,9 +20,7 @@ class RegisterRepositoryImpl implements RegisterRepository {
     required String password,
     required String confirmPassword,
   }) async {
-    if (password != confirmPassword) {
-      throw Exception("Passwords do not match.");
-    }
+    
     await authRemoteDataSource.registerWithEmail(
       name: name,
       email: email,

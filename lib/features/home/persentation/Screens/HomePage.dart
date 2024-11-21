@@ -1,17 +1,14 @@
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-import 'package:hive/hive.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipes_list.dart';
 import '../../../../core/components/Custome_Appbar.dart';
-import '../../../../core/components/Custome_recipes_card.dart';
-import '../../../../core/components/side_bar.dart';
 import '../../../../core/utiles/assets.dart';
-import '../../../favorites/data/models/favorites.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 
