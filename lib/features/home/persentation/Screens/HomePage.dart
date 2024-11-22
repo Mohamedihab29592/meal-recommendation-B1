@@ -11,6 +11,7 @@ import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/utiles/assets.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
+import '../Widgets/searchCards.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -32,7 +33,6 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       body: SafeArea(
-
         child: RefreshIndicator(
           onRefresh: () async {
             // Implement refresh logic
@@ -87,72 +87,78 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: screenSize.height * 0.03),
 
                   // Enhanced Search Bar with Functionality
-                  SearchBar(
-                    backgroundColor: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.focused)) {
-                        return Colors.white.withOpacity(0.95);
-                      }
-                      return Colors.white;
-                    }),
-                    elevation: WidgetStateProperty.resolveWith((states) {
-                      if (states.contains(WidgetState.focused)) {
-                        return 3.0;
-                      }
-                      return 1.0;
-                    }),
-                    constraints: const BoxConstraints(minHeight: 55, maxHeight: 55),
-                    shape: MaterialStateProperty.all(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        side: BorderSide(
-                          color: Colors.grey.shade300,
-                          width: 1.0,
-                        ),
-                      ),
-                    ),
-                    hintText: "Search Recipes",
-                    hintStyle: MaterialStateProperty.all(
-                      TextStyle(
-                        color: Colors.grey.shade500,
-                        fontSize: 16,
-                      ),
-                    ),
-                    textStyle: MaterialStateProperty.all(
-                      const TextStyle(
-                        color: Colors.black,
-                        fontSize: 16,
-                      ),
-                    ),
-                    onChanged: (value) {
-                      // Implement search functionality with optional debounce
-                    },
-                    leading: Padding(
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Image.asset(
-                        Assets.icSearch,
-                        color: AppColors.primary,
-                        height: 25,
-                        width: 25,
-                      ),
-                    ),
-
-                    trailing: [
-                      Tooltip(
-                        message: 'Filter Recipes',
-                        child: IconButton(
-                          icon: Image.asset(
-                            Assets.icFilter,
-                            color: AppColors.primary,
-                            height: 25,
-                            width: 25,
+                  BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+                    return SearchBar(
+                      backgroundColor:
+                          WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.focused)) {
+                          return Colors.white.withOpacity(0.95);
+                        }
+                        return Colors.white;
+                      }),
+                      elevation: WidgetStateProperty.resolveWith((states) {
+                        if (states.contains(WidgetState.focused)) {
+                          return 3.0;
+                        }
+                        return 1.0;
+                      }),
+                      constraints:
+                          const BoxConstraints(minHeight: 55, maxHeight: 55),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          side: BorderSide(
+                            color: Colors.grey.shade300,
+                            width: 1.0,
                           ),
-                          onPressed: () {
-                            // Show filter bottom sheet or dialog
-                          },
                         ),
                       ),
-                    ],
-                  ),
+                      hintText: "Search Recipes",
+                      hintStyle: MaterialStateProperty.all(
+                        TextStyle(
+                          color: Colors.grey.shade500,
+                          fontSize: 16,
+                        ),
+                      ),
+                      textStyle: MaterialStateProperty.all(
+                        const TextStyle(
+                          color: Colors.black,
+                          fontSize: 16,
+                        ),
+                      ),
+                      onTap: () {
+                        showSearch(
+                            context: context,
+                            delegate: SearchCards(homeState: state));
+                      },
+                      onChanged: (value) {},
+                      leading: Padding(
+                        padding: const EdgeInsets.only(left: 10),
+                        child: Image.asset(
+                          Assets.icSearch,
+                          color: AppColors.primary,
+                          height: 25,
+                          width: 25,
+                        ),
+                      ),
+                      trailing: [
+                        Tooltip(
+                          message: 'Filter Recipes',
+                          child: IconButton(
+                            icon: Image.asset(
+                              Assets.icFilter,
+                              color: AppColors.primary,
+                              height: 25,
+                              width: 25,
+                            ),
+                            onPressed: () {
+                              // Show filter bottom sheet or dialog
+                            },
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
 
                   SizedBox(height: screenSize.height * 0.02),
 
@@ -280,4 +286,3 @@ Future<void> showDeleteDialog({
     },
   ).show();
 }
-
