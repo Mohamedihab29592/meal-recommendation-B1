@@ -4,7 +4,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 
+import '../../features/gemini_integrate/data/Recipe.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeEvent.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeState.dart';
@@ -43,17 +45,6 @@ Future<void> showDeleteDialog({
       HapticFeedback.lightImpact(); // Add subtle vibration feedback
     },
     btnOkOnPress: () async {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (context) => const Center(
-          child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
-          ),
-        ),
-      );
-
       try {
         print("Attempting to delete document with ID: $mealId");
 
@@ -170,19 +161,20 @@ String _getErrorMessage(Object error) {
       : error.toString();
 }
 
-void showNotification(
-    BuildContext context, String message, ContentType contentType) {
+void showNotification(BuildContext context, String message,
+    ContentType contentType, Color color) {
   DynamicNotificationWidget.showNotification(
     context: context,
     title: "Recipe Management",
     message: message,
-    color: Colors.redAccent,
-    contentType: ContentType.failure,
+    color: color,
+    contentType: contentType,
     inMaterialBanner: false,
   );
 }
 
-void showSaveConfirmationDialog(BuildContext context) {
+void showSaveConfirmationDialog(
+    BuildContext context, List<Recipe> recipesToSave) {
   showDialog(
     context: context,
     builder: (context) => AlertDialog(
@@ -199,14 +191,15 @@ void showSaveConfirmationDialog(BuildContext context) {
               // Successfully saved
               Navigator.of(context).pop(); // Close dialog
 
-              showNotification(
-                  context, 'Recipes saved successfully!', ContentType.success);
+              showNotification(context, 'Recipes saved successfully!',
+                  ContentType.success, Colors.greenAccent);
             } else if (state is RecipeError) {
               Navigator.of(context).pop(); // Close dialog
               showNotification(
                   context,
                   'Failed to save recipes: ${state.message}',
-                  ContentType.failure);
+                  ContentType.failure,
+                  Colors.redAccent);
             }
           },
           child: ElevatedButton(
@@ -215,9 +208,9 @@ void showSaveConfirmationDialog(BuildContext context) {
               foregroundColor: Colors.white,
             ),
             onPressed: () {
-              // Directly dispatch the event
+              Navigator.of(context).pop(); // Close dialog
               print('Attempting to save recipes');
-              context.read<RecipeBloc>().add(SaveRecipesEvent());
+              context.read<RecipeBloc>().add(SaveRecipesEvent(recipesToSave));
             },
             child: const Text('Save'),
           ),
@@ -227,7 +220,7 @@ void showSaveConfirmationDialog(BuildContext context) {
   );
 }
 
-void showCleanupOptions(BuildContext context) {
+void showCleanupOptions(BuildContext context, RecipeBloc recipeBloc) {
   showModalBottomSheet(
     context: context,
     builder: (BuildContext context) {
@@ -242,15 +235,16 @@ void showCleanupOptions(BuildContext context) {
               onTap: () {
                 Navigator.pop(context);
                 showCleanupConfirmationDialog(
-                    context,
-                    'Delete Generated Recipes',
-                    'Are you sure you want to delete all generated recipes?',
-                    () {
-                  context.read<RecipeBloc>().add(CleanupRecipesEvent(
-                        deleteGenerated: true,
-                        archiveOld: false,
-                      ));
-                });
+                  context,
+                  'Delete Generated Recipes',
+                  'Are you sure you want to delete all generated recipes?',
+                  () {
+                    recipeBloc.add(CleanupRecipesEvent(
+                      deleteGenerated: true,
+                      archiveOld: false,
+                    ));
+                  },
+                );
               },
             ),
             ListTile(
@@ -259,14 +253,18 @@ void showCleanupOptions(BuildContext context) {
               subtitle: const Text('Archive recipes older than 30 days'),
               onTap: () {
                 Navigator.pop(context);
-                showCleanupConfirmationDialog(context, 'Archive Old Recipes',
-                    'Archive recipes older than 30 days?', () {
-                  context.read<RecipeBloc>().add(CleanupRecipesEvent(
-                        deleteGenerated: false,
-                        archiveOld: true,
-                        daysOld: 30,
-                      ));
-                });
+                showCleanupConfirmationDialog(
+                  context,
+                  'Archive Old Recipes',
+                  'Archive recipes older than 30 days?',
+                  () {
+                    recipeBloc.add(CleanupRecipesEvent(
+                      deleteGenerated: false,
+                      archiveOld: true,
+                      daysOld: 30,
+                    ));
+                  },
+                );
               },
             ),
             ListTile(
@@ -275,14 +273,18 @@ void showCleanupOptions(BuildContext context) {
               subtitle: const Text('Delete generated and archive old recipes'),
               onTap: () {
                 Navigator.pop(context);
-                showCleanupConfirmationDialog(context, 'Complete Cleanup',
-                    'Perform a complete cleanup of recipes?', () {
-                  context.read<RecipeBloc>().add(CleanupRecipesEvent(
-                        deleteGenerated: true,
-                        archiveOld: true,
-                        daysOld: 30,
-                      ));
-                });
+                showCleanupConfirmationDialog(
+                  context,
+                  'Complete Cleanup',
+                  'Perform a complete cleanup of recipes?',
+                  () {
+                    recipeBloc.add(CleanupRecipesEvent(
+                      deleteGenerated: true,
+                      archiveOld: true,
+                      daysOld: 30,
+                    ));
+                  },
+                );
               },
             ),
           ],
@@ -317,3 +319,82 @@ void showCleanupConfirmationDialog(BuildContext context, String title,
     ),
   );
 }
+
+List<Recipe> getCurrentRecipes(BuildContext context) {
+  final recipeBloc = context.read<RecipeBloc>();
+  final state = recipeBloc.state;
+
+  if (state is RecipeLoaded) {
+    return state.recipes;
+  } else if (state is SavedRecipesLoaded) {
+    return state.savedRecipes;
+  } else if (state is RetrieveRecipesLoaded) {
+    state.savedRecipes;
+  }
+
+  // If no recipes are available, return an empty list
+  return recipeBloc.fetchedRecipes;
+}
+
+int safeParseInt(dynamic value) {
+  if (value == null) return 0;
+
+  if (value is int) return value;
+
+  if (value is double) return value.toInt();
+
+  if (value is String) {
+// Debugging line to check the string value
+    print('Parsing int from string: $value');
+    return int.tryParse(value.replaceAll(RegExp(r'[^\d-]'), '')) ?? 0;
+  }
+
+  print('Unexpected type for int: ${value.runtimeType}'); // Debugging line
+  return 0;
+}
+
+double safeParseDouble(dynamic value) {
+  if (value == null) return 0.0;
+
+  if (value is double) return value;
+
+  if (value is int) return value.toDouble();
+
+  if (value is String) {
+// Debugging line to check the string value
+    print('Parsing double from string: $value');
+    return double.tryParse(value.replaceAll(RegExp(r'[^\d.-]'), '')) ?? 0.0;
+  }
+
+  print('Unexpected type for double: ${value.runtimeType}'); // Debugging line
+  return 0.0;
+}
+
+List<String> parseSafeStringList(dynamic value) {
+  if (value == null) return [];
+
+// If it's already a list of strings, return it
+  if (value is List<String>) return value;
+
+// If it's a list of dynamic, convert to strings
+  if (value is List) {
+    return value.map((e) => e?.toString() ?? '').toList();
+  }
+
+// If it's a single string, wrap it in a list
+  if (value is String) return [value];
+
+// Default to empty list
+  return [];
+}
+String safeParseString(dynamic value, {String defaultValue = ''}) {
+if (value == null) return defaultValue;
+return value.toString().trim().isEmpty ? defaultValue : value.toString();
+}
+
+
+ String parseSafeString(dynamic value) {
+if (value == null) return 'N/A';
+return value.toString().trim().isEmpty ? 'N/A' : value.toString();
+}
+

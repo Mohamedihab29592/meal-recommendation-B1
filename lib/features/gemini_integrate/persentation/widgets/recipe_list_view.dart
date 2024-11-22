@@ -23,37 +23,46 @@ class RecipeListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    print('Current State: $state'); // Debug print
+
     if (state is RecipeLoading) {
       return const LoadingChatWidget();
-    } else if (state is RecipeLoaded || state is SavedRecipesLoaded) {
-      final List<Recipe> recipes = state is RecipeLoaded
-          ? (state as RecipeLoaded).recipes
-          : (state as SavedRecipesLoaded).savedRecipes;
+    }
 
-      if (recipes.isEmpty) {
-        return RecipeEmptyState(showSavedRecipes: showSavedRecipes);
-      }
+    // Extract recipes based on state
+    final List<Recipe> recipes = _extractRecipes(state);
 
-      return ListView.builder(
-        itemCount: recipes.length,
-        padding: const EdgeInsets.only(bottom: 16),
-        itemBuilder: (context, index) {
-          final recipe = recipes[index];
-          context.read<AddIngredientCubit>().checkIngredientsAdded(recipe);
-          return RecipeCard(
-            recipe: recipe,
-            isSaved: showSavedRecipes || state is SavedRecipesLoaded,
-          );
+    // Handle empty state
+    if (recipes.isEmpty) {
+      return RecipeEmptyState(showSavedRecipes: showSavedRecipes);
+    }
 
-        },
-      );
-    } else if (state is RecipeError) {
+    // Handle error state
+    if (state is RecipeError) {
       return RecipeErrorView(
-        errorMessage: (state as RecipeError).message,
+        errorMessage: (state as RecipeError).message ,
         onRetry: () => context.read<RecipeBloc>().add(LoadSavedRecipesEvent()),
       );
     }
 
-    return RecipeEmptyState(showSavedRecipes: showSavedRecipes);
+    // Display recipes
+    return ListView.builder(
+      itemCount: recipes.length,
+      padding: const EdgeInsets.only(bottom: 16),
+      itemBuilder: (context, index) {
+        final recipe = recipes[index];
+        return RecipeCard(
+          recipe: recipe,
+          isSaved: showSavedRecipes || state is RetrieveRecipesLoaded,
+        );
+      },
+    );
+  }
+
+  List<Recipe> _extractRecipes(RecipeState state) {
+    if (state is RecipeLoaded) return state.recipes;
+    if (state is SavedRecipesLoaded) return state.savedRecipes;
+    if (state is RetrieveRecipesLoaded) return state.savedRecipes;
+    return [];
   }
 }

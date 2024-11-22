@@ -4,6 +4,7 @@ import 'package:google_generative_ai/google_generative_ai.dart' as gemini;
 import '../../../core/networking/ServerException.dart';
 import '../../../core/services/GeminiApiService.dart';
 import '../../../core/services/RecipeApiService.dart';
+import '../../../core/utiles/helper.dart';
 import 'Recipe.dart';
 
 class RecipeRepository {
@@ -34,7 +35,7 @@ class RecipeRepository {
       final recipe = await _processRecipeData(query, geminiResponse, id: null);
 
       // Additional validation
-      if (recipe.name!.isEmpty) {
+      if (recipe.name.isEmpty) {
         throw ServerException(
             message: 'Invalid recipe: Missing name',
             statusCode: 400
@@ -43,24 +44,21 @@ class RecipeRepository {
 
       return [recipe];
     } on gemini.GenerativeAIException catch (e) {
-      // Handle Gemini-specific exceptions
+
       if (e.toString().contains('503') || e.toString().contains('UNAVAILABLE')) {
         throw ServerException(
             message: 'AI service is currently overloaded. Please try again later.',
             statusCode: 503
         );
       }
-
-      // For other Generative AI exceptions
       throw ServerException(
           message: 'Generative AI error: ${e.toString()}',
           statusCode: 500
       );
     } on ServerException {
-      // Re-throw local ServerException
       rethrow;
     } catch (e) {
-      // Catch-all for unexpected errors
+
       throw ServerException(
           message: 'Unexpected error fetching recipes: ${e.toString()}',
           statusCode: 500
@@ -117,7 +115,6 @@ class RecipeRepository {
         });
       } catch (e) {
         print('Ingredient Processing Error: $e');
-        // Continue processing other ingredients
       }
     }
 
@@ -131,11 +128,11 @@ class RecipeRepository {
       }
 
       return Nutrition(
-          calories: nutritionData['calories'] ?? 0,
-          protein: nutritionData['protein'] ?? 0,
-          carbs: nutritionData['carbs'] ?? 0,
-          fat: nutritionData['fat'] ?? 0,
-          vitamins: nutritionData['vitamins'] ?? ''
+        calories: safeParseInt(nutritionData['calories']),
+        protein: safeParseDouble(nutritionData['protein']),
+        carbs: safeParseDouble(nutritionData['carbs']),
+        fat: safeParseDouble(nutritionData['fat']),
+        vitamins: parseSafeStringList(nutritionData['vitamins']),
       ).toJson();
     } catch (e) {
       print('Nutrition Processing Error: $e');
@@ -150,9 +147,9 @@ class RecipeRepository {
       }
 
       return Directions(
-          firstStep: directionsData['firstStep'] ?? '',
-          secondStep: directionsData['secondStep'] ?? '',
-          additionalSteps: directionsData['additionalSteps'] ?? []
+        firstStep: parseSafeString(directionsData['firstStep']),
+        secondStep: parseSafeString(directionsData['secondStep']),
+        additionalSteps: parseSafeStringList(directionsData['additionalSteps']),
       ).toJson();
     } catch (e) {
       print('Directions Processing Error: $e');
@@ -162,6 +159,10 @@ class RecipeRepository {
 
   Future<void> saveRecipes(List<Recipe> recipes) async {
     try {
+      User? currentUser  = _auth.currentUser ;
+      if (currentUser  == null) {
+        throw Exception('User  must be signed in to save recipes');
+      }
       print('Repository: Attempting to save ${recipes.length} recipes');
 
       if (recipes.isEmpty) {
@@ -169,39 +170,57 @@ class RecipeRepository {
         throw Exception('No recipes to save');
       }
 
-      String userId;
-      if (_auth.currentUser == null) {
-        print('Repository: User not authenticated');
-        throw Exception('User not authenticated');
-      } else {
-        userId = _auth.currentUser!.uid;
-        print('Repository: User ID - $userId');
-      }
+      String userId = currentUser .uid; // Directly get userId from currentUser
+      print('Repository: User ID - $userId');
 
-      WriteBatch batch = _firestore.batch();
+      DocumentReference userDoc = _firestore.collection('users').doc(userId);
 
+      // Prepare the recipes to be added
+      List<Map<String, dynamic>> recipesToAdd = [];
       for (var recipe in recipes) {
         // Additional validation
-        if (recipe.id == null || recipe.name == null) {
+        if (recipe.id == null) {
           print('Repository: Skipping invalid recipe: ${recipe.name}');
           continue;
         }
 
-        DocumentReference recipeDoc = _firestore.collection('recipesGemini').doc();
-
-        batch.set(recipeDoc, {
+        // Convert recipe to JSON format
+        recipesToAdd.add({
           ...recipe.toJson(),
           'userId': userId,
-          'savedAt': FieldValue.serverTimestamp(),
-          'isGenerated': true
+          'isGenerated': true,
+          'isArchived': false,
         });
       }
 
-      print('Repository: Committing batch');
-      await batch.commit();
-      print('Repository: Batch committed successfully');
+      if (recipesToAdd.isNotEmpty) {
+        await userDoc.update({
+          'recipesGemini': FieldValue.arrayUnion(recipesToAdd),
+        });
+
+        for (var recipe in recipesToAdd) {
+          await userDoc.update({
+            'recipesGemini': FieldValue.arrayUnion([
+              {
+                ...recipe,
+                'savedAt': FieldValue.serverTimestamp(),
+              }
+            ]),
+          });
+        }
+
+        print('Repository: Recipes saved successfully');
+      } else {
+        print('Repository: No valid recipes to save');
+      }
     } on FirebaseException catch (e) {
       print('Repository: Firebase Save Recipes Error: ${e.code} - ${e.message}');
+
+      // More detailed error handling
+      if (e.code == 'permission-denied') {
+        throw Exception('You do not have permission to save recipes. Please check your authentication.');
+      }
+
       rethrow;
     } catch (e, stackTrace) {
       print('Repository: Save Recipes Error: $e');
@@ -212,62 +231,127 @@ class RecipeRepository {
 
   Future<List<Recipe>> fetchSavedRecipes() async {
     try {
-      String userId = _auth.currentUser!.uid;
+      User? currentUser  = _auth.currentUser ;
+      if (currentUser  == null) {
+        throw Exception('User  must be signed in to fetch recipes');
+      }
 
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('recipesGemini')
-          .where('userId', isEqualTo: userId)
-          .where('isArchived', isEqualTo: false)
-          .get();
+      String userId = currentUser .uid;
+      print('Fetching recipes for user ID: $userId');
 
-      return querySnapshot.docs.map((doc) {
-        return Recipe.fromJson(doc.data() as Map<String, dynamic>);
-      }).toList();
+      DocumentSnapshot userDoc = await _firestore.collection('users').doc(userId).get();
+
+      if (userDoc.exists) {
+        List<dynamic> recipesData = userDoc.get('recipesGemini') ?? [];
+        List<Recipe> recipes = recipesData.map((data) => Recipe.fromJson(data)).toList();
+        print('Fetched ${recipes.length} recipes');
+
+        List<Recipe> savedRecipes = recipes.where((recipe) => recipe.isArchived == false).toList();
+
+        return savedRecipes;
+      } else {
+        print('User  document does not exist');
+        return [];
+      }
+    } on FirebaseException catch (e) {
+      print('Error fetching user recipes: ${e.code} - ${e.message}');
+      rethrow;
     } catch (e) {
-      print('Fetch Saved Recipes Error: $e');
-      return [];
+      print('Error fetching user recipes: $e');
+      rethrow;
     }
   }
 
   Future<void> performCompleteCleanup({
     bool deleteGenerated = true,
     bool archiveOld = true,
-    int daysOld = 30
+    int daysOld = 30,
   }) async {
     try {
-      String userId = _auth.currentUser!.uid;
-      DateTime cutoffDate = DateTime.now().subtract(Duration(days: daysOld));
+      User? currentUser  = _auth.currentUser ;
+      if (currentUser  == null) {
+        print('Cleanup Error: No authenticated user');
+        throw Exception('User  must be authenticated to perform cleanup');
+      }
 
+      String userId = currentUser .uid;
+
+      if (daysOld <= 0) {
+        print('Invalid days old parameter: $daysOld');
+        return;
+      }
+
+      DocumentReference userDoc = _firestore.collection('users').doc(userId);
+      DocumentSnapshot userSnapshot = await userDoc.get();
+
+      if (!userSnapshot.exists) {
+        print('Cleanup Error: User document does not exist');
+        return;
+      }
+
+      // Access the recipesGemini array
+      List<dynamic> recipesGemini = userSnapshot.get('recipesGemini') ?? [];
       WriteBatch batch = _firestore.batch();
+      int batchOperationsCount = 0;
+      int maxBatchOperations = 500;
 
-      // Query for recipes to clean up
-      QuerySnapshot querySnapshot = await _firestore
-          .collection('recipesGemini')
-          .where('userId', isEqualTo: userId)
-          .where('generatedAt', isLessThan: cutoffDate.toIso8601String())
-          .get();
+      int deleteCount = 0;
+      int archiveCount = 0;
 
-      for (var doc in querySnapshot.docs) {
-        Map<String, dynamic> data = doc.data() as Map<String, dynamic>;
+      for (var recipe in recipesGemini) {
+        if (recipe is Map<String, dynamic>) {
 
-        if (deleteGenerated && data['isGenerated'] == true) {
-          // Completely delete generated recipes
-          batch.delete(doc.reference);
-        } else if (archiveOld) {
-          // Soft archive other old recipes
-          batch.update(doc.reference, {
-            'isArchived': true,
-            'archivedAt': FieldValue.serverTimestamp()
-          });
+          try {
+            if (deleteGenerated && (recipe['isGenerated'] == true)) {
+              batch.update(userDoc, {
+                'recipesGemini': FieldValue.arrayRemove([recipe]),
+              });
+              deleteCount++;
+            } else if (archiveOld) {
+              Map<String, dynamic> updatedRecipe = {
+                ...recipe,
+                'isArchived': true,
+              };
+
+              // Remove the old recipe and add the updated one
+              batch.update(userDoc, {
+                'recipesGemini': FieldValue.arrayRemove([recipe]),
+              });
+              batch.update(userDoc, {
+                'recipesGemini': FieldValue.arrayUnion([updatedRecipe]),
+              });
+              archiveCount++;
+            }
+
+            batchOperationsCount++;
+
+            // Commit batch when it reaches max operations
+            if (batchOperationsCount >= maxBatchOperations) {
+              await batch.commit();
+              batch = _firestore.batch();
+              batchOperationsCount = 0;
+            }
+          } catch (e) {
+            print('Error processing individual recipe during cleanup: $e');
+          }
         }
       }
 
-      await batch.commit();
+      if (batchOperationsCount > 0) {
+        await batch.commit();
+      }
+
+      print('Cleanup complete: Deleted $deleteCount, Archived $archiveCount recipes');
+    } on FirebaseException catch (e) {
+      print('Firebase Cleanup Error: ${e.code} - ${e.message}');
+      rethrow;
     } catch (e) {
       print('Comprehensive Cleanup Error: $e');
       rethrow;
     }
   }
+
+
 
 }
 

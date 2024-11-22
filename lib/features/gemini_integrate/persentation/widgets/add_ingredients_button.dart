@@ -33,6 +33,9 @@ class AddIngredientsButtonState extends State<AddIngredientsButton> {
   Future<void> _checkIngredientsAdded() async {
     try {
       final isAdded = await context.read<AddIngredientCubit>().checkIngredientsAdded(widget.recipe);
+      print("VALUEE  $isAdded+");
+      print("REcipe  ${widget.recipe}+");
+
       if (mounted) {
         setState(() {
           _isAlreadyAdded = isAdded;

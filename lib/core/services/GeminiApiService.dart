@@ -37,7 +37,7 @@ Provide a recipe for "$dishName" in JSON format with this structure:
     "vitamins": ["List of vitamins"]
   },
   "directions": {
-    "firstStep": "First step description",
+    "firstStep": "First step To make it description",
     "secondStep": "Second step description",
     "additionalSteps": ["Additional steps"]
   }

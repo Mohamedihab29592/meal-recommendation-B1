@@ -1,61 +1,22 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:meal_recommendation_b1/core/components/custom_button.dart';
-import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
-import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
-import 'package:meal_recommendation_b1/core/components/custom_text_field.dart';
-import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
-import 'package:meal_recommendation_b1/core/utiles/assets.dart';
-import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
+import '../../../../../../core/components/custom_button.dart';
+import '../../../../../../core/components/custom_text_field.dart';
 import '../../../../../../core/components/dynamic_notification_widget.dart';
+import '../../../../../../core/components/loading_dialog.dart';
+import '../../../../../../core/routes/app_routes.dart';
+import '../../../../../../core/utiles/app_colors.dart';
+import '../../../../../../core/utiles/assets.dart';
+import '../../../../../../core/utiles/secure_storage_helper.dart';
 import '../../../data/data_source/local/secure_local_data.dart';
 import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_event.dart';
 import '../../bloc/auth_state.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends StatelessWidget {
   const LoginScreen({super.key});
 
-  @override
-  State<LoginScreen> createState() => _LoginScreenState();
-}
-
-class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _rememberMe = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _loadSavedUserData();
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    super.dispose();
-  }
-
-  Future<void> _loadSavedUserData() async {
-    final userData = await SecureStorageLoginHelper.loadUserData();
-      _rememberMe = userData['rememberMe'] == 'true';
-      _emailController.text = userData['email'] ?? '';
-      _passwordController.text = userData['password'] ?? '';
-  }
-
-  Future<void> _saveUserData() async {
-    await SecureStorageLoginHelper.saveUserData(
-      rememberMe: _rememberMe,
-      email: _emailController.text,
-      password: _passwordController.text,
-    );
-  }
-
-// login --> email , password --> remember me ()
-//  we have user enitity inside it we have uid after login operation
   @override
   Widget build(BuildContext context) {
     final mediaQuery = MediaQuery.of(context);
@@ -68,20 +29,10 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) async {
           if (state is Authenticated) {
-            // Navigate to the home screen on successful login
             await SecureStorageHelper.setSecuredString('uid', state.user.uid!);
-
             Navigator.pushReplacementNamed(context, AppRoutes.navBar);
-
           } else if (state is AuthError) {
-            DynamicNotificationWidget.showNotification(
-              context: context,
-              title: 'Oh Hey!!',
-              message: state.message,
-              color: Colors.green, // You can use this color if needed
-              contentType: ContentType.failure,
-              inMaterialBanner: false,
-            );
+            _showErrorNotification(context, state.message);
           }
         },
         builder: (context, state) {
@@ -89,151 +40,347 @@ class _LoginScreenState extends State<LoginScreen> {
             return const LoadingDialog();
           }
 
-          return Stack(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Image.asset(Assets.authLayoutFoodImage),
-              ),
-              Center(
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: isMobile ? 20 : screenWidth * 0.1,
-                    vertical: isMobile ? 40 : screenHeight * 0.1,
-                  ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Image.asset(Assets.icSplash),
-                        SizedBox(height: screenHeight * 0.05),
-                        CustomTextField(
-                          hintText: 'User Name',
-                          prefixIcon: Assets.icAccount,
-                          inputType: TextInputType.emailAddress,
-                          controller: _emailController,
-                          validator: (String? value) {},
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        CustomTextField(
-                          hintText: 'Password',
-                          prefixIcon: Assets.icLock,
-                          inputType: TextInputType.text,
-                          controller: _passwordController,
-                          isPassword: true,
-                          validator: (String? value) {},
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _rememberMe,
-                              onChanged: (value) {
-                                setState(() {
-                                  _rememberMe = value!;
-                                });
-                                _saveUserData();
-                              },
-                              activeColor: Colors.grey,
-                              side: const BorderSide(color: AppColors.white),
-                              checkColor: Colors.white,
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                setState(() {
-                                  _rememberMe = !_rememberMe;
-                                });
-                                _saveUserData();
-                              },
-                              child: const Text(
-                                'Remember me and keep me logged in',
-                                style: TextStyle(
-                                  color: AppColors.white,
-                                  fontSize: 13,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight * 0.03),
-                        CustomButton(
-                          text: 'Login',
-                          onPressed: () {
-                            final email = _emailController.text;
-                            final password = _passwordController.text;
-                            BlocProvider.of<AuthBloc>(context).add(
-                              LoginWithEmailEvent(email, password),
-                            );
-                            _saveUserData();
-                            Navigator.of(context)
-                                .pushReplacementNamed(AppRoutes.navBar);
-
-                          },
-                        ),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(vertical: 16.0),
-                          child: Row(
-                            children: [
-                              Expanded(child: Divider(color: Colors.white)),
-                              Padding(
-                                padding: EdgeInsets.symmetric(horizontal: 8.0),
-                                child: Text(
-                                  'or login with',
-                                  style: TextStyle(color: Colors.white),
-                                ),
-                              ),
-                              Expanded(child: Divider(color: Colors.white)),
-                            ],
-                          ),
-                        ),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            FloatingActionButton(
-                              onPressed: () {
-                                // Handle Google login
-                                BlocProvider.of<AuthBloc>(context)
-                                    .add(LoginWithGoogleEvent());
-                              },
-                              backgroundColor: AppColors.white,
-                              shape: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Image.asset(
-                                Assets.icGoogle,
-                                scale: 5,
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Text(
-                              'Don\'t have an account?',
-                              style: TextStyle(color: AppColors.white),
-                            ),
-                            TextButton(
-                              onPressed: () {
-                                Navigator.pushNamed(
-                                    context, AppRoutes.register);
-                              },
-                              child: const Text(
-                                'Register now',
-                                style: TextStyle(color: AppColors.white),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          );
+          return _buildLoginContent(
+              context, screenWidth, screenHeight, isMobile);
         },
+      ),
+    );
+  }
+
+  Widget _buildLoginContent(BuildContext context, double screenWidth,
+      double screenHeight, bool isMobile) {
+    final emailController = TextEditingController();
+    final passwordController = TextEditingController();
+
+    // Load saved user data
+    _loadSavedUserData(emailController, passwordController);
+
+    return Stack(
+      children: [
+        // Background Image
+        Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: Image.asset(Assets.authLayoutFoodImage),
+        ),
+
+        // Login Content
+        Center(
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: isMobile ? 20 : screenWidth * 0.1,
+              vertical: isMobile ? 40 : screenHeight * 0.1,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // App Logo
+                  Image.asset(Assets.icSplash),
+                  SizedBox(height: screenHeight * 0.05),
+
+                  _buildEmailTextField(emailController, screenHeight),
+
+                  _buildPasswordTextField(passwordController, screenHeight),
+
+                  RememberMeWidget(
+                      emailController: emailController,
+                      passwordController: passwordController
+                  ),
+
+                  SizedBox(height: screenHeight * 0.03),
+
+                  _buildLoginButton(
+                      context, emailController, passwordController),
+
+                  const LoginDividerWidget(),
+
+                  const GoogleLoginButton(),
+
+                  SizedBox(height: screenHeight * 0.02),
+
+                  // Register Option
+                  const RegisterOptionWidget(),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmailTextField(TextEditingController emailController,
+      double screenHeight) {
+    return Column(
+      children: [
+        CustomTextField(
+          hintText: 'User Name',
+          prefixIcon: Assets.icAccount,
+          inputType: TextInputType.emailAddress,
+          controller: emailController,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your email';
+            }
+            if (!_isValidEmail(value)) {
+              return 'Please enter a valid email';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: screenHeight * 0.02),
+      ],
+    );
+  }
+
+  Widget _buildPasswordTextField(TextEditingController passwordController,
+      double screenHeight) {
+    return Column(
+      children: [
+        CustomTextField(
+          hintText: 'Password',
+          prefixIcon: Assets.icLock,
+          inputType: TextInputType.text,
+          controller: passwordController,
+          isPassword: true,
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Please enter your password';
+            }
+            if (value.length < 6) {
+              return 'Password must be at least 6 characters';
+            }
+            return null;
+          },
+        ),
+        SizedBox(height: screenHeight * 0.02),
+      ],
+    );
+  }
+
+  // Build Login Button
+  Widget _buildLoginButton(BuildContext context,
+      TextEditingController emailController,
+      TextEditingController passwordController) {
+    return CustomButton(
+      text: 'Login',
+      onPressed: () =>
+          _performLogin(context, emailController, passwordController),
+    );
+  }
+
+  // Perform Login
+  void _performLogin(BuildContext context,
+      TextEditingController emailController,
+      TextEditingController passwordController) {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    // Validate inputs
+    if (_validateInputs(context, email, password)) {
+      // Attempt login
+      BlocProvider.of<AuthBloc>(context).add(
+        LoginWithEmailEvent(email, password),
+      );
+    }
+  }
+
+  // Validate Login Inputs
+  bool _validateInputs(BuildContext context, String email, String password) {
+    if (email.isEmpty) {
+      _showErrorNotification(context, 'Please enter your email');
+      return false;
+    }
+
+    if (!_isValidEmail(email)) {
+      _showErrorNotification(context, 'Please enter a valid email');
+      return false;
+    }
+
+    if (password.isEmpty) {
+      _showErrorNotification(context, 'Please enter your password');
+      return false;
+    }
+
+    if (password.length < 6) {
+      _showErrorNotification(context, 'Password must be at least 6 characters');
+      return false;
+    }
+
+    return true;
+  }
+
+  // Email Validation
+  bool _isValidEmail(String email) {
+    final emailRegex = RegExp(r'^[^@]+@[^@]+\.[^@]+');
+    return emailRegex.hasMatch(email);
+  }
+
+  // Load Saved User Data
+  Future<void> _loadSavedUserData(TextEditingController emailController,
+      TextEditingController passwordController) async {
+    try {
+      final userData = await SecureStorageLoginHelper.loadUserData();
+      emailController.text = userData['email'] ?? '';
+      passwordController.text = userData['password'] ?? '';
+    } catch (e) {
+      // Handle any potential errors in loading saved data
+      print('Error loading saved user data: $e');
+    }
+  }
+
+  // Show Error Notification
+  void _showErrorNotification(BuildContext context, String message) {
+    DynamicNotificationWidget.showNotification(
+      context: context,
+      title: 'Oh Hey!!',
+      message: message,
+      color: Colors.red,
+      contentType: ContentType.failure,
+      inMaterialBanner: false,
+    );
+  }
+}
+class RememberMeWidget extends StatelessWidget {
+  final TextEditingController emailController;
+  final TextEditingController passwordController;
+
+  const RememberMeWidget({
+    super.key,
+    required this.emailController,
+    required this.passwordController,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final ValueNotifier<bool> rememberMeNotifier = ValueNotifier(false);
+
+    return Row(
+      children: [
+        ValueListenableBuilder<bool>(
+          valueListenable: rememberMeNotifier,
+          builder: (context, rememberMe, child) {
+            return Checkbox(
+              value: rememberMe,
+              onChanged: (value) {
+                rememberMeNotifier.value = value!;
+                _saveUserData(
+                  rememberMe: value,
+                  email: emailController.text,
+                  password: passwordController.text,
+                );
+              },
+              activeColor: Colors.grey,
+              side: const BorderSide(color: AppColors.white),
+              checkColor: Colors.white,
+            );
+          },
+        ),
+        GestureDetector(
+          onTap: () {
+            rememberMeNotifier.value = !rememberMeNotifier.value;
+            _saveUserData(
+              rememberMe: rememberMeNotifier.value,
+              email: emailController.text,
+              password: passwordController.text,
+            );
+          },
+          child: const Text(
+            'Remember me and keep me logged in',
+            style: TextStyle(
+              color: AppColors.white,
+              fontSize: 13,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Future<void> _saveUserData({
+    required bool rememberMe,
+    required String email,
+    required String password,
+  }) async {
+    await SecureStorageLoginHelper.saveUserData(
+      rememberMe: rememberMe,
+      email: email,
+      password: password,
+    );
+  }
+}
+
+class GoogleLoginButton extends StatelessWidget {
+  const GoogleLoginButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        FloatingActionButton(
+          onPressed: () {
+            BlocProvider.of<AuthBloc>(context).add(LoginWithGoogleEvent());
+          },
+          backgroundColor: AppColors.white,
+          shape: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(30),
+          ),
+          child: Image.asset(
+            Assets.icGoogle,
+            scale: 5,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class RegisterOptionWidget extends StatelessWidget {
+  const RegisterOptionWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const Text(
+          'Don\'t have an account?',
+          style: TextStyle(color: AppColors.white),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.pushNamed(context, AppRoutes.register);
+          },
+          child: const Text(
+            'Register now',
+            style: TextStyle(color: AppColors.white),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class LoginDividerWidget extends StatelessWidget {
+  const LoginDividerWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Padding(
+      padding: EdgeInsets.symmetric(vertical: 16.0),
+      child: Row(
+        children: [
+          Expanded(child: Divider(color: Colors.white)),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 8.0),
+            child: Text(
+              'or login with',
+              style: TextStyle(color: Colors.white),
+            ),
+          ),
+          Expanded(child: Divider(color: Colors.white)),
+        ],
       ),
     );
   }

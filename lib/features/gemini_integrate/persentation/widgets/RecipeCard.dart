@@ -70,8 +70,8 @@ class RecipeCard extends StatelessWidget {
         context: context,
         title: 'Oh Hey!!',
         message: "You Must Save it To Show Details!",
-        color: Colors.red,
-        contentType: ContentType.failure,
+        color: Colors.blueAccent,
+        contentType: ContentType.help,
         inMaterialBanner: false,
       );
     } else {

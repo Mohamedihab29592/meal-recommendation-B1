@@ -1,9 +1,11 @@
-import 'package:meal_recommendation_b1/features/gemini_integrate/data/RecipeRepository.dart';
+
+import '../../../core/utiles/helper.dart';
 
 class Recipe {
   String? id;
   String? generatedAt;
   bool isGenerated;
+  bool isArchived;
   String? sourceQuery;
   final String name;
   final String summary;
@@ -18,6 +20,7 @@ class Recipe {
     this.id,
     this.generatedAt,
     this.isGenerated = false,
+    this.isArchived = false,
     this.sourceQuery,
     required this.name,
     required this.summary,
@@ -46,6 +49,7 @@ class Recipe {
         time: _safeParseString(json['time'], defaultValue: 'N/A'),
         generatedAt: _safeParseString(json['generatedAt']),
         isGenerated: _safeParseBoolean(json['isGenerated']),
+        isArchived: _safeParseBoolean(json['isArchived']),
         sourceQuery: _safeParseString(json['sourceQuery']),
         imageUrl: _safeParseString(json['imageUrl'], defaultValue: ''),
 
@@ -125,6 +129,7 @@ class Recipe {
       'imageUrl': imageUrl,
       'generatedAt': generatedAt,
       'isGenerated': isGenerated,
+      'isArchived':isArchived,
       'sourceQuery': sourceQuery,
       'ingredients':
           ingredients.map((ingredient) => ingredient.toJson()).toList(),
@@ -174,21 +179,15 @@ class Ingredient {
       print('Parsing Ingredient JSON: $json');
 
       return Ingredient(
-        name: _safeParseString(json['name'], defaultValue: 'Unknown Ingredient'),
-        quantity: _safeParseString(json['quantity'], defaultValue: 'N/A'),
-        unit: _safeParseString(json['unit'], defaultValue: 'N/A'),
-        imageUrl: _safeParseString(json['imageUrl'], defaultValue: ''),
+        name: safeParseString(json['name'], defaultValue: 'Unknown Ingredient'),
+        quantity: safeParseString(json['quantity'], defaultValue: 'N/A'),
+        unit: safeParseString(json['unit'], defaultValue: 'N/A'),
+        imageUrl: safeParseString(json['imageUrl'], defaultValue: ''),
       );
     } catch (e) {
       print('Error parsing Ingredient: $e');
       throw ArgumentError('Failed to parse Ingredient: $e');
     }
-  }
-
-  // Safe string parsing method (same as in Recipe)
-  static String _safeParseString(dynamic value, {String defaultValue = ''}) {
-    if (value == null) return defaultValue;
-    return value.toString().trim().isEmpty ? defaultValue : value.toString();
   }
 
   Map<String, dynamic> toJson() {
@@ -223,14 +222,16 @@ class Nutrition {
 
   // Factory constructor to parse JSON data
   factory Nutrition.fromJson(Map<String, dynamic> json) {
+    print('Parsing JSON: $json'); // Debugging line
     return Nutrition(
-      calories: _safeParseInt(json['calories']),
-      protein: _safeParseDouble(json['protein']),
-      carbs: _safeParseDouble(json['carbs']),
-      fat: _safeParseDouble(json['fat']),
-      vitamins: List<String>.from(json['vitamins'] ?? []),
+      calories: safeParseInt(json['calories']),
+      protein: safeParseDouble(json['protein']),
+      carbs: safeParseDouble(json['carbs']),
+      fat: safeParseDouble(json['fat']),
+      vitamins: parseSafeStringList(json['vitamins']),
     );
   }
+
 
   Map<String, dynamic> toJson() {
     return {
@@ -242,7 +243,6 @@ class Nutrition {
     };
   }
 
-  // Provide default values if data is missing
   factory Nutrition.defaultValues() {
     return Nutrition(
       calories: 0,
@@ -251,35 +251,6 @@ class Nutrition {
       fat: 0.0,
       vitamins: [],
     );
-  }
-
-  // Enhanced parsing methods
-  static int _safeParseInt(dynamic value) {
-    if (value == null) return 0;
-
-    if (value is int) return value;
-
-    if (value is double) return value.toInt();
-
-    if (value is String) {
-      return int.tryParse(value) ?? 0;
-    }
-
-    return 0;
-  }
-
-  static double _safeParseDouble(dynamic value) {
-    if (value == null) return 0.0;
-
-    if (value is double) return value;
-
-    if (value is int) return value.toDouble();
-
-    if (value is String) {
-      return double.tryParse(value) ?? 0.0;
-    }
-
-    return 0.0;
   }
 
   @override
@@ -302,19 +273,20 @@ class Directions {
   // Factory constructor to parse JSON data
   factory Directions.fromJson(Map<String, dynamic> json) {
     return Directions(
-      firstStep: json['firstStep'] ?? 'No first step provided',
-      secondStep: json['secondStep'] ?? 'No second step provided',
-      additionalSteps: List<String>.from(json['additionalSteps'] ?? []),
+      firstStep: parseSafeString(json['firstStep']),
+      secondStep: parseSafeString(json['secondStep']),
+      additionalSteps: parseSafeStringList(json['additionalSteps']),
     );
   }
+
   Map<String, dynamic> toJson() {
     return {
-      'firstStep': firstStep  ,
+      'firstStep': firstStep,
       'secondStep': secondStep,
       'additionalSteps': additionalSteps,
     };
   }
-  // Provide default values if data is missing
+
   factory Directions.defaultValues() {
     return Directions(
       firstStep: 'N/A',

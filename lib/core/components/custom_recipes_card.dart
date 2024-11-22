@@ -30,7 +30,7 @@ class CustomRecipesCard extends StatelessWidget {
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
         // Call your existing delete dialog method
-        _showDeleteDialog( context,mealId);
+        _showDeleteDialog( context,mealId,context.read<HomeCubit>());
         return false; // Prevent automatic dismissal
       },
       background: Container(
@@ -141,12 +141,12 @@ class CustomRecipesCard extends StatelessWidget {
   }
 }
 
-void _showDeleteDialog(BuildContext context, String mealId) {
+void _showDeleteDialog(BuildContext context, String mealId, HomeCubit homeCubit) {
   showDeleteDialog(
     context: context,
     mealId: mealId,
     onSuccess: () {
-      BlocProvider.of<HomeCubit>(context).getdata();
+      homeCubit.getdata();
     },
   );
 }

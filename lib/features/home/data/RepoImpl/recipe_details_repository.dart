@@ -11,10 +11,10 @@ class RecipeDetailsRepository {
   Future<Recipe> getRecipeDetails(String recipeId) async {
     try {
       // Get current user ID
-      String? userId = _auth.currentUser?.uid;
+      String? userId = _auth.currentUser ?.uid;
 
       if (userId == null) {
-        throw AuthenticationException('User not authenticated');
+        throw AuthenticationException('User  not authenticated');
       }
 
       // Reference to the user document
@@ -25,21 +25,27 @@ class RecipeDetailsRepository {
 
       // Check if user document exists
       if (!userDoc.exists) {
-        throw DataNotFoundException('User document not found');
+        throw DataNotFoundException('User  document not found');
       }
 
-      // Get the recipes field
+      // Get the recipes fields
       Map<String, dynamic> userData = userDoc.data() as Map<String, dynamic>;
+      List<dynamic> recipesGemini = userData['recipesGemini'] ?? [];
       List<dynamic> recipes = userData['recipes'] ?? [];
 
-      // Find the specific recipe
-      Map<String, dynamic>? recipeData = recipes.firstWhere(
+      // Find the specific recipe in recipesGemini
+      Map<String, dynamic>? recipeData = recipesGemini.firstWhere(
             (recipe) => recipe['id'] == recipeId,
         orElse: () => null,
       );
 
+      recipeData ??= recipes.firstWhere(
+              (recipe) => recipe['id'] == recipeId,
+          orElse: () => null,
+        );
+
       if (recipeData == null) {
-        throw DataNotFoundException('Recipe not found');
+        throw DataNotFoundException('Recipe not found in both fields');
       }
 
       // Convert the recipe data to a Recipe object
