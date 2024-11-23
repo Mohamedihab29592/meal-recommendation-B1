@@ -33,7 +33,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     CustomAppbar(
                       leftPadding: 0,
                       rightPadding: 0,
-                      ontapleft: () {},
+                      ontapleft: () {
+                        Scaffold.of(context).openDrawer();
+                      },
                       ontapright: () {
                         context.pushNamed(AppRoutes.geminiRecipe);
                       },
