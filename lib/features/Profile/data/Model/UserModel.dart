@@ -1,10 +1,9 @@
 import 'package:hive/hive.dart';
-import 'package:meal_recommendation_b1/features/auth/login/domain/entity/user_entity.dart';
 import '../../domain/entity/entity.dart';
 
 part 'UserModel.g.dart'; // Make sure this matches the exact file name
 
-@HiveType(typeId: 32)
+@HiveType(typeId: 0)
 class UserModel extends User {
   @HiveField(0)
   final String id;

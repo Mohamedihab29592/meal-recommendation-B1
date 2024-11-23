@@ -36,8 +36,6 @@ import '../../features/auth/register/domain/use_cases/register_with_email_use_ca
 import '../../features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
 import '../../features/auth/register/persentation/bloc/register_bloc.dart';
 import '../../features/favorites/data/models/favorites.dart';
-import '../../features/favorites/data/repository_impl/favorites_repository_impl.dart';
-import '../../features/favorites/domain/repository/favorites_repository.dart';
 import '../../features/favorites/domain/usecases/delete_favorite_use_case.dart';
 import '../../features/favorites/domain/usecases/get_all_favorites_use_case.dart';
 import '../../features/favorites/domain/usecases/save_favorite_use_case.dart';
@@ -58,7 +56,7 @@ Future<void> setup() async {
   const pexelsApiKey =
       "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
 
-  if (!Hive.isAdapterRegistered(32)) {
+  if (!Hive.isAdapterRegistered(0)) {
     Hive.registerAdapter(UserModelAdapter());
   }
   Box<UserModel> userBox = await Hive.openBox<UserModel>('userBox');

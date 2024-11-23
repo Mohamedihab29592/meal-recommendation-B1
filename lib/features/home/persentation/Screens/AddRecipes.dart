@@ -226,7 +226,6 @@ class AddRecipesState extends State<AddRecipes> {
                 // Meal Details
               CustomTextField(
                 key:  ValueKey(typeMeal),
-                validator: (value) => null, // Provide actual validation if needed
                 hintText: 'Type Of Meal',
                 inputType: TextInputType.text,
                 controller: typeMeal,
@@ -238,7 +237,6 @@ class AddRecipesState extends State<AddRecipes> {
               ),
                 const SizedBox(height: 15),
                 CustomTextField(
-                  validator: (value) => null,
                   hintText: 'Meal Name',
                   inputType: TextInputType.text,
                   controller: mealName,
@@ -246,7 +244,6 @@ class AddRecipesState extends State<AddRecipes> {
                 ),
                 const SizedBox(height: 15),
                 CustomTextField(
-                  validator: (value) => null,
                   hintText: 'Number of Ingredients',
                   inputType: TextInputType.text,
                   controller: numberOfIngredients,
@@ -254,7 +251,6 @@ class AddRecipesState extends State<AddRecipes> {
                 ),
                 const SizedBox(height: 15),
                 CustomTextField(
-                  validator: (value) => null,
                   hintText: 'Time',
                   inputType: TextInputType.text,
                   controller: time,
@@ -277,16 +273,19 @@ class AddRecipesState extends State<AddRecipes> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    CustomContainerWithTextfield(
-                        hintText: "Protein", controller: protein),
-                    CustomContainerWithTextfield(
-                        hintText: "Carb", controller: carb),
-                    CustomContainerWithTextfield(
-                        hintText: "Fat", controller: fat),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      CustomContainerWithTextfield(
+                          hintText: "Protein", controller: protein),
+                      CustomContainerWithTextfield(
+                          hintText: "Carb", controller: carb),
+                      CustomContainerWithTextfield(
+                          hintText: "Fat", controller: fat),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Row(
