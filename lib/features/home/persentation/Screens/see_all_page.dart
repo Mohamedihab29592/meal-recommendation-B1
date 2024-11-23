@@ -107,9 +107,9 @@ class SeeAllScreen extends StatelessWidget {
                       );
                     }
 
-                    if (state is SuccessState) {
+                    if (state is HomeLoaded) {
                       // Check if data is empty
-                      if (state.data.isEmpty) {
+                      if (state.homeRecipes.isEmpty) {
                         return SliverFillRemaining(
                           child: Center(
                             child: Column(
@@ -152,11 +152,11 @@ class SeeAllScreen extends StatelessWidget {
                               padding: EdgeInsets.symmetric(
                                 horizontal: screenSize.width * 0.025,
                               ),
-                              itemCount: state.data.length,
+                              itemCount: state.homeRecipes.length,
                               separatorBuilder: (context, index) =>
                                   SizedBox(width: screenSize.width * 0.02),
                               itemBuilder: (context, index) {
-                                final recipe = state.data[index];
+                                final recipe = state.homeRecipes[index];
                                 return TrendingRecipeCard(
                                   recipeId: recipe.id ?? "",
                                   duration: "${recipe.time} min",
@@ -173,9 +173,9 @@ class SeeAllScreen extends StatelessWidget {
                           ListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
-                            itemCount: state.data.length,
+                            itemCount: state.homeRecipes.length,
                             itemBuilder: (context, index) {
-                              final recipe = state.data[index];
+                              final recipe = state.homeRecipes[index];
                               return Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: screenSize.width * 0.025,

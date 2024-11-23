@@ -45,10 +45,10 @@ class SearchCards extends SearchDelegate {
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    if (homeState is SuccessState) {
-      final successState = homeState as SuccessState;
+    if (homeState is HomeLoaded) {
+      final successState = homeState as HomeLoaded;
 
-      if (successState.data.isEmpty) {
+      if (successState.homeRecipes.isEmpty) {
         return EmptyStateWidget(
           image: Assets.noFoodFound,
           title: "No Recipes Found",
@@ -58,7 +58,7 @@ class SearchCards extends SearchDelegate {
           },
         );
       }
-      List<Recipe> filteredRecipeCard = successState.data
+      List<Recipe> filteredRecipeCard = successState.homeRecipes
           .where((element) => element.name.startsWith(query))
           .toList();
       return ListView(

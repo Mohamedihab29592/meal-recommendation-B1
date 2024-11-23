@@ -1,4 +1,3 @@
-// State classes
 import '../../../../Profile/data/Model/UserModel.dart';
 
 abstract class NavBarState {}
@@ -9,11 +8,13 @@ class NavBarChanged extends NavBarState {
   final int index;
   NavBarChanged(this.index);
 }
+
 class UserLoading extends NavBarState {}
 
 class UserLoaded extends NavBarState {
   final UserModel user;
-  UserLoaded(this.user);
+  final int currentIndex; // Include current index for consistency
+  UserLoaded(this.user, this.currentIndex);
 }
 
 class UserFetchError extends NavBarState {

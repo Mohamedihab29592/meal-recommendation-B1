@@ -14,22 +14,26 @@ class RecipeEmptyState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Image.asset(Assets.noFoodFound),
-          const SizedBox(height: 16),
-          Text(
-            showSavedRecipes
-                ? 'No saved recipes found'
-                : 'Search for recipes or generate new ones',
-            style: Theme
-                .of(context)
-                .textTheme
-                .titleMedium,
-            textAlign: TextAlign.center,
+      child: Expanded(
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset(Assets.noFoodFound),
+              const SizedBox(height: 16),
+              Text(
+                showSavedRecipes
+                    ? 'No saved recipes found'
+                    : 'Search for recipes or generate new ones',
+                style: Theme
+                    .of(context)
+                    .textTheme
+                    .titleMedium,
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }

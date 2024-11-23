@@ -27,10 +27,10 @@ class RecipesList extends StatelessWidget {
       );
     }
 
-    if (state is SuccessState || state is FavoriteRecipesState) {
-      final successState = state as SuccessState;
+    if (state is HomeLoaded ) {
+      final successState = state as HomeLoaded;
 
-      if (successState.data.isEmpty) {
+      if (successState.homeRecipes.isEmpty) {
         return EmptyStateWidget(
           image: Assets.noFoodFound,
           title: "No Recipes Found",
@@ -44,9 +44,9 @@ class RecipesList extends StatelessWidget {
       return ListView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        itemCount: successState.data.length,
+        itemCount: successState.homeRecipes.length,
         itemBuilder: (context, index) {
-          var recipe = successState.data[index];
+          var recipe = successState.homeRecipes[index];
 
           // Add debug prints
           print('Recipe at index $index: ${recipe.id}');
@@ -70,7 +70,7 @@ class RecipesList extends StatelessWidget {
             },
           );
         },
-      );;
+      );
     }
 
     if (state is FailureState) {

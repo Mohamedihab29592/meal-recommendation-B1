@@ -33,10 +33,8 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
       print('Failed to load initial saved recipes: $e');
     }
   }
-
   Future<void> _onFetchRecipes(
       FetchRecipesEvent event, Emitter<RecipeState> emit) async {
-    // Extensive logging for fetch process
     print('Fetching recipes for query: ${event.query}');
 
     if (event.query.trim().isEmpty) {
@@ -48,6 +46,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
     emit(RecipeLoading());
 
     try {
+      // Fetch new recipes from the repository
       final newRecipes = await recipeRepository.fetchRecipes(event.query);
 
       print('Raw fetched recipes count: ${newRecipes.length}');
@@ -60,21 +59,24 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
         return;
       }
 
+      // Validate the fetched recipes
       final validRecipes = _validateRecipes(newRecipes);
 
       print('Valid recipes count after validation: ${validRecipes.length}');
 
-      // Detailed logging of recipe details
+      // Log details of valid recipes
       for (var recipe in validRecipes) {
-        print('Fetched Recipe: ${recipe.name}, Ingredients: ${recipe.ingredients.length}');
+        print(
+            'Fetched Recipe: ${recipe.name}, Ingredients: ${recipe.ingredients.length}');
       }
 
-      // Replace instead of adding to maintain state consistency
-      _fetchedRecipes = validRecipes;
+      // Append valid recipes to the existing list
+      _fetchedRecipes.addAll(validRecipes);
 
-      print('_fetchedRecipes after assignment: ${_fetchedRecipes.length}');
+      print('_fetchedRecipes after appending: ${_fetchedRecipes.length}');
 
-      emit(RecipeLoaded(_fetchedRecipes));
+      // Emit the updated list of recipes
+      emit(RecipeLoaded(List.from(_fetchedRecipes)));
     } on ServerException catch (e) {
       print('Server Exception during fetch: ${e.message}');
       emit(RecipeError(e.message, true));

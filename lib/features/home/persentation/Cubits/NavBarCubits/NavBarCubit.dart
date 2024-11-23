@@ -7,7 +7,8 @@ import '../../../../Profile/data/Model/UserModel.dart';
 import 'NavBarState.dart';
 
 class NavBarCubit extends Cubit<NavBarState> {
-  int _currentIndex = 0;
+  int _currentIndex = 0; // Keep track of the current navigation index
+  UserModel? _currentUser; // Store the current user
 
   NavBarCubit() : super(NavBarInitial());
 
@@ -16,10 +17,15 @@ class NavBarCubit extends Cubit<NavBarState> {
   void moveChange(int index) {
     if (index != _currentIndex) {
       _currentIndex = index;
-      emit(NavBarChanged(index));
+
+      // Preserve the user state if already loaded
+      if (_currentUser != null) {
+        emit(UserLoaded(_currentUser!, _currentIndex));
+      } else {
+        emit(NavBarChanged(index));
+      }
     }
   }
-
 
   Future<void> fetchCurrentUser() async {
     emit(UserLoading()); // Emit loading state
@@ -52,15 +58,13 @@ class NavBarCubit extends Cubit<NavBarState> {
         return;
       }
 
-      UserModel currentUser = UserModel.fromFirestore(userData, userId);
-      debugPrint('Current User Retrieved: ${currentUser.toString()}');
-      emit(UserLoaded(currentUser)); // Emit loaded state
+      _currentUser = UserModel.fromFirestore(userData, userId);
+      debugPrint('Current User Retrieved: ${_currentUser.toString()}');
+      emit(UserLoaded(_currentUser!, _currentIndex)); // Emit loaded state with current index
     } catch (e, stackTrace) {
-      // Log the error and emit error state
       debugPrint('Error fetching current user: $e');
       debugPrint('$stackTrace');
       emit(UserFetchError('Failed to fetch user: $e'));
     }
   }
 }
-

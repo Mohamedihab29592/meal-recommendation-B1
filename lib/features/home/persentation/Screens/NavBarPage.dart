@@ -17,14 +17,15 @@ import '../Cubits/NavBarCubits/NavBarState.dart';
 import 'HomePage.dart';
 
 class NavBarPage extends StatelessWidget {
-   NavBarPage({super.key});
+  NavBarPage({super.key});
 
   List<Widget> pages = [
     BlocProvider(
       create: (context) => getIt<HomeCubit>(),
       child: const HomePage(),
     ),
-    const FavoritesView(),
+    BlocProvider(
+        create: (context) => getIt<HomeCubit>(), child: const FavoritesView()),
     BlocProvider(
       create: (context) => getIt<UserProfileBloc>(),
       child: const ProfileScreen(),
@@ -35,7 +36,11 @@ class NavBarPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<NavBarCubit, NavBarState>(
       builder: (context, state) {
-        if (state is UserLoaded) {
+        if (state is UserLoading) {
+          return const LoadingDialog();
+        } else if (state is UserFetchError) {
+          return Center(child: Text(state.errorMessage));
+        } else if (state is UserLoaded) {
           final user = state.user;
           final authBloc = context.read<AuthBloc>();
           final screenSize = MediaQuery.of(context).size;
@@ -61,16 +66,10 @@ class NavBarPage extends StatelessWidget {
               ),
               body: pages[navBarCubit.currentIndex],
               drawer: SideBar(
-                oldIndex: navBarCubit.currentIndex,
-                returnedIndex: (index) {
-                  Navigator.of(context).pop();
-                  navBarCubit.moveChange(index);
-                },
-                  user:user,
-                authBloc:authBloc
-              ));
+                  user: user,
+                  authBloc: authBloc));
         } else {
-        return    const LoadingDialog(); //issue here
+          return const Center(child: Text('Unexpected state.')); //issue here
         }
       },
     );

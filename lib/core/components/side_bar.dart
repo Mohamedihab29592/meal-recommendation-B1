@@ -4,41 +4,23 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/side_bar_items.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
-import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/bloc.dart';
 import 'package:meal_recommendation_b1/features/Profile/data/Model/UserModel.dart';
 import 'package:meal_recommendation_b1/features/auth/login/domain/entity/user_entity.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/bloc/auth_event.dart';
 import '../../features/auth/login/persentation/bloc/auth_state.dart';
+import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
 import '../utiles/app_strings.dart';
 import '../utiles/assets.dart';
-
-class SideBar extends StatefulWidget {
-  final int oldIndex;
-  final Function(int) returnedIndex;
+class SideBar extends StatelessWidget {
   final UserModel user;
   final AuthBloc authBloc;
 
-  const SideBar({
+   SideBar({
     super.key,
-    required this.oldIndex,
-    required this.returnedIndex,
     required this.user,
     required this.authBloc,
   });
-
-  @override
-  SideBarState createState() => SideBarState();
-}
-
-class SideBarState extends State<SideBar> {
-  late int _selectedIndex;
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedIndex = widget.oldIndex;
-  }
 
   // Sidebar Menu Items Configuration
   final List<SidebarMenuItem> _menuItems = [
@@ -48,13 +30,13 @@ class SideBarState extends State<SideBar> {
       inactiveIcon: Icons.home_outlined,
       route: AppRoutes.home,
     ),
-    SidebarMenuItem(
+     SidebarMenuItem(
       title: AppStrings.favorites,
       activeIcon: Icons.favorite_rounded,
       inactiveIcon: Icons.favorite_border_rounded,
       route: AppRoutes.favorites,
     ),
-    SidebarMenuItem(
+     SidebarMenuItem(
       title: AppStrings.profile,
       activeIcon: Icons.person_rounded,
       inactiveIcon: Icons.person_outline_rounded,
@@ -64,6 +46,8 @@ class SideBarState extends State<SideBar> {
 
   @override
   Widget build(BuildContext context) {
+    final navBarCubit = context.watch<NavBarCubit>();
+
     return Drawer(
       backgroundColor: AppColors.white,
       child: SafeArea(
@@ -75,7 +59,7 @@ class SideBarState extends State<SideBar> {
               _buildUserProfileHeader(context),
 
               // Menu Items
-              _buildMenuSection(),
+              _buildMenuSection(context, navBarCubit),
 
               // Divider
               const Divider(indent: 20, endIndent: 20),
@@ -97,20 +81,19 @@ class SideBarState extends State<SideBar> {
         children: [
           CircleAvatar(
             radius: 40,
-            foregroundImage: NetworkImage(widget.user.profilePhotoUrl ??
-                ""), // Assuming profilePhoto is a URL
+            foregroundImage: NetworkImage(user.profilePhotoUrl ?? ""),
           ),
           const SizedBox(width: 20),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                widget.user.name ?? "",
+                user.name ?? "",
                 style: const TextStyle(
                     color: AppColors.white, fontWeight: FontWeight.bold),
               ),
               Text(
-                widget.user.email,
+               user.email,
                 style: TextStyle(color: AppColors.white.withOpacity(0.7)),
               ),
             ],
@@ -120,24 +103,24 @@ class SideBarState extends State<SideBar> {
     );
   }
 
-  Widget _buildMenuSection() {
+  Widget _buildMenuSection(BuildContext context, NavBarCubit navBarCubit) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
       child: Column(
         children: _menuItems.map((item) {
           final index = _menuItems.indexOf(item);
+          final isSelected = navBarCubit.currentIndex == index;
+
           return SideBarItem(
             index: index,
             title: item.title,
             activeIcon: item.activeIcon,
             inactiveIcon: item.inactiveIcon,
-            isSelected: _selectedIndex == index,
+            isSelected: isSelected,
             onTap: () {
-              setState(() {
-                _selectedIndex = index;
-              });
-              widget.returnedIndex(index);
-              Navigator.pop(context);
+              // Close drawer and update navigation state
+              Navigator.of(context).pop();
+              navBarCubit.moveChange(index);
             },
             activeColor: AppColors.primary,
             inactiveColor: Colors.grey,
@@ -153,8 +136,7 @@ class SideBarState extends State<SideBar> {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8.w),
       child: SideBarItem(
-        index: -1,
-        // Special index for logout
+        index: -1, // Special index for logout
         title: AppStrings.logout,
         activeIcon: Icons.logout_rounded,
         inactiveIcon: Icons.logout_outlined,
@@ -181,7 +163,7 @@ class SideBarState extends State<SideBar> {
           ),
           ElevatedButton(
             onPressed: () {
-              widget.authBloc.add(LogoutEvent());
+              authBloc.add(LogoutEvent());
               Navigator.pushReplacementNamed(context, AppRoutes.login);
             },
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
