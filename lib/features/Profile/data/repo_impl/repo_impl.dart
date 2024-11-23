@@ -19,9 +19,9 @@ class FirebaseUserRepository implements UserRepository {
   @override
   Future<User> getUserProfile(String userId) async {
     // Check local storage first
-    final localUser = localDataSource.getUser(userId);
-    if (localUser != null) {
-      return localUser;
+    final localUser  = localDataSource.getUser(userId);
+    if (localUser  != null) {
+      return localUser ;
     }
 
     // If not in local storage, fetch from Firebase
@@ -30,22 +30,26 @@ class FirebaseUserRepository implements UserRepository {
       final user = UserModel.fromFirestore(doc.data()!, doc.id);
 
       // Save to local storage for future access
-      await localDataSource.saveUser(user);
+      await localDataSource.saveUser (user);
       return user;
     } else {
-      throw Exception("User not found");
+      throw Exception("User  not found");
     }
   }
 
   @override
-  Future<void> updateUserProfile(UserModel user) async {
-    await firestore
-        .collection('users')
-        .doc(user.id)
-        .update((user).toFirestore());
+  Future<void> updateUserProfile(User user) async {
+    if (user is UserModel) { // Check if user is of type UserModel
+      await firestore
+          .collection('users')
+          .doc(user.id)
+          .update(user.toFirestore());
 
-    // Update the local storage
-    await localDataSource.saveUser(user);
+      // Update the local storage
+      await localDataSource.saveUser (user);
+    } else {
+      throw Exception("Invalid user type. Expected UserModel.");
+    }
   }
 
   @override

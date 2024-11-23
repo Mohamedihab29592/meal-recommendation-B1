@@ -2,8 +2,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-
-
 class AuthRemoteDataSource{
   final FirebaseAuth _firebaseAuth;
   final GoogleSignIn _googleSignIn;
@@ -63,6 +61,7 @@ class AuthRemoteDataSource{
         'name': user.displayName,
         'email': user.email,
         'phone': user.phoneNumber,
+        'profilePhoto': user.phoneNumber,
       };
     }
     return null;

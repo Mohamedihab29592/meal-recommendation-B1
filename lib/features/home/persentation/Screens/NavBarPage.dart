@@ -3,10 +3,13 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/profile_screen.dart';
 import 'package:meal_recommendation_b1/features/favorites/presentaion/favorites_view.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeState.dart';
+import '../../../../core/components/side_bar.dart';
 import '../../../../core/services/di.dart';
 import '../../../../core/utiles/app_colors.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../Profile/Presentation/bloc/bloc.dart';
+import '../../../auth/login/persentation/bloc/auth_bloc.dart';
 import '../Cubits/DetailsCubit/DetailsCubit.dart';
 import '../Cubits/NavBarCubits/NavBarCubit.dart';
 import '../Cubits/NavBarCubits/NavBarState.dart';
@@ -27,15 +30,13 @@ class NavBarPage extends StatelessWidget {
     ),
   ];
 
-  AppColors appcolor = AppColors();
-  Assets asset = Assets();
-
   @override
   Widget build(BuildContext context) {
-    return BlocConsumer<NavBarCubit, NavBarState>(
-      listener: (context, state) {},
+    return BlocBuilder<NavBarCubit, NavBarState>(
       builder: (context, state) {
         final screenSize = MediaQuery.of(context).size;
+        final navBarCubit = context.read<NavBarCubit>();
+        final authBloc = context.read<AuthBloc>();
 
         return Scaffold(
           bottomNavigationBar: Container(
@@ -46,62 +47,66 @@ class NavBarPage extends StatelessWidget {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(30),
               child: BottomNavigationBar(
-                currentIndex:
-                    BlocProvider.of<NavBarCubit>(context).currentIndex,
-                items: [
-                  BottomNavigationBarItem(
-                    icon:
-                        BlocProvider.of<NavBarCubit>(context).currentIndex == 0
-                            ? CircleAvatar(
-                                radius: screenSize.width < 600 ? 30 : 40,
-                                backgroundColor: AppColors.primary,
-                                child: Image.asset(
-                                  "${Assets.icHome}",
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Image.asset("${Assets.icHome}"),
-                    label: "",
-                  ),
-                  BottomNavigationBarItem(
-                    icon:
-                        BlocProvider.of<NavBarCubit>(context).currentIndex == 1
-                            ? CircleAvatar(
-                                radius: screenSize.width < 600 ? 30 : 40,
-                                backgroundColor: AppColors.primary,
-                                child: Image.asset(
-                                  "${Assets.icFavorite}",
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Image.asset("${Assets.icFavorite}"),
-                    label: "",
-                  ),
-                  BottomNavigationBarItem(
-                    icon:
-                        BlocProvider.of<NavBarCubit>(context).currentIndex == 2
-                            ? CircleAvatar(
-                                radius: screenSize.width < 600 ? 30 : 40,
-                                backgroundColor: AppColors.primary,
-                                child: Image.asset(
-                                  Assets.icAccount,
-                                  color: Colors.white,
-                                ),
-                              )
-                            : Image.asset(Assets.icAccount),
-                    label: "",
-                  ),
-                ],
+                currentIndex: navBarCubit.currentIndex,
+                items: _buildBottomNavItems(screenSize, navBarCubit),
                 backgroundColor: Colors.white,
                 onTap: (value) {
-                  BlocProvider.of<NavBarCubit>(context).moveChange(value);
+                  navBarCubit.moveChange(value);
                 },
               ),
             ),
           ),
-          body: pages[BlocProvider.of<NavBarCubit>(context).currentIndex],
+          body: pages[navBarCubit.currentIndex],
+          drawer:   SideBar(
+                  oldIndex: navBarCubit.currentIndex,
+                  returnedIndex: (index) {
+                    Navigator.of(context).pop();
+                    navBarCubit.moveChange(index);
+                  },
+                  authBloc: authBloc,
+                )
         );
       },
+    );
+  }
+
+  List<BottomNavigationBarItem> _buildBottomNavItems(Size screenSize, NavBarCubit navBarCubit) {
+    return [
+      _buildBottomNavItem(
+          Assets.icHome,
+          navBarCubit.currentIndex == 0,
+          screenSize
+      ),
+      _buildBottomNavItem(
+          Assets.icFavorite,
+          navBarCubit.currentIndex == 1,
+          screenSize
+      ),
+      _buildBottomNavItem(
+          Assets.icAccount,
+          navBarCubit.currentIndex == 2,
+          screenSize
+      ),
+    ];
+  }
+
+  BottomNavigationBarItem _buildBottomNavItem(
+      String assetPath,
+      bool isSelected,
+      Size screenSize
+      ) {
+    return BottomNavigationBarItem(
+      icon: isSelected
+          ? CircleAvatar(
+        radius: screenSize.width < 600 ? 30 : 40,
+        backgroundColor: AppColors.primary,
+        child: Image.asset(
+          assetPath,
+          color: Colors.white,
+        ),
+      )
+          : Image.asset(assetPath),
+      label: "",
     );
   }
 }

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
-import '../utiles/assets.dart';
+
 
 class CustomTextField extends StatefulWidget {
   final String hintText;
@@ -23,7 +21,7 @@ class CustomTextField extends StatefulWidget {
   final Color? iconColor;
 
   const CustomTextField({
-    Key? key,
+    super.key,
     required this.hintText,
     this.prefixIcon,
     this.suffixIcon,
@@ -41,7 +39,7 @@ class CustomTextField extends StatefulWidget {
     this.textColor,
     this.hintColor,
     this.iconColor,
-  }) : super(key: key);
+  });
 
   @override
   CustomTextFieldState createState() => CustomTextFieldState();
@@ -73,6 +71,18 @@ class CustomTextFieldState extends State<CustomTextField> {
     }
     _focusNode.removeListener(_onFocusChange);
     super.dispose();
+  }
+
+  @override
+  void didUpdateWidget(CustomTextField oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    // Handle focus node changes
+    if (widget.focusNode != oldWidget.focusNode) {
+      _focusNode.removeListener(_onFocusChange);
+      _focusNode = widget.focusNode ?? FocusNode();
+      _focusNode.addListener(_onFocusChange);
+    }
   }
 
   @override
@@ -109,6 +119,7 @@ class CustomTextFieldState extends State<CustomTextField> {
             ],
           ),
           child: TextFormField(
+            key: ValueKey(widget.hintText), // Unique key to prevent unnecessary rebuilds
             controller: widget.controller,
             focusNode: _focusNode,
             autovalidateMode: AutovalidateMode.onUserInteraction,
@@ -121,6 +132,12 @@ class CustomTextFieldState extends State<CustomTextField> {
             enabled: widget.enabled,
             textInputAction: widget.textInputAction,
             onEditingComplete: widget.onEditingComplete,
+
+            // Keyboard interaction improvements
+            onTapOutside: (event) {
+              FocusScope.of(context).unfocus();
+            },
+
             decoration: InputDecoration(
               filled: true,
               fillColor: defaultFillColor,
@@ -159,6 +176,7 @@ class CustomTextFieldState extends State<CustomTextField> {
                 vertical: 16,
                 horizontal: 20,
               ),
+              errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
             ),
           ),
         ),

@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
+import 'package:meal_recommendation_b1/features/auth/login/persentation/bloc/auth_bloc.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
@@ -36,7 +37,7 @@ class MealApp extends StatelessWidget {
               designSize: const Size(375, 812),
               minTextAdapt: true,
               child: BlocProvider(
-                create:(context) =>  getIt<RecipeBloc>(),
+                create:(context) =>  getIt<AuthBloc>(),
                 child: MaterialApp(
                   title: 'Meal - Recommendation',
                   debugShowCheckedModeBanner: false,

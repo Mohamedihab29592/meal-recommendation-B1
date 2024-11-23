@@ -1,14 +1,14 @@
-import 'package:bloc/bloc.dart';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/networking/firebase_error_model.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_strings.dart';
 import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
-import 'package:meal_recommendation_b1/features/auth/register/domain/entity/user_entity.dart';
 import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/login_with_google_use_case.dart';
 import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/register_with_email_use_case.dart';
 import 'package:meal_recommendation_b1/features/auth/register/domain/use_cases/save_user_data_in_firebase_use_case.dart';
-import 'package:meta/meta.dart';
 
+import '../../../login/domain/entity/user_entity.dart';
 part 'register_event.dart';
 part 'register_state.dart';
 
@@ -37,7 +37,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         confirmPassword: event.confirmPassword,
       );
       final userInfo = UserEntity(
-          uid: await SecureStorageHelper.getSecuredString(AppStrings.uid),
+          id: await SecureStorageHelper.getSecuredString(AppStrings.uid),
           name: event.name,
           email: event.email,
           phone: event.phone);

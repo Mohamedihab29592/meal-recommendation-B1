@@ -1,4 +1,4 @@
-import '../entity/user_entity.dart';
+import '../../../login/domain/entity/user_entity.dart';
 import '../repository/register_repository.dart';
 
 class RegisterWithGoogleUseCase {

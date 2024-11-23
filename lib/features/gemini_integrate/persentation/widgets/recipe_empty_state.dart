@@ -17,7 +17,7 @@ class RecipeEmptyState extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Expanded(child: Image.asset(Assets.noFoodFound)),
+          Image.asset(Assets.noFoodFound),
           const SizedBox(height: 16),
           Text(
             showSavedRecipes

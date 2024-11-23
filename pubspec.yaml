@@ -98,6 +98,7 @@ flutter:
   # Assets Section
   assets:
     - assets/images/
+    - assets/animations/
   # Fonts Section
   #  fonts:
   #    - family: Inter        # Inter font family

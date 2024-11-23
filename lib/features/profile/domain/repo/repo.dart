@@ -6,8 +6,7 @@ import '../entity/entity.dart';
 
 abstract class UserRepository {
   Future<User> getUserProfile(String userId);
-  Future<void> updateUserProfile(UserModel user);
-
+  Future<void> updateUserProfile(User user);
   Future<Either<FirebaseErrorModel, String>> uploadUserImage(
       {required File newImage, String? oldImage});
 }

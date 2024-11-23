@@ -21,6 +21,7 @@ import '../../features/auth/OTP/data/repository/repository.dart';
 import '../../features/auth/OTP/domin/use_case/phone_authentication_use_case.dart';
 import '../../features/auth/OTP/domin/use_case/submit_otp_use_case.dart';
 import '../../features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
+import '../../features/auth/login/data/data_source/local/local_data_source_impl.dart';
 import '../../features/auth/login/data/data_source/remote/auth_remote_data_source.dart';
 import '../../features/auth/login/data/repository_impl/auth_repository_impl.dart';
 import '../../features/auth/login/domain/repository/auth_repository.dart';
@@ -28,8 +29,6 @@ import '../../features/auth/login/domain/use_cases/login_with_email_use_case.dar
 import '../../features/auth/login/domain/use_cases/login_with_google_use_case.dart';
 import '../../features/auth/login/domain/use_cases/logout_use_case.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
-import '../../features/auth/register/data/data_source_impl/remote_impl/register_firebase_data_source_impl.dart';
-import '../../features/auth/register/data/data_source_impl/remote_impl/register_remote_data_source_Impl.dart';
 import '../../features/auth/register/data/repository_impl/register_repository_impl.dart';
 import '../../features/auth/register/domain/repository/register_repository.dart';
 import '../../features/auth/register/domain/use_cases/login_with_google_use_case.dart';
@@ -54,7 +53,6 @@ import 'RecipeApiService.dart';
 
 final getIt = GetIt.instance;
 
-
 Future<void> setup(Box<Favorites> favoriteBox) async {
   const apiGeminiKey = "AIzaSyB2Vo6M6ETSGqiOAee-AORksgi8pMp2jgw";
   const pexelsApiKey =
@@ -68,8 +66,10 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(FavoritesAdapter());
   }
-  Box<Favorites> favoriteBox =await Hive.openBox<Favorites>('favorites');
-
+  Box<Favorites> favoriteBox = await Hive.openBox<Favorites>('favorites');
+  getIt.registerLazySingleton<LocalDataSource>(
+    () => LocalDataSourceImpl(getIt<Box<UserModel>>()),
+  );
   getIt.registerLazySingleton<Box<Favorites>>(() => favoriteBox);
 
   getIt.registerLazySingleton<Box<UserModel>>(() => userBox);
@@ -80,27 +80,24 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
 
   getIt
       .registerLazySingleton<BaseOTPRemoteDataSource>(() => RemoteDataSource());
-  getIt.registerLazySingleton<RegisterRemoteDataSourceImpl>(
-    () => RegisterRemoteDataSourceImpl(getIt(), getIt()),
-  );
-  getIt.registerLazySingleton<RegisterFirebaseDataSourceImpl>(
-    () => RegisterFirebaseDataSourceImpl(),
-  );
-
-  // Registering AuthRemoteDataSource 2to resolve the missing type
-  getIt.registerLazySingleton<AuthRemoteDataSource>(
-    () => AuthRemoteDataSource(getIt(), getIt(), getIt()),
-  );
 
   // Repositories
   getIt.registerLazySingleton<RegisterRepository>(
     () => RegisterRepositoryImpl(
-      getIt<RegisterRemoteDataSourceImpl>(),
-      getIt<RegisterFirebaseDataSourceImpl>(),
-    ),
+        firebaseAuth: getIt<FirebaseAuth>(),
+        firestore: getIt<FirebaseFirestore>()),
   );
+
+  getIt.registerLazySingleton<AuthRemoteDataSource>(() => AuthRemoteDataSource(
+        getIt<FirebaseAuth>(),
+        getIt<GoogleSignIn>(),
+        getIt<FirebaseFirestore>(),
+      ));
+
   getIt.registerLazySingleton<AuthRepository>(
-    () => AuthRepositoryImpl(getIt()),
+    () => AuthRepositoryImpl(
+        authRemoteDataSource: getIt<AuthRemoteDataSource>(),
+        localDataSource: getIt<LocalDataSource>()),
   );
   getIt.registerLazySingleton<FavoritesRepository>(
     () => FavoritesRepositoryImpl(favoriteBox),
@@ -160,6 +157,7 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
 
   // Blocs
   getIt.registerFactory(() => AuthBloc(
+        getIt<LocalDataSource>(),
         loginWithEmailUseCase: getIt<LoginWithEmailUseCase>(),
         loginWithGoogleUseCase: getIt<LoginWithGoogleUseCase>(),
         logoutUseCase: getIt<LogoutUseCase>(),

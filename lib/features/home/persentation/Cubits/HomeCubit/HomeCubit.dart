@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../auth/login/domain/entity/user_entity.dart';
 import '../../../../gemini_integrate/data/Recipe.dart';
 import 'HomeState.dart';
 class HomeCubit extends Cubit<HomeState> {
@@ -107,5 +108,7 @@ class HomeCubit extends Cubit<HomeState> {
       emit(FailureState(errorMessage: 'Failed to delete recipe: $e'));
     }
   }
+
 }
+
 

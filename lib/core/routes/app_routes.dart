@@ -4,6 +4,7 @@ import 'package:meal_recommendation_b1/features/auth/OTP/presentation/phone_bloc
 import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/AddRecipes.dart';
+import 'package:meal_recommendation_b1/features/welcome/welcome_screen.dart';
 import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/screens/login/login_screen.dart';
@@ -26,6 +27,7 @@ class AppRoutes {
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String register = '/register';
+  static const String welcome = '/welcome';
   static const String verification = '/verification';
   static const String home = '/home';
   static const String favorites = '/favorites';
@@ -63,6 +65,8 @@ class AppRoutes {
                 ], child: const RegisterScreen()));
       case otp:
         return MaterialPageRoute(builder: (_) => const OTPView());
+      case welcome:
+        return MaterialPageRoute(builder: (_) => const WelcomePage());
       case geminiRecipe:
         return MaterialPageRoute(
             builder: (_) => const GeminiRecipePage());

@@ -53,7 +53,8 @@ class _HomePageState extends State<HomePage> {
                     rightPadding: 0,
                     leftPadding: 0,
                     ontapleft: () {
-                      // Add profile or menu functionality
+                      Scaffold.of(context).openDrawer();
+
                     },
                     ontapright: () {
                       context.pushNamed(AppRoutes.geminiRecipe);

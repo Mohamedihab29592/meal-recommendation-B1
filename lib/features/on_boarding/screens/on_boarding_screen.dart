@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import '../../../core/routes/app_routes.dart';
 import '../../../core/utiles/assets.dart';
 import '../../../core/utiles/app_colors.dart';
@@ -47,7 +48,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   }
 
   void _navigateToLogin() {
-    Navigator.pushReplacementNamed(context, AppRoutes.login);
+  context.pushReplacementNamed(AppRoutes.welcome);
   }
 
   @override
@@ -405,7 +406,7 @@ class _NavigationButton extends StatelessWidget {
         : TextButton(
       onPressed: onLoginPressed,
       child: const Text(
-        "Login",
+        "Start",
         style: TextStyle(
           fontWeight: FontWeight.w700,
           fontSize: 15,
