@@ -1,4 +1,6 @@
 
+import 'package:meal_recommendation_b1/features/gemini_integrate/data/Recipe.dart';
+
 import '../../data/models/favorites.dart';
 
 abstract class FavoritesState {}
@@ -20,7 +22,7 @@ class DeleteFavoriteError extends FavoritesState {
 }
 
 class GetAllFavoritesDone extends FavoritesState {
-  final List<Favorites> favorites;
+  final List<Recipe> favorites;
   GetAllFavoritesDone(this.favorites);
 }
 class GetAllFavoritesError extends FavoritesState {

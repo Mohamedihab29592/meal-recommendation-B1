@@ -15,8 +15,11 @@ class Recipe {
   final List<Ingredient> ingredients;
   final Nutrition nutrition;
   final Directions directions;
+   bool? isFavorite; // Nullable to handle missing values gracefully
 
-  Recipe({
+
+  Recipe( {
+    this.isFavorite,
     this.id,
     this.generatedAt,
     this.isGenerated = false,
@@ -43,6 +46,7 @@ class Recipe {
       // Detailed type checking and conversion
       return Recipe(
         id: _safeParseString(json['id']),
+        isFavorite: json['isFavorite'],
         name: _safeParseString(json['name'], defaultValue: 'Unnamed Recipe'),
         summary: _safeParseString(json['summary'], defaultValue: 'No summary available'),
         typeOfMeal: _safeParseString(json['typeOfMeal'], defaultValue: 'Unknown Meal Type'),

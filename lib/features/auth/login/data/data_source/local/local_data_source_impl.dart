@@ -13,7 +13,7 @@ abstract class LocalDataSource {
 }
 
 class LocalDataSourceImpl implements LocalDataSource {
-  final Box<dynamic> _box; // Hive box or equivalent
+  final Box<dynamic> _box;
 
   LocalDataSourceImpl(this._box);
 

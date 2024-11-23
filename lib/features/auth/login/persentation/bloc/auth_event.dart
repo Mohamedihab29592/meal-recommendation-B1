@@ -12,10 +12,5 @@ sealed class AuthEvent {}
  class LogoutEvent extends AuthEvent {}
 
 
-class FetchUserDataEvent extends AuthEvent {
-final String uid;
-
-FetchUserDataEvent(this.uid);
-}
 
  class CheckAuthStatusEvent extends AuthEvent {}

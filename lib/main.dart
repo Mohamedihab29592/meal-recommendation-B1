@@ -7,6 +7,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/features/auth/login/persentation/bloc/auth_bloc.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
+import 'core/utiles/local_storage_service.dart';
 import 'features/favorites/data/models/favorites.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
@@ -19,10 +20,8 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,);
   await Hive.initFlutter();
-  Hive.registerAdapter(FavoritesAdapter());
-  final favoriteBox = await Hive.openBox<Favorites>('favorites');
-
-  await setup(favoriteBox);
+  LocalStorageService.init();
+await setup();
   runApp(const MealApp());
 }
 

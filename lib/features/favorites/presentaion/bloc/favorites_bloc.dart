@@ -1,11 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../gemini_integrate/data/Recipe.dart';
+import '../../../home/persentation/Cubits/HomeCubit/HomeState.dart';
 import '../../domain/usecases/delete_favorite_use_case.dart';
 import '../../domain/usecases/get_all_favorites_use_case.dart';
 import '../../domain/usecases/save_favorite_use_case.dart';
-import 'favorites_event.dart';
+
 import 'favorites_state.dart';
 
-class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
+class FavoritesBloc extends Cubit<FavoritesState> {
   final SaveFavoriteUseCase saveFavoriteUseCase;
   final DeleteFavoriteUseCase deleteFavoriteUseCase;
   final GetAllFavoritesUseCase getAllFavoritesUseCase;
@@ -15,41 +19,43 @@ class FavoritesBloc extends Bloc<FavoritesEvent, FavoritesState> {
       this.deleteFavoriteUseCase,
       this.getAllFavoritesUseCase)
       : super(FavoritesInitial()) {
-    on<SaveFavoriteEvent>(_onSaveFavorite);
-    on<DeleteFavoriteEvent>(_onDeleteFavorite);
-    on<GetAllFavoritesEvent>(_onGetAllFavorites);
   }
-
-  Future<void> _onSaveFavorite(
-      SaveFavoriteEvent event, Emitter<FavoritesState> emit) async {
+  Future<void> getFavoriteRecipes() async {
     emit(FavoritesLoading());
     try {
-      await saveFavoriteUseCase(event.favorite);
-      emit(SaveFavoriteDone());
-    } catch (e) {
-      emit(SaveFavoriteError(e.toString()));
-    }
-  }
+      // Get the current user's ID
+      String? userId = FirebaseAuth.instance.currentUser?.uid;
+      if (userId == null) {
+        emit(GetAllFavoritesError( "No user is logged in."));
+        return;
+      }
 
-  Future<void> _onDeleteFavorite(
-      DeleteFavoriteEvent event, Emitter<FavoritesState> emit) async {
-    emit(FavoritesLoading());
-    try {
-      await deleteFavoriteUseCase(event.id);
-      emit(DeleteFavoriteDone());
-    } catch (e) {
-      emit(DeleteFavoriteError(e.toString()));
-    }
-  }
+      // Fetch the user's document
+      DocumentReference userDoc = FirebaseFirestore.instance.collection("users").doc(userId);
+      DocumentSnapshot snapshot = await userDoc.get();
 
-  Future<void> _onGetAllFavorites(
-      GetAllFavoritesEvent event, Emitter<FavoritesState> emit) async {
-    emit(FavoritesLoading());
-    try {
-      final favorites = await getAllFavoritesUseCase();
-      emit(GetAllFavoritesDone(favorites));
+      if (!snapshot.exists) {
+        emit(GetAllFavoritesError( "User document does not exist."));
+        return;
+      }
+
+      Map<String, dynamic>? userData = snapshot.data() as Map<String, dynamic>?;
+
+      List<Recipe> recipes = userData != null && userData.containsKey("recipes")
+          ? (userData["recipes"] as List).map((recipeData) {
+        // Convert Firestore recipe data to Recipe objects
+        Map<String, dynamic> recipeMap = Map<String, dynamic>.from(recipeData);
+        return Recipe.fromJson(recipeMap);
+      }).toList()
+          : [];
+
+      // Filter favorite recipes
+      List<Recipe> favoriteRecipes = recipes.where((recipe) => recipe.isFavorite == true).toList();
+
+      // Emit the favorite recipes
+      emit(GetAllFavoritesDone(favoriteRecipes));
     } catch (e) {
-      emit(GetAllFavoritesError(e.toString()));
+      emit(GetAllFavoritesError('Failed to fetch favorite recipes: $e'));
     }
   }
 }

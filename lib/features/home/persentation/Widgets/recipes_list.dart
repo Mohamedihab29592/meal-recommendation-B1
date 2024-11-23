@@ -27,7 +27,7 @@ class RecipesList extends StatelessWidget {
       );
     }
 
-    if (state is SuccessState) {
+    if (state is SuccessState || state is FavoriteRecipesState) {
       final successState = state as SuccessState;
 
       if (successState.data.isEmpty) {

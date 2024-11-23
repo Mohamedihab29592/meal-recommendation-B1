@@ -44,6 +44,7 @@ class RecipeCardWidget extends StatelessWidget {
         onTapFav: () => _addToFavorites(context, mealId),
         firstText: mealType,
         ingredients: ingredients,
+        isFavorite:isFavorite(context,mealId),
         time: time,
         middleText: mealName,
         mealId: mealId,
@@ -63,16 +64,10 @@ class RecipeCardWidget extends StatelessWidget {
   }
 
   void _addToFavorites(BuildContext context, String mealId) {
+    BlocProvider.of<HomeCubit>(context).toggleFavoriteLocal(mealId);
+  }
 
-    //Logic to Add it
-    DynamicNotificationWidget.showNotification(
-      context: context,
-      title: 'Oh Hey!!',
-      message: 'Added $mealId to favorites',
-      color: Colors.green, // You can use this color if needed
-      contentType: ContentType.success,
-      inMaterialBanner: false,
-    );
-
+  bool isFavorite(BuildContext context, String mealId){
+    return BlocProvider.of<HomeCubit>(context).isFavorite(mealId);
   }
 }

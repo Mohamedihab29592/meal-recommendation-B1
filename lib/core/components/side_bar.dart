@@ -5,6 +5,7 @@ import 'package:meal_recommendation_b1/core/components/side_bar_items.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/bloc/bloc.dart';
+import 'package:meal_recommendation_b1/features/Profile/data/Model/UserModel.dart';
 import 'package:meal_recommendation_b1/features/auth/login/domain/entity/user_entity.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/bloc/auth_event.dart';
@@ -15,13 +16,14 @@ import '../utiles/assets.dart';
 class SideBar extends StatefulWidget {
   final int oldIndex;
   final Function(int) returnedIndex;
+  final UserModel user;
   final AuthBloc authBloc;
-
 
   const SideBar({
     super.key,
     required this.oldIndex,
     required this.returnedIndex,
+    required this.user,
     required this.authBloc,
   });
 
@@ -88,50 +90,33 @@ class SideBarState extends State<SideBar> {
   }
 
   Widget _buildUserProfileHeader(BuildContext context) {
-    return BlocBuilder<AuthBloc, AuthState>(
-      builder: (context, state) {
-        if (state is Authenticated) {
-          var user = state.user;
-
-          return Container(
-            padding: const EdgeInsets.all(20),
-            color: AppColors.primary,
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 40,
-                  foregroundImage: NetworkImage(user.profilePhoto ??
-                      ""), // Assuming profilePhoto is a URL
-                ),
-                const SizedBox(width: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      user.name ??"",
-                      style: const TextStyle(
-                          color: AppColors.white, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      user.email,
-                      style: TextStyle(color: AppColors.white.withOpacity(0.7)),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          );
-        } else {
-          return Container(
-            padding: const EdgeInsets.all(20),
-            color: AppColors.primary,
-            child: Text(
-              'User  not logged in',
-              style: TextStyle(color: AppColors.white),
-            ),
-          );
-        }
-      },
+    return Container(
+      padding: const EdgeInsets.all(20),
+      color: AppColors.primary,
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            foregroundImage: NetworkImage(widget.user.profilePhotoUrl ??
+                ""), // Assuming profilePhoto is a URL
+          ),
+          const SizedBox(width: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                widget.user.name ?? "",
+                style: const TextStyle(
+                    color: AppColors.white, fontWeight: FontWeight.bold),
+              ),
+              Text(
+                widget.user.email,
+                style: TextStyle(color: AppColors.white.withOpacity(0.7)),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 

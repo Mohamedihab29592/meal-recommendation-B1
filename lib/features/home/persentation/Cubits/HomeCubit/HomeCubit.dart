@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../../../../core/utiles/local_storage_service.dart';
 import '../../../../auth/login/domain/entity/user_entity.dart';
 import '../../../../gemini_integrate/data/Recipe.dart';
 import 'HomeState.dart';
@@ -8,6 +10,7 @@ class HomeCubit extends Cubit<HomeState> {
   HomeCubit() : super(InitialState());
 
   List<Recipe> homeRecipes = [];
+  List<Recipe> favoriteRecipes = [];
 
   Future<void> getdata() async {
     emit(IsLoadingHome());
@@ -107,6 +110,50 @@ class HomeCubit extends Cubit<HomeState> {
     } catch (e) {
       emit(FailureState(errorMessage: 'Failed to delete recipe: $e'));
     }
+  }
+
+  Future<void> toggleFavoriteLocal(String recipeId) async {
+    final favoritesBox = LocalStorageService.getFavoritesBox();
+
+    if (favoritesBox.containsKey(recipeId)) {
+      // Remove the recipe from favorites
+      await favoritesBox.delete(recipeId);
+      debugPrint('Removed $recipeId from favorites.');
+    } else {
+      // Add the recipe to favorites
+      await favoritesBox.put(recipeId, recipeId);
+      debugPrint('Added $recipeId to favorites.');
+    }
+
+    // Update the favorite recipes list
+    updateFavoriteRecipes();
+  }
+
+  // Update favorite recipes based on local storage
+  void updateFavoriteRecipes() {
+    final favoritesBox = LocalStorageService.getFavoritesBox();
+    final favoriteIds = favoritesBox.keys.toSet();
+
+    // Filter homeRecipes to get only favorites
+    favoriteRecipes = homeRecipes.where((recipe) => favoriteIds.contains(recipe.id)).toList();
+
+    // Emit the updated favorite recipes
+    emit(FavoriteRecipesState(favoriteRecipes));
+  }
+
+  // Get all favorite recipes
+  Future<void> getFavoriteRecipes() async {
+    emit(IsLoadingFavorites());
+    try {
+      updateFavoriteRecipes();
+    } catch (e) {
+      emit(FailureState(errorMessage: "Error fetching favorites: $e"));
+    }
+  }
+
+  bool isFavorite(String recipeId) {
+    final favoritesBox = LocalStorageService.getFavoritesBox();
+    return favoritesBox.containsKey(recipeId);
   }
 
 }

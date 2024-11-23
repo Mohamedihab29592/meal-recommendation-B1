@@ -17,3 +17,9 @@ class FailureState extends HomeState{
 
   FailureState({required this.errorMessage});
 }
+class FavoriteRecipesState extends HomeState {
+  final List<Recipe> favoriteRecipes;
+
+  FavoriteRecipesState(this.favoriteRecipes);
+}
+class IsLoadingFavorites extends HomeState{}

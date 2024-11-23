@@ -74,15 +74,15 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
             create: (context) => getIt<HomeCubit>(),
-            child: HomePage(),
+            child: const HomePage(),
           ),
 
         );
       case navBar:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                  create: (context) => getIt<NavBarCubit>(),
-                  child: NavBarPage(),
+                  create: (context) => getIt<NavBarCubit>()..fetchCurrentUser(),
+                  child:   NavBarPage(),
                 ));
 
       case detailsPage:

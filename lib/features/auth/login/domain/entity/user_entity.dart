@@ -11,22 +11,4 @@ class UserEntity {
     this.name,
     this.profilePhoto, required this.phone,
   });
-
-  factory UserEntity.fromJson(Map<String, dynamic> json, String id) {
-    return UserEntity(
-      id: id,
-      phone: json['phone'] ?? '',
-      email: json['email'] ?? '',
-      name: json['displayName'],
-      profilePhoto: json['photoUrl'],
-    );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'email': email,
-      'displayName': name,
-      'photoUrl': profilePhoto,
-    };
-  }
 }

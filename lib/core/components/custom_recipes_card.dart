@@ -7,6 +7,12 @@ import '../utiles/assets.dart';
 import '../utiles/helper.dart';
 
 class CustomRecipesCard extends StatelessWidget {
+  final String? firstText, middleText, ingredients, time, image;
+  final VoidCallback onTapFav;
+  final VoidCallback onTapDelete;
+  final String mealId;
+  final bool  isFavorite;
+
   const CustomRecipesCard({
     super.key,
     required this.onTapFav,
@@ -15,13 +21,9 @@ class CustomRecipesCard extends StatelessWidget {
     this.ingredients,
     this.middleText,
     this.image,
-    required this.onTapDelete, required this.mealId,
+    required this.onTapDelete,
+    required this.mealId, required this.isFavorite,
   });
-
-  final String? firstText, middleText, ingredients, time, image;
-  final VoidCallback onTapFav;
-  final VoidCallback onTapDelete;
-  final String mealId; // Add mealId to the constructor
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class CustomRecipesCard extends StatelessWidget {
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
         // Call your existing delete dialog method
-        _showDeleteDialog( context,mealId,context.read<HomeCubit>());
+        _showDeleteDialog(context, mealId, context.read<HomeCubit>());
         return false; // Prevent automatic dismissal
       },
       background: Container(
@@ -83,7 +85,8 @@ class CustomRecipesCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      middleText![0].toUpperCase() + middleText!.substring(1) ?? "Meal Name",
+                      middleText![0].toUpperCase() + middleText!.substring(1) ??
+                          "Meal Name",
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 18,
@@ -95,18 +98,21 @@ class CustomRecipesCard extends StatelessWidget {
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Icon(Icons.kitchen, size: 16, color: Colors.blueAccent),
+                        const Icon(Icons.kitchen,
+                            size: 16, color: Colors.blueAccent),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             ingredients ?? "0 ingredients",
-                            style: const TextStyle(fontSize: 13, color: Colors.black54),
+                            style: const TextStyle(
+                                fontSize: 13, color: Colors.black54),
                             overflow: TextOverflow.ellipsis,
                             maxLines: 1,
                           ),
                         ),
                         const SizedBox(width: 16),
-                        const Icon(Icons.timer, size: 16, color: Colors.orangeAccent),
+                        const Icon(Icons.timer,
+                            size: 16, color: Colors.orangeAccent),
                         const SizedBox(width: 4),
                         Text(
                           time ?? "0 min",
@@ -128,7 +134,10 @@ class CustomRecipesCard extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.favorite_border, color: AppColors.primary, size: 32),
+                    icon: Icon(
+                        isFavorite ? Icons.favorite : Icons.favorite_border,
+                        color: AppColors.primary,
+                        size: 32),
                     onPressed: onTapFav,
                   ),
                 ],
@@ -141,7 +150,8 @@ class CustomRecipesCard extends StatelessWidget {
   }
 }
 
-void _showDeleteDialog(BuildContext context, String mealId, HomeCubit homeCubit) {
+void _showDeleteDialog(
+    BuildContext context, String mealId, HomeCubit homeCubit) {
   showDeleteDialog(
     context: context,
     mealId: mealId,

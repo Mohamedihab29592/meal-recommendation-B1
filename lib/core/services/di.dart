@@ -53,7 +53,7 @@ import 'RecipeApiService.dart';
 
 final getIt = GetIt.instance;
 
-Future<void> setup(Box<Favorites> favoriteBox) async {
+Future<void> setup() async {
   const apiGeminiKey = "AIzaSyB2Vo6M6ETSGqiOAee-AORksgi8pMp2jgw";
   const pexelsApiKey =
       "SxA9Tdvd19HRDmqo7Ei3PmGfOuDzQ48J76hrEPisWFt5ZyvBh9C7AIGc";
@@ -66,11 +66,10 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
   if (!Hive.isAdapterRegistered(1)) {
     Hive.registerAdapter(FavoritesAdapter());
   }
-  Box<Favorites> favoriteBox = await Hive.openBox<Favorites>('favorites');
+
   getIt.registerLazySingleton<LocalDataSource>(
     () => LocalDataSourceImpl(getIt<Box<UserModel>>()),
   );
-  getIt.registerLazySingleton<Box<Favorites>>(() => favoriteBox);
 
   getIt.registerLazySingleton<Box<UserModel>>(() => userBox);
   getIt.registerLazySingleton(() => FirebaseFirestore.instance);
@@ -99,9 +98,7 @@ Future<void> setup(Box<Favorites> favoriteBox) async {
         authRemoteDataSource: getIt<AuthRemoteDataSource>(),
         localDataSource: getIt<LocalDataSource>()),
   );
-  getIt.registerLazySingleton<FavoritesRepository>(
-    () => FavoritesRepositoryImpl(favoriteBox),
-  );
+
   getIt.registerLazySingleton<OTPRepository>(
     () => OTPRepository(getIt()),
   );

@@ -1,6 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/utiles/assets.dart';
 import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeState.dart';
 
 import '../../../../../core/utiles/app_strings.dart';
 import '../../data/data_source/local/local_data_source_impl.dart';
@@ -41,8 +43,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
             isNewUser: loginResult.isNewUser,
             isFirstLogin: loginResult.isFirstLogin,
             authMethod: AuthenticationMethod.email));
-
-
       } else {
         emit(Unauthenticated(
             errorMessage: 'Login failed',
@@ -81,7 +81,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await logoutUseCase();
-      await SecureStorageHelper.setSecuredString('uid', '');
+      await SecureStorageHelper.setSecuredString(AppStrings.uid, '');
       emit(Unauthenticated());
     } catch (e) {
       emit(AuthError(
