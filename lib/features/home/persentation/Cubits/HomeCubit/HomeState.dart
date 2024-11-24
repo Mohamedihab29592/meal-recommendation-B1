@@ -1,13 +1,9 @@
 import '../../../../gemini_integrate/data/Recipe.dart';
 
-abstract class HomeState {
-  final int stateId;
-
-  HomeState({int? stateId}) : stateId = stateId ?? DateTime.now().millisecondsSinceEpoch;
-}
+abstract class HomeState {}
 
 class InitialState extends HomeState {
-  InitialState({super.stateId});
+  InitialState();
 }
 
 class HomeLoaded extends HomeState {
@@ -19,27 +15,15 @@ class HomeLoaded extends HomeState {
     required this.homeRecipes,
     required this.favoriteRecipes,
      this.filteredRecipes = const [],
-    super.stateId
   });
-
-  // Override equality to force rebuilds
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is HomeLoaded &&
-              runtimeType == other.runtimeType &&
-              stateId != other.stateId;
-
-  @override
-  int get hashCode => stateId.hashCode;
 }
 
 class IsLoadingHome extends HomeState {
-  IsLoadingHome({super.stateId});
+  IsLoadingHome();
 }
 
 class IsLoadingFavorites extends HomeState {
-  IsLoadingFavorites({super.stateId});
+  IsLoadingFavorites();
 }
 
 class FailureState extends HomeState {
@@ -47,17 +31,6 @@ class FailureState extends HomeState {
 
   FailureState({
     required this.errorMessage,
-    super.stateId
   });
 
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-          other is FailureState &&
-              runtimeType == other.runtimeType &&
-              errorMessage == other.errorMessage &&
-              stateId != other.stateId;
-
-  @override
-  int get hashCode => Object.hash(errorMessage, stateId);
 }

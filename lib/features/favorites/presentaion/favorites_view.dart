@@ -78,7 +78,7 @@ class _FavoritesViewState extends State<FavoritesView> {
         } else if (state is IsLoadingFavorites) {
           return const LoadingDialog();
         } else {
-          return const Center(child: Text("Something Went Wrong!", style: TextStyle(color: Colors.red)));
+          return const LoadingDialog();
         }
       },
     );

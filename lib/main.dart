@@ -8,9 +8,6 @@ import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/features/auth/login/persentation/bloc/auth_bloc.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import 'core/utiles/local_storage_service.dart';
-import 'features/favorites/data/models/favorites.dart';
-import 'features/gemini_integrate/persentation/bloc/RecipeEvent.dart';
-import 'features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'core/utiles/app_themes.dart';
@@ -41,7 +38,6 @@ class MealApp extends StatelessWidget {
                 providers: [
                   BlocProvider(lazy: true, create: (context) => getIt<RecipeBloc>(),),
                   BlocProvider(lazy: true, create: (context) => getIt<AuthBloc>(),),
-
                 ],
                 child: MaterialApp(
                   title: 'Meal - Recommendation',

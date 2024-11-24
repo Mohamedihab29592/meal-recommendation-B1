@@ -227,43 +227,31 @@ class _HomePageState extends State<HomePage> {
 
                   SizedBox(height: screenSize.height * 0.02),
 
-                  BlocBuilder<HomeBloc, HomeState>(
-                    buildWhen: (previous, current) {
-                      // Rebuild when:
-                      // 1. State type changes
-                      // 2. State ID is different
-                      // 3. Recipes have changed
-                      return previous.runtimeType != current.runtimeType ||
-                          (current is HomeLoaded && previous is HomeLoaded &&
-                              (current.stateId != previous.stateId ||
-                                  current.homeRecipes.length != previous.homeRecipes.length ||
-                                  current.filteredRecipes.length != previous.filteredRecipes.length));
-                    },
-                      builder: (context, state) {
-                        if (state is IsLoadingHome) {
-                          return const CustomRecipesCardShimmer();
-                        }
+              BlocBuilder<HomeBloc, HomeState>(
+                builder: (context, state) {
+                  if (state is IsLoadingHome) {
+                    return const CustomRecipesCardShimmer();
+                  }
 
-                        if (state is FailureState) {
-                          return ErrorStateWidget(
-                            errorMessage: state.errorMessage,
-                            onRetry: () {
-                              context.read<HomeBloc>().add(FetchRecipesEvent());
-                            },
-                          );
-                        }
-
-                        if (state is HomeLoaded) {
-                          return RecipesList(
-                            key: ValueKey(state.stateId), // Use stateId as key
-                            state: state,
-                            showFilteredRecipes: state.filteredRecipes.isNotEmpty,
-                          );
-                        }
-
-                        return const SizedBox.shrink();
+                  if (state is FailureState) {
+                    return ErrorStateWidget(
+                      errorMessage: state.errorMessage,
+                      onRetry: () {
+                        context.read<HomeBloc>().add(FetchRecipesEvent());
                       },
-                  ),
+                    );
+                  }
+
+                  if (state is HomeLoaded) {
+                    return RecipesList(
+                      state: state,
+                      showFilteredRecipes: state.filteredRecipes.isNotEmpty,
+                    );
+                  }
+
+                  return const SizedBox.shrink();
+                },
+              ),
                 ],
               ),
             ),

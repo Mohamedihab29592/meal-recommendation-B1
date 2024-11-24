@@ -15,7 +15,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   HomeBloc({
     required FirebaseFirestore firestore,
     required FirebaseAuth auth,
-  })  : _firestore = firestore,
+  })
+      : _firestore = firestore,
         _auth = auth,
         super(InitialState()) {
     on<FetchRecipesEvent>(_onFetchRecipes);
@@ -25,20 +26,18 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     on<ResetFiltersEvent>(_onResetFilters);
     on<ToggleFavoriteEvent>(_onToggleFavorite);
     on<DeleteRecipeEvent>(_onDeleteRecipe);
+    on<UpdateFavorite>(_onUpdateFavorite);
   }
 
   List<Recipe> _homeRecipes = [];
   List<Recipe> _favoriteRecipes = [];
   List<Recipe> _filteredRecipes = [];
 
-  int _generateUniqueStateId() {
-    return DateTime.now().millisecondsSinceEpoch + Random().nextInt(1000);
-  }
 
-  Future<void> _onFetchRecipes(
-    FetchRecipesEvent event,
-    Emitter<HomeState> emit,
-  ) async {
+  Future<void> _onFetchRecipes(FetchRecipesEvent event,
+      Emitter<HomeState> emit,) async {
+    final favoritesBox = LocalStorageService.getFavoritesBox();
+
     emit(IsLoadingHome());
     try {
       final userId = _auth.currentUser?.uid;
@@ -54,24 +53,23 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         _homeRecipes = (userData?["recipes"] as List<dynamic>? ?? [])
             .map((recipeData) =>
-                Recipe.fromJson(Map<String, dynamic>.from(recipeData as Map)))
+            Recipe.fromJson(Map<String, dynamic>.from(recipeData as Map)))
             .toList();
 
         _filteredRecipes = List.from(_homeRecipes);
-        _updateFavoriteRecipes();
+        final favoriteIds = favoritesBox.keys.toSet();
+        _favoriteRecipes = _homeRecipes.where((recipe) => favoriteIds.contains(recipe.id)).toList();
 
         emit(HomeLoaded(
           homeRecipes: _homeRecipes,
           favoriteRecipes: _favoriteRecipes,
           filteredRecipes: _filteredRecipes,
-          stateId: _generateUniqueStateId(),
         ));
       } else {
         emit(HomeLoaded(
           homeRecipes: [],
           favoriteRecipes: [],
           filteredRecipes: [],
-          stateId: _generateUniqueStateId(),
         ));
       }
     } catch (e) {
@@ -79,19 +77,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  void _onFilterRecipes(
-      FilterRecipesEvent event,
-      Emitter<HomeState> emit,
-      ) {
+  void _onFilterRecipes(FilterRecipesEvent event,
+      Emitter<HomeState> emit,) {
     emit(IsLoadingHome());
     _filteredRecipes = _homeRecipes.where((recipe) {
       // Filter by meal type
-    /*  if (event.mealType != null && recipe.typeOfMeal != event.mealType) {
+        if (event.mealType != null && recipe.typeOfMeal != event.mealType) {
         return false;
-      }*/
+      }
 
       // Filter by cooking time
-    /*  if (event.cookingTime != null) {
+      /*  if (event.cookingTime != null) {
         switch (event.cookingTime) {
           case 0: // "5 min"
             if (_parseCookingTime(recipe.time) > 5) return false;
@@ -106,14 +102,14 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       }*/
 
       // Filter by calories
-      if (event.caloriesRange != null &&
+    /*  if (event.caloriesRange != null &&
           (recipe.nutrition.calories < event.caloriesRange!.start ||
               recipe.nutrition.calories > event.caloriesRange!.end)) {
         return false;
-      }
+      }*/
 
       // Filter by number of ingredients
-     /* if (event.maxIngredients != null && recipe.ingredients.length > event.maxIngredients!) {
+      /* if (event.maxIngredients != null && recipe.ingredients.length > event.maxIngredients!) {
         return false;
       }*/
 
@@ -124,19 +120,17 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       homeRecipes: _homeRecipes,
       favoriteRecipes: _favoriteRecipes,
       filteredRecipes: _filteredRecipes,
-      stateId: _generateUniqueStateId(),
     ));
   }
 
-  void _onSearchRecipes(
-    SearchRecipesEvent event,
-    Emitter<HomeState> emit,
-  ) {
+  void _onSearchRecipes(SearchRecipesEvent event,
+      Emitter<HomeState> emit,) {
     _filteredRecipes = _homeRecipes.where((recipe) {
       return recipe.name.toLowerCase().contains(event.query.toLowerCase()) ||
           recipe.summary.toLowerCase().contains(event.query.toLowerCase()) ||
           recipe.typeOfMeal.toLowerCase().contains(event.query.toLowerCase()) ||
-          (recipe.ingredients.any((ingredient) => ingredient.name
+          (recipe.ingredients.any((ingredient) =>
+              ingredient.name
                   .toLowerCase()
                   .contains(event.query.toLowerCase())) ??
               false);
@@ -146,29 +140,29 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       homeRecipes: _homeRecipes,
       favoriteRecipes: _favoriteRecipes,
       filteredRecipes: _filteredRecipes,
-      stateId: _generateUniqueStateId(),
     ));
   }
 
-  void _onSortRecipes(
-    SortRecipesEvent event,
-    Emitter<HomeState> emit,
-  ) {
+  void _onSortRecipes(SortRecipesEvent event,
+      Emitter<HomeState> emit,) {
     switch (event.sortBy) {
       case 'calories':
-        _filteredRecipes.sort((a, b) => event.ascending
+        _filteredRecipes.sort((a, b) =>
+        event.ascending
             ? (a.nutrition.calories ?? 0).compareTo(b.nutrition.calories ?? 0)
             : (b.nutrition.calories ?? 0).compareTo(a.nutrition.calories ?? 0));
         break;
       case 'protein':
-        _filteredRecipes.sort((a, b) => event.ascending
+        _filteredRecipes.sort((a, b) =>
+        event.ascending
             ? (a.nutrition.protein ?? 0).compareTo(b.nutrition.protein ?? 0)
             : (b.nutrition.protein ?? 0).compareTo(a.nutrition.protein ?? 0));
         break;
       case 'cookingTime':
-        _filteredRecipes.sort((a, b) => event.ascending
+        _filteredRecipes.sort((a, b) =>
+        event.ascending
             ? (_parseCookingTime(a.time)).compareTo(_parseCookingTime(b.time))
-            : (_parseCookingTime(b.time).compareTo(_parseCookingTime(a.time) )));
+            : (_parseCookingTime(b.time).compareTo(_parseCookingTime(a.time))));
         break;
     }
 
@@ -176,50 +170,25 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
       homeRecipes: _homeRecipes,
       favoriteRecipes: _favoriteRecipes,
       filteredRecipes: _filteredRecipes,
-      stateId: _generateUniqueStateId(),
     ));
   }
 
-  void _onResetFilters(
-    ResetFiltersEvent event,
-    Emitter<HomeState> emit,
-  ) {
+  void _onResetFilters(ResetFiltersEvent event,
+      Emitter<HomeState> emit,) {
     _filteredRecipes = List.from(_homeRecipes);
     emit(HomeLoaded(
       homeRecipes: _homeRecipes,
       favoriteRecipes: _favoriteRecipes,
       filteredRecipes: _filteredRecipes,
-      stateId: _generateUniqueStateId(),
     ));
   }
 
-  Future<void> _onToggleFavorite(
-    ToggleFavoriteEvent event,
-    Emitter<HomeState> emit,
-  ) async {
+
+  Future<void> _onDeleteRecipe(DeleteRecipeEvent event,
+      Emitter<HomeState> emit,) async {
+    emit(IsLoadingHome());
     final favoritesBox = LocalStorageService.getFavoritesBox();
 
-    if (favoritesBox.containsKey(event.recipeId)) {
-      await favoritesBox.delete(event.recipeId);
-    } else {
-      await favoritesBox.put(event.recipeId, event.recipeId);
-    }
-
-    _updateFavoriteRecipes();
-
-    emit(HomeLoaded(
-      homeRecipes: _homeRecipes,
-      favoriteRecipes: _favoriteRecipes,
-      filteredRecipes: _filteredRecipes,
-      stateId: _generateUniqueStateId(),
-    ));
-  }
-
-  Future<void> _onDeleteRecipe(
-    DeleteRecipeEvent event,
-    Emitter<HomeState> emit,
-  ) async {
-    emit(IsLoadingHome());
     try {
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
@@ -235,7 +204,7 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         final recipes = (userData?["recipes"] as List<dynamic>? ?? [])
             .map((recipeData) =>
-                Recipe.fromJson(Map<String, dynamic>.from(recipeData as Map)))
+            Recipe.fromJson(Map<String, dynamic>.from(recipeData as Map)))
             .toList();
 
         recipes.removeWhere((recipe) => recipe.id == event.recipeId);
@@ -245,13 +214,13 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
 
         _homeRecipes = recipes;
         _filteredRecipes = List.from(_homeRecipes);
-        _updateFavoriteRecipes();
+        final favoriteIds = favoritesBox.keys.toSet();
+        _favoriteRecipes = _homeRecipes.where((recipe) => favoriteIds.contains(recipe.id)).toList();
 
         emit(HomeLoaded(
           homeRecipes: _homeRecipes,
           favoriteRecipes: _favoriteRecipes,
           filteredRecipes: _filteredRecipes,
-          stateId: _generateUniqueStateId(),
         ));
       } else {
         emit(FailureState(errorMessage: "User document does not exist."));
@@ -261,14 +230,26 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
-  void _updateFavoriteRecipes() {
+  Future<void> _onToggleFavorite(ToggleFavoriteEvent event, Emitter<HomeState> emit) async {
     final favoritesBox = LocalStorageService.getFavoritesBox();
-    final favoriteIds = favoritesBox.keys.toSet();
 
-    _favoriteRecipes = _homeRecipes
-        .where((recipe) => favoriteIds.contains(recipe.id))
-        .toList();
+    if (favoritesBox.containsKey(event.recipeId)) {
+      await favoritesBox.delete(event.recipeId);
+    } else {
+      await favoritesBox.put(event.recipeId, event.recipeId);
+    }
+
+    // Emit the updated favorites state directly
+    final favoriteIds = favoritesBox.keys.toSet();
+    _favoriteRecipes = _homeRecipes.where((recipe) => favoriteIds.contains(recipe.id)).toList();
+
+    emit(HomeLoaded(
+      homeRecipes: _homeRecipes,
+      favoriteRecipes: _favoriteRecipes,
+      filteredRecipes: _filteredRecipes,
+    ));
   }
+
 
   bool isFavorite(String recipeId) {
     final favoritesBox = LocalStorageService.getFavoritesBox();
@@ -284,9 +265,30 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
     }
   }
 
+
+
+  Future<void> _onUpdateFavorite(UpdateFavorite event,
+      Emitter<HomeState> emit,) async {
+    {
+      final favoritesBox = LocalStorageService.getFavoritesBox();
+      final favoriteIds = favoritesBox.keys.toSet();
+
+      _favoriteRecipes = _homeRecipes
+          .where((recipe) => favoriteIds.contains(recipe.id))
+          .toList();
+
+      emit(HomeLoaded(
+        homeRecipes: _homeRecipes,
+        favoriteRecipes: _favoriteRecipes,
+        filteredRecipes: _filteredRecipes,
+      ));
+    }
+  }
+
   @override
   void onTransition(Transition<HomeEvent, HomeState> transition) {
-    print('Bloc Transition: ${transition.currentState} -> ${transition.nextState}');
+    print('Bloc Transition: ${transition.currentState} -> ${transition
+        .nextState}');
     super.onTransition(transition);
   }
 }

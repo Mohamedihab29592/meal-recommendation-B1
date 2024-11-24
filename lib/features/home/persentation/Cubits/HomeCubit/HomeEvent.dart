@@ -36,7 +36,9 @@ class ToggleFavoriteEvent extends HomeEvent {
   final String recipeId;
   ToggleFavoriteEvent(this.recipeId);
 }
-
+class UpdateFavorite extends HomeEvent {
+  UpdateFavorite();
+}
 class DeleteRecipeEvent extends HomeEvent {
   final String recipeId;
   DeleteRecipeEvent(this.recipeId);

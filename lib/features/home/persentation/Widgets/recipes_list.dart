@@ -40,7 +40,6 @@ class RecipesList extends StatelessWidget {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: ListView.separated(
-        key: ValueKey(state.stateId), // Force rebuild on state change
         shrinkWrap: true,
         physics: const BouncingScrollPhysics(),
         itemCount: recipesToShow.length,

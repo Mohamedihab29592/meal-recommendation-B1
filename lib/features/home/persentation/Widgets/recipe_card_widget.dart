@@ -8,6 +8,8 @@ import '../../../gemini_integrate/data/Recipe.dart';
 import '../Cubits/HomeCubit/HomeBloc.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
+import '../Cubits/HomeCubit/HomeState.dart';
+
 class RecipeCardWidget extends StatelessWidget {
   final Recipe meal;
   final VoidCallback onTap;
@@ -24,22 +26,31 @@ class RecipeCardWidget extends StatelessWidget {
     String mealName = meal.name.isNotEmpty ? meal.name : "Unnamed Meal";
     String mealType = meal.typeOfMeal.isNotEmpty ? meal.typeOfMeal! : "Unknown Type";
     String mealImage = meal.imageUrl;
+
+    // For ingredients, you'll need to modify based on your Recipe model
     String ingredients = "${meal.ingredients.length} Ingredients";
     String time = meal.time != null ? "${meal.time} min" : "N/A";
 
     return GestureDetector(
       onTap: onTap,
-      child: CustomRecipesCard(
-        key: ValueKey(mealId),
-        onTapDelete: () => _showDeleteDialog(context, mealId),
-        onTapFav: () => _addToFavorites(context, mealId),
-        firstText: mealType,
-        ingredients: ingredients,
-        isFavorite: BlocProvider.of<HomeBloc>(context).isFavorite(mealId),
-        time: time,
-        middleText: mealName,
-        mealId: mealId,
-        image: mealImage,
+      child: BlocBuilder<HomeBloc, HomeState>(
+        builder: (context, state) {
+          // Determine if the meal is a favorite
+          bool isFavorite = BlocProvider.of<HomeBloc>(context).isFavorite(mealId);
+
+          return CustomRecipesCard(
+            key: ValueKey(mealId),
+            onTapDelete: () => _showDeleteDialog(context, mealId),
+            onTapFav: () => _addToFavorites(context, mealId),
+            firstText: mealType,
+            ingredients: ingredients,
+            isFavorite: isFavorite, // Use the isFavorite state here
+            time: time,
+            middleText: mealName,
+            mealId: mealId,
+            image: mealImage,
+          );
+        },
       ),
     );
   }
