@@ -177,7 +177,10 @@ Future<void> setup() async {
         submitOTPUseCase: getIt<SubmitOTPUseCase>(),
       ));
 
-  getIt.registerFactory(() => HomeCubit());
+  getIt.registerFactory(() => HomeBloc(
+        firestore: getIt<FirebaseFirestore>(),
+        auth: getIt<FirebaseAuth>(),
+      ));
 
   getIt.registerFactory(() => NavBarCubit());
 

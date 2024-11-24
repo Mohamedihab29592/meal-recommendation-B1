@@ -35,8 +35,11 @@ class MealApp extends StatelessWidget {
             ScreenUtilInit(
               designSize: const Size(375, 812),
               minTextAdapt: true,
-              child: BlocProvider(
-                create:(context) =>  getIt<AuthBloc>(),
+              child: MultiBlocProvider(
+                providers: [
+                  BlocProvider(create: (context) => getIt<RecipeBloc>(),),
+                  BlocProvider(create: (context) => getIt<AuthBloc>(),)
+                ],
                 child: MaterialApp(
                   title: 'Meal - Recommendation',
                   debugShowCheckedModeBanner: false,

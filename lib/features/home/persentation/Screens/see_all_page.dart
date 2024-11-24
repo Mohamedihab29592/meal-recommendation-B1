@@ -4,6 +4,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 import '../Widgets/recommended_recipes.dart';
@@ -17,12 +18,12 @@ class SeeAllScreen extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
 
     return BlocProvider(
-      create: (context) => getIt<HomeCubit>()..getdata(),
+      create: (context) => getIt<HomeBloc>()..add(FetchRecipesEvent()),
       child: Scaffold(
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: () async {
-              await context.read<HomeCubit>().getdata();
+               context.read<HomeBloc>().add(FetchRecipesEvent());
             },
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -52,7 +53,7 @@ class SeeAllScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                BlocBuilder<HomeCubit, HomeState>(
+                BlocBuilder<HomeBloc, HomeState>(
                   builder: (context, state) {
                     if (state is IsLoadingHome) {
                       return SliverFillRemaining(
@@ -97,7 +98,7 @@ class SeeAllScreen extends StatelessWidget {
                               SizedBox(height: screenSize.height * 0.02),
                               ElevatedButton(
                                 onPressed: () {
-                                  context.read<HomeCubit>().getdata();
+                                  context.read<HomeBloc>().add(FetchRecipesEvent());
                                 },
                                 child: const Text('Retry'),
                               ),

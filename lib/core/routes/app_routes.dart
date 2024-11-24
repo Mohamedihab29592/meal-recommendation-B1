@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/auth/OTP/presentation/phone_bloc/phone_bloc.dart';
 import 'package:meal_recommendation_b1/features/auth/register/persentation/bloc/register_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Screens/AddRecipes.dart';
 import 'package:meal_recommendation_b1/features/welcome/welcome_screen.dart';
 import '../../features/auth/OTP/presentation/screens/otp.dart';
@@ -73,7 +74,7 @@ class AppRoutes {
       case home:
         return MaterialPageRoute(
           builder: (_) => BlocProvider(
-            create: (context) => getIt<HomeCubit>(),
+            create: (context) => getIt<HomeBloc>(),
             child: const HomePage(),
           ),
 
@@ -99,7 +100,7 @@ class AppRoutes {
       case seeAll:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                create: (_) => getIt<HomeCubit>()..getdata(),
+                create: (_) => getIt<HomeBloc>()..add(FetchRecipesEvent()),
                 child: const SeeAllScreen()));
       default:
         return MaterialPageRoute(

@@ -21,11 +21,11 @@ class NavBarPage extends StatelessWidget {
 
   List<Widget> pages = [
     BlocProvider(
-      create: (context) => getIt<HomeCubit>(),
+      create: (context) => getIt<HomeBloc>(),
       child: const HomePage(),
     ),
     BlocProvider(
-        create: (context) => getIt<HomeCubit>(), child: const FavoritesView()),
+        create: (context) => getIt<HomeBloc>(), child: const FavoritesView()),
     BlocProvider(
       create: (context) => getIt<UserProfileBloc>(),
       child: const ProfileScreen(),

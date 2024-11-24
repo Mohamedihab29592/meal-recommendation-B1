@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 
 import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
 import '../utiles/app_colors.dart';
@@ -32,7 +33,7 @@ class CustomRecipesCard extends StatelessWidget {
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
         // Call your existing delete dialog method
-        _showDeleteDialog(context, mealId, context.read<HomeCubit>());
+        _showDeleteDialog(context, mealId, context.read<HomeBloc>());
         return false; // Prevent automatic dismissal
       },
       background: Container(
@@ -151,12 +152,12 @@ class CustomRecipesCard extends StatelessWidget {
 }
 
 void _showDeleteDialog(
-    BuildContext context, String mealId, HomeCubit homeCubit) {
+    BuildContext context, String mealId, HomeBloc homeCubit) {
   showDeleteDialog(
     context: context,
     mealId: mealId,
     onSuccess: () {
-      homeCubit.getdata();
+      homeCubit.add(FetchRecipesEvent());
     },
   );
 }

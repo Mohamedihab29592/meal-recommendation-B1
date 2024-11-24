@@ -148,23 +148,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
 
       // Emit loaded state with validated recipes
       emit(RetrieveRecipesLoaded(_savedRecipes));
-    } on FirebaseException catch (e) {
-      // Specific Firebase-related error handling
-      String errorMessage = 'Failed to load saved recipes';
-
-      switch (e.code) {
-        case 'permission-denied':
-          errorMessage = 'Permission denied. Please log in or check your account.';
-          break;
-        case 'unavailable':
-          errorMessage = 'Network is unavailable. Please check your connection.';
-          break;
-        default:
-          errorMessage = 'Firebase error: ${e.message}';
-      }
-
-      emit(RecipeError(errorMessage, true));
-    } catch (e) {
+    }  catch (e) {
       // Generic error handling
       String errorMessage = 'Unexpected error loading saved recipes';
 

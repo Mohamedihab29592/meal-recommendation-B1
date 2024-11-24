@@ -50,15 +50,23 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
         body: BlocConsumer<RecipeBloc, RecipeState>(
           listener: (context, state) {
             if (state is SavedRecipesLoaded) {
-              showNotification(context, 'Operation completed successfully!',
-                  ContentType.success, Colors.greenAccent);
+              showNotification(
+                context,
+                'Operation completed successfully!',
+                ContentType.success,
+                Colors.greenAccent,
+              );
             } else if (state is RecipeError) {
-              showNotification(context, state.message, ContentType.failure,
-                  Colors.redAccent);
+              showNotification(
+                context,
+                state.message,
+                ContentType.failure,
+                Colors.redAccent,
+              );
             }
           },
           builder: (context, state) {
-            int newRecipesCount =
+            final newRecipesCount =
                 _getNewRecipesCount(context.read<RecipeBloc>());
 
             return Padding(
@@ -75,8 +83,20 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                       iconSize: 30,
                       icon: const Icon(Icons.cleaning_services,
                           color: AppColors.primary),
-                      onPressed: () => showCleanupOptions(
-                          context, context.read<RecipeBloc>()),
+                      onPressed: () => {
+                        showCleanupConfirmationDialog(
+                          context,
+                          'Complete Cleanup',
+                          'Perform a complete cleanup of saved recipes?',
+                          () {
+                            context.read<RecipeBloc>().add(CleanupRecipesEvent(
+                              deleteGenerated: true,
+                              archiveOld: true,
+                              daysOld: 30,
+                            ));
+                          },
+                        )
+                      },
                     ),
                     rightChild: RecipeButtons(
                       recipesCount: newRecipesCount,
@@ -89,13 +109,9 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                         setState(() {
                           _showSavedRecipes = !_showSavedRecipes;
                         });
-                        if (_showSavedRecipes) {
-                          context
-                              .read<RecipeBloc>()
-                              .add(LoadSavedRecipesEvent());
-                        } else {
-                          context.read<RecipeBloc>().add(CombineRecipesEvent());
-                        }
+                        context.read<RecipeBloc>().add(_showSavedRecipes
+                            ? LoadSavedRecipesEvent()
+                            : CombineRecipesEvent());
                       },
                     ),
                     leftImage: Assets.icProfileMenu,
@@ -119,10 +135,11 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                             .add(FetchRecipesEvent(query));
                       } else {
                         showNotification(
-                            context,
-                            "You Must add food name in other section",
-                            ContentType.warning,
-                            Colors.orangeAccent);
+                          context,
+                          "Please enter a valid food name.",
+                          ContentType.warning,
+                          Colors.orangeAccent,
+                        );
                       }
                     },
                   ),

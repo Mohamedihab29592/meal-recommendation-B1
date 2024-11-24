@@ -6,11 +6,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Widgets/custom_recipes_card_shimmer.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipes_list.dart';
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/utiles/assets.dart';
+import '../../../../core/utiles/helper.dart';
 import '../Cubits/HomeCubit/HomeCubit.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
+import '../Widgets/error_state_widget.dart';
 import '../Widgets/searchCards.dart';
 
 class HomePage extends StatefulWidget {
@@ -21,12 +25,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+
   @override
   void initState() {
     super.initState();
-    context.read<HomeCubit>().getdata();
+    context.read<HomeBloc>().add(FetchRecipesEvent());
   }
-
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.read<HomeBloc>().add(FetchRecipesEvent());
+  }
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -35,8 +44,7 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-            // Implement refresh logic
-            await BlocProvider.of<HomeCubit>(context).getdata();
+             BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
@@ -54,7 +62,6 @@ class _HomePageState extends State<HomePage> {
                     leftPadding: 0,
                     ontapleft: () {
                       Scaffold.of(context).openDrawer();
-
                     },
                     ontapright: () {
                       context.pushNamed(AppRoutes.geminiRecipe);
@@ -88,7 +95,7 @@ class _HomePageState extends State<HomePage> {
                   SizedBox(height: screenSize.height * 0.03),
 
                   // Enhanced Search Bar with Functionality
-                  BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+                  BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
                     return SearchBar(
                       backgroundColor:
                           WidgetStateProperty.resolveWith((states) {
@@ -153,7 +160,7 @@ class _HomePageState extends State<HomePage> {
                               width: 25,
                             ),
                             onPressed: () {
-                              // Show filter bottom sheet or dialog
+                              showFilterBottomSheet(context);
                             },
                           ),
                         ),
@@ -218,14 +225,43 @@ class _HomePageState extends State<HomePage> {
 
                   SizedBox(height: screenSize.height * 0.02),
 
-                  BlocBuilder<HomeCubit, HomeState>(
-                    builder: (context, state) {
-                      return AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: RecipesList(state: state),
-                      );
+                  BlocBuilder<HomeBloc, HomeState>(
+                    buildWhen: (previous, current) {
+                      // Rebuild when:
+                      // 1. State type changes
+                      // 2. State ID is different
+                      // 3. Recipes have changed
+                      return previous.runtimeType != current.runtimeType ||
+                          (current is HomeLoaded && previous is HomeLoaded &&
+                              (current.stateId != previous.stateId ||
+                                  current.homeRecipes.length != previous.homeRecipes.length ||
+                                  current.filteredRecipes.length != previous.filteredRecipes.length));
                     },
-                  )
+                      builder: (context, state) {
+                        if (state is IsLoadingHome) {
+                          return const CustomRecipesCardShimmer();
+                        }
+
+                        if (state is FailureState) {
+                          return ErrorStateWidget(
+                            errorMessage: state.errorMessage,
+                            onRetry: () {
+                              context.read<HomeBloc>().add(FetchRecipesEvent());
+                            },
+                          );
+                        }
+
+                        if (state is HomeLoaded) {
+                          return RecipesList(
+                            key: ValueKey(state.stateId), // Use stateId as key
+                            state: state,
+                            showFilteredRecipes: state.filteredRecipes.isNotEmpty,
+                          );
+                        }
+
+                        return const SizedBox.shrink();
+                      },
+                  ),
                 ],
               ),
             ),

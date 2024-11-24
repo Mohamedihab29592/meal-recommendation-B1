@@ -5,14 +5,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 
 import '../../features/gemini_integrate/data/Recipe.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeEvent.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeState.dart';
 import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import '../../features/home/persentation/Widgets/filter_bottom_sheet.dart';
 import '../components/dynamic_notification_widget.dart';
 import '../components/loading_dialog.dart';
+import '../services/di.dart';
 import 'app_colors.dart';
 
 void showLoadingDialog(BuildContext context) {
@@ -48,10 +51,9 @@ Future<void> showDeleteDialog({
       try {
         print("Attempting to delete document with ID: $mealId");
 
-        final homeCubit = BlocProvider.of<HomeCubit>(context);
+        final homeBloc = BlocProvider.of<HomeBloc>(context);
 
-        // Perform delete operation
-        await homeCubit.deleteRecipe(mealId);
+         homeBloc.add(DeleteRecipeEvent(mealId));
 
         // Close loading dialog
         Navigator.of(context).pop();
@@ -174,9 +176,9 @@ void showNotification(BuildContext context, String message,
 }
 
 void showSaveConfirmationDialog(
-    BuildContext context, List<Recipe> recipesToSave) {
+    BuildContext parentContext, List<Recipe> recipesToSave) {
   showDialog(
-    context: context,
+    context: parentContext, // Use the parent context
     builder: (context) => AlertDialog(
       title: const Text('Save Recipes'),
       content: const Text('Do you want to save these recipes?'),
@@ -188,9 +190,7 @@ void showSaveConfirmationDialog(
         BlocListener<RecipeBloc, RecipeState>(
           listener: (context, state) {
             if (state is RecipesSaved) {
-              // Successfully saved
               Navigator.of(context).pop(); // Close dialog
-
               showNotification(context, 'Recipes saved successfully!',
                   ContentType.success, Colors.greenAccent);
             } else if (state is RecipeError) {
@@ -210,7 +210,9 @@ void showSaveConfirmationDialog(
             onPressed: () {
               Navigator.of(context).pop(); // Close dialog
               print('Attempting to save recipes');
-              context.read<RecipeBloc>().add(SaveRecipesEvent(recipesToSave));
+              parentContext
+                  .read<RecipeBloc>()
+                  .add(SaveRecipesEvent(recipesToSave));
             },
             child: const Text('Save'),
           ),
@@ -228,63 +230,11 @@ void showCleanupOptions(BuildContext context, RecipeBloc recipeBloc) {
         child: Wrap(
           children: <Widget>[
             ListTile(
-              leading: const Icon(Icons.delete_forever, color: Colors.red),
-              title: const Text('Delete All Generated Recipes'),
-              subtitle:
-                  const Text('Permanently remove all auto-generated recipes'),
-              onTap: () {
-                Navigator.pop(context);
-                showCleanupConfirmationDialog(
-                  context,
-                  'Delete Generated Recipes',
-                  'Are you sure you want to delete all generated recipes?',
-                  () {
-                    recipeBloc.add(CleanupRecipesEvent(
-                      deleteGenerated: true,
-                      archiveOld: false,
-                    ));
-                  },
-                );
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.archive, color: Colors.orange),
-              title: const Text('Archive Old Recipes'),
-              subtitle: const Text('Archive recipes older than 30 days'),
-              onTap: () {
-                Navigator.pop(context);
-                showCleanupConfirmationDialog(
-                  context,
-                  'Archive Old Recipes',
-                  'Archive recipes older than 30 days?',
-                  () {
-                    recipeBloc.add(CleanupRecipesEvent(
-                      deleteGenerated: false,
-                      archiveOld: true,
-                      daysOld: 30,
-                    ));
-                  },
-                );
-              },
-            ),
-            ListTile(
               leading: const Icon(Icons.cleaning_services, color: Colors.blue),
               title: const Text('Complete Cleanup'),
               subtitle: const Text('Delete generated and archive old recipes'),
               onTap: () {
                 Navigator.pop(context);
-                showCleanupConfirmationDialog(
-                  context,
-                  'Complete Cleanup',
-                  'Perform a complete cleanup of recipes?',
-                  () {
-                    recipeBloc.add(CleanupRecipesEvent(
-                      deleteGenerated: true,
-                      archiveOld: true,
-                      daysOld: 30,
-                    ));
-                  },
-                );
               },
             ),
           ],
@@ -304,7 +254,10 @@ void showCleanupConfirmationDialog(BuildContext context, String title,
       actions: [
         TextButton(
           onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
+          child: const Text(
+            'Cancel',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -387,14 +340,23 @@ List<String> parseSafeStringList(dynamic value) {
 // Default to empty list
   return [];
 }
+
 String safeParseString(dynamic value, {String defaultValue = ''}) {
-if (value == null) return defaultValue;
-return value.toString().trim().isEmpty ? defaultValue : value.toString();
+  if (value == null) return defaultValue;
+  return value.toString().trim().isEmpty ? defaultValue : value.toString();
 }
 
-
- String parseSafeString(dynamic value) {
-if (value == null) return 'N/A';
-return value.toString().trim().isEmpty ? 'N/A' : value.toString();
+String parseSafeString(dynamic value) {
+  if (value == null) return 'N/A';
+  return value.toString().trim().isEmpty ? 'N/A' : value.toString();
 }
 
+void showFilterBottomSheet(BuildContext context) {
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) => BlocProvider.value(
+        value: getIt<HomeBloc>(), child: const FilterBottomSheet()),
+  );
+}

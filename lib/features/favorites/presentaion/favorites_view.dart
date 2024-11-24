@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeState.dart';
 import '../../../../core/components/custom_recipes_card.dart';
 
@@ -17,7 +18,7 @@ class _FavoritesViewState extends State<FavoritesView> {
   @override
   void initState() {
     super.initState();
-    BlocProvider.of<HomeCubit>(context).getdata();
+    BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
   }
 
   @override
@@ -33,7 +34,7 @@ class _FavoritesViewState extends State<FavoritesView> {
   }
 
   Widget bodyContent(BuildContext context) {
-    return BlocConsumer<HomeCubit, HomeState>(
+    return BlocConsumer<HomeBloc, HomeState>(
       listener: (context, state) {},
       builder: (context, state) {
         if (state is HomeLoaded) {
@@ -53,11 +54,11 @@ class _FavoritesViewState extends State<FavoritesView> {
             child: ListView.separated(
               itemBuilder: (context, index) {
                 var recipe = favoriteList[index];
-                var isFavorite = BlocProvider.of<HomeCubit>(context).isFavorite(recipe.id ?? "");
+                var isFavorite = BlocProvider.of<HomeBloc>(context).isFavorite(recipe.id ?? "");
 
                 return CustomRecipesCard(
                   onTapFav: () {
-                    BlocProvider.of<HomeCubit>(context).toggleFavoriteLocal(recipe.id ?? "");
+                    BlocProvider.of<HomeBloc>(context).add(ToggleFavoriteEvent(recipe.id ?? ""));
                   },
                   time: recipe.time,
                   middleText: recipe.summary,

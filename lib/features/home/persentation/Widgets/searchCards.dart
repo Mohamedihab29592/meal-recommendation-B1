@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipe_card_widget.dart';
 
 import '../../../../core/routes/app_routes.dart';
@@ -88,7 +89,7 @@ class SearchCards extends SearchDelegate {
         errorMessage:
             failureState.errorMessage ?? "An unexpected error occurred",
         onRetry: () {
-          BlocProvider.of<HomeCubit>(context).getdata();
+          BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
         },
       );
     } else {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import '../../../../core/components/custom_recipes_card.dart';
 import '../../../../core/components/dynamic_notification_widget.dart';
 import '../../../../core/utiles/helper.dart';
@@ -58,16 +59,16 @@ class RecipeCardWidget extends StatelessWidget {
       context: context,
       mealId: mealId,
       onSuccess: () {
-        BlocProvider.of<HomeCubit>(context).getdata();
+        BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
       },
     );
   }
 
   void _addToFavorites(BuildContext context, String mealId) {
-    BlocProvider.of<HomeCubit>(context).toggleFavoriteLocal(mealId);
+    BlocProvider.of<HomeBloc>(context).add(ToggleFavoriteEvent(mealId));
   }
 
   bool isFavorite(BuildContext context, String mealId){
-    return BlocProvider.of<HomeCubit>(context).isFavorite(mealId);
+    return BlocProvider.of<HomeBloc>(context).isFavorite(mealId);
   }
 }
