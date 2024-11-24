@@ -34,7 +34,6 @@ class Recipe {
     required this.nutrition,
     required this.directions,
   }) : ingredients = List.unmodifiable(ingredients) {
-    _validate();
   }
   Recipe copyWith({bool? isFavorite}) {
     return Recipe(
@@ -153,13 +152,6 @@ class Recipe {
       'nutrition': nutrition.toJson(),
       'directions': directions.toJson(),
     };
-  }
-
-  // Validation method to ensure required fields are not empty
-  void _validate() {
-    if (name.isEmpty || summary.isEmpty || typeOfMeal.isEmpty) {
-      throw ArgumentError('Name, summary, and typeOfMeal cannot be empty.');
-    }
   }
 
   @override

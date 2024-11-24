@@ -7,6 +7,7 @@ import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_state.dart';
 import '../../../../core/components/Custome_Appbar.dart';
+import '../../../../core/components/custom_drop_down_Button.dart';
 import '../../../../core/components/custom_text_field.dart';
 import '../../../../core/services/di.dart';
 import '../../../../core/utiles/app_colors.dart';
@@ -222,23 +223,17 @@ class AddRecipesState extends State<AddRecipes> {
                   ),
                 ),
                 const SizedBox(height: 20),
-
-                // Meal Details
-              CustomTextField(
-                key:  ValueKey(typeMeal),
-                validator: (value) => null, // Provide actual validation if needed
-                hintText: 'Type Of Meal',
-                inputType: TextInputType.text,
-                controller: typeMeal,
-                prefixIcon: Assets.icSplash,
-                // Add onChanged if needed
-                onChanged: (value) {
-                  // Minimal processing if required
-                },
-              ),
+                CustomDropdownField(
+                  hintText: 'Type Of Meal',
+                  prefixIcon: Assets.icSplash,
+                  controller: typeMeal,
+                  items: const ['Breakfast', 'Lunch', 'Dinner', 'Snack', 'Appetizers'],
+                  onChanged: (value) {
+                    // Handle change if needed
+                  },
+                ),
                 const SizedBox(height: 15),
                 CustomTextField(
-                  validator: (value) => null,
                   hintText: 'Meal Name',
                   inputType: TextInputType.text,
                   controller: mealName,
@@ -246,7 +241,6 @@ class AddRecipesState extends State<AddRecipes> {
                 ),
                 const SizedBox(height: 15),
                 CustomTextField(
-                  validator: (value) => null,
                   hintText: 'Number of Ingredients',
                   inputType: TextInputType.text,
                   controller: numberOfIngredients,
@@ -254,7 +248,6 @@ class AddRecipesState extends State<AddRecipes> {
                 ),
                 const SizedBox(height: 15),
                 CustomTextField(
-                  validator: (value) => null,
                   hintText: 'Time',
                   inputType: TextInputType.text,
                   controller: time,
@@ -277,16 +270,19 @@ class AddRecipesState extends State<AddRecipes> {
                   ),
                 ),
                 const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    CustomContainerWithTextfield(
-                        hintText: "Protein", controller: protein),
-                    CustomContainerWithTextfield(
-                        hintText: "Carb", controller: carb),
-                    CustomContainerWithTextfield(
-                        hintText: "Fat", controller: fat),
-                  ],
+                SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      CustomContainerWithTextfield(
+                          hintText: "Protein", controller: protein),
+                      CustomContainerWithTextfield(
+                          hintText: "Carb", controller: carb),
+                      CustomContainerWithTextfield(
+                          hintText: "Fat", controller: fat),
+                    ],
+                  ),
                 ),
                 const SizedBox(height: 10),
                 Row(
