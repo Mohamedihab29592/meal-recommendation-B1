@@ -6,7 +6,7 @@ import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipe
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeEvent.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 import 'custom_recipes_card_shimmer.dart';
@@ -25,27 +25,28 @@ class RecipesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Debug print to track state
     _debugPrintRecipeState();
 
-    // Determine which list of recipes to show
+    // Get the recipes to display
     List<Recipe> recipesToShow = _getRecipesToShow(state);
 
-    // Check if there are no recipes to show
+    // Display empty state if no recipes are found
     if (recipesToShow.isEmpty) {
       return _buildEmptyState(context);
     }
 
-    // Display the list of recipes with animation
+    // Build animated list view for recipes
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
-      child: ListView.builder(
-        key: ValueKey(state.stateId), // Use stateId as key to force rebuild
+      child: ListView.separated(
+        key: ValueKey(state.stateId), // Force rebuild on state change
         shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
+        physics: const BouncingScrollPhysics(),
         itemCount: recipesToShow.length,
+        separatorBuilder: (_, __) => const SizedBox(height: 8.0),
         itemBuilder: (context, index) {
           var recipe = recipesToShow[index];
-
           return AnimatedOpacity(
             duration: const Duration(milliseconds: 300),
             opacity: 1.0,
@@ -59,7 +60,7 @@ class RecipesList extends StatelessWidget {
     );
   }
 
-  // Determine which recipes to show
+  // Helper to get recipes to show
   List<Recipe> _getRecipesToShow(HomeLoaded successState) {
     return showFilteredRecipes && successState.filteredRecipes.isNotEmpty
         ? successState.filteredRecipes
@@ -74,14 +75,21 @@ class RecipesList extends StatelessWidget {
           ? "No Recipes Match Your Filters"
           : "No Recipes Found",
       subtitle: showFilteredRecipes
-          ? "Try adjusting your filter settings"
-          : "Add your first recipe and start cooking!",
+          ? "Try adjusting your filter settings."
+          : "Add your first recipe to get started!",
       onActionPressed: () {
         if (!showFilteredRecipes) {
           Navigator.of(context).pushNamed(AppRoutes.addRecipes);
         }
       },
     );
+  }
+
+  // Debugging method for recipe state
+  void _debugPrintRecipeState() {
+    print('Filtered Recipes Shown: $showFilteredRecipes');
+    print('Total Home Recipes: ${state.homeRecipes.length}');
+    print('Filtered Recipes Count: ${state.filteredRecipes.length}');
   }
 
   // Navigate to recipe details
@@ -94,12 +102,5 @@ class RecipesList extends StatelessWidget {
         const SnackBar(content: Text('Invalid recipe ID')),
       );
     }
-  }
-
-  // Debug print to track recipe state
-  void _debugPrintRecipeState() {
-    print('Showing Filtered Recipes: $showFilteredRecipes');
-    print('Total Home Recipes: ${state.homeRecipes.length}');
-    print('Total Filtered Recipes: ${state.filteredRecipes.length}');
   }
 }

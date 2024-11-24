@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/features/Profile/Presentation/Screens/profile_screen.dart';
 import 'package:meal_recommendation_b1/features/favorites/presentaion/favorites_view.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeState.dart';
 import '../../../../core/components/side_bar.dart';
 import '../../../../core/services/di.dart';
@@ -20,14 +20,9 @@ class NavBarPage extends StatelessWidget {
   NavBarPage({super.key});
 
   List<Widget> pages = [
-    BlocProvider(
-      create: (context) => getIt<HomeBloc>(),
-      child: const HomePage(),
-    ),
-    BlocProvider(
-        create: (context) => getIt<HomeBloc>(), child: const FavoritesView()),
-    BlocProvider(
-      create: (context) => getIt<UserProfileBloc>(),
+    BlocProvider.value(value: getIt<HomeBloc>(),child: const HomePage()),
+    BlocProvider.value(value: getIt<HomeBloc>(),child: const FavoritesView()),
+    BlocProvider(create: (context) =>  getIt<UserProfileBloc>(),
       child: const ProfileScreen(),
     ),
   ];

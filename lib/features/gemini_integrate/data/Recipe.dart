@@ -36,7 +36,20 @@ class Recipe {
   }) : ingredients = List.unmodifiable(ingredients) {
     _validate();
   }
-
+  Recipe copyWith({bool? isFavorite}) {
+    return Recipe(
+      id: id,
+      name: name,
+      summary: summary,
+      typeOfMeal: typeOfMeal,
+      time: time,
+      ingredients: ingredients,
+      nutrition: nutrition,
+      imageUrl: imageUrl,
+      isFavorite: isFavorite ?? this.isFavorite,
+      directions: Directions.defaultValues(),
+    );
+  }
   // Enhanced factory constructor with detailed error handling and logging
   factory Recipe.fromJson(Map<String, dynamic> json) {
     try {

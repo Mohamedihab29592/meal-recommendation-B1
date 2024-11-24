@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeState.dart';
 import '../../../../core/components/custom_recipes_card.dart';
+import '../../../core/services/di.dart';
 
 class FavoritesView extends StatefulWidget {
   const FavoritesView({super.key});

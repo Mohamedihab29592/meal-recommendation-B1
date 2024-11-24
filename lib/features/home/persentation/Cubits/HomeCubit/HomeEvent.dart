@@ -8,20 +8,12 @@ class FilterRecipesEvent extends HomeEvent {
   final String? mealType;
   final int? cookingTime;
   final RangeValues? caloriesRange;
-  final RangeValues? proteinRange;
-  final RangeValues? carbsRange;
-  final RangeValues? fatRange;
-  final List<String>? selectedVitamins;
   final int? maxIngredients;
 
   FilterRecipesEvent({
     this.mealType,
     this.cookingTime,
     this.caloriesRange,
-    this.proteinRange,
-    this.carbsRange,
-    this.fatRange,
-    this.selectedVitamins,
     this.maxIngredients,
   });
 }

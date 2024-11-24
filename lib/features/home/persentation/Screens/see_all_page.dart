@@ -5,7 +5,7 @@ import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 import '../Widgets/recommended_recipes.dart';
 import '../Widgets/trending_recipes.dart';

@@ -6,7 +6,7 @@ import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCub
 
 import '../../../../core/utiles/app_colors.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeEvent.dart';
 
 class FilterBottomSheet extends StatefulWidget {
@@ -21,29 +21,14 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
 
   @override
   void initState() {
-   // context.read<HomeBloc>().add(FetchRecipesEvent());
     super.initState();
   }
   int _selectedMeal = -1;
   int _selectedTime = -1;
 
-  double _ingredientsSliderValue = 5;
+   double _ingredientsSliderValue = 5;
    RangeValues _caloriesRange =  const RangeValues(0, 1000);
-   RangeValues _proteinRange =  const RangeValues(0, 100);
-   RangeValues _carbsRange = const RangeValues(0, 200);
-   RangeValues _fatRange = const RangeValues(0, 100);
 
-  final List<String> _vitamins = [
-    'Vitamin A',
-    'Vitamin B1',
-    'Vitamin B2',
-    'Vitamin C',
-    'Vitamin D',
-    'Vitamin E',
-    'Vitamin K'
-  ];
-
-  List<String> _selectedVitamins = [];
   @override
   Widget build(BuildContext context) {
     return BlocListener<HomeBloc,HomeState>(
@@ -88,7 +73,6 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
                   ),
                 ),
 
-                // Cooking Time Filter
                 _buildSectionWithTitle(
                   title: "Cooking Time",
                   child: _buildFilterChips(
@@ -102,7 +86,6 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
                   ),
                 ),
 
-                // Difficulty Level Filter
                 _buildNutritionRangeSection(
                   title: "Calories (kcal)",
                   rangeValues: _caloriesRange,
@@ -114,49 +97,7 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
                     });
                   },
                 ),
-                _buildNutritionRangeSection(
-                  title: "Protein (g)",
-                  rangeValues: _proteinRange,
-                  min: 0,
-                  max: 100,
-                  onChanged: (RangeValues values) {
-                    setState(() {
-                      _proteinRange = values;
-                    });
-                  },
-                ),
 
-                _buildNutritionRangeSection(
-                  title: "Carbs (g)",
-                  rangeValues: _carbsRange,
-                  min: 0,
-                  max: 200,
-                  onChanged: (RangeValues values) {
-                    setState(() {
-                      _carbsRange = values;
-                    });
-                  },
-                ),
-
-                _buildNutritionRangeSection(
-                  title: "Fat (g)",
-                  rangeValues: _fatRange,
-                  min: 0,
-                  max: 100,
-                  onChanged: (RangeValues values) {
-                    setState(() {
-                      _fatRange = values;
-                    });
-                  },
-                ),
-
-                // Vitamins Multi-Select
-                _buildSectionWithTitle(
-                  title: "Vitamins",
-                  child: _buildVitaminsMultiSelect(),
-                ),
-
-                // Apply Filters Button
                 const SizedBox(height: 20),
                 // Number of Ingredients Slider
                 _buildSectionWithTitle(
@@ -362,50 +303,6 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
     );
   }
 
-  Widget _buildVitaminsMultiSelect() {
-    return Wrap(
-      spacing: 10,
-      runSpacing: 10,
-      children: _vitamins.map((vitamin) {
-        bool isSelected = _selectedVitamins.contains(vitamin);
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              if (isSelected) {
-                _selectedVitamins.remove(vitamin);
-              } else {
-                _selectedVitamins.add(vitamin);
-              }
-            });
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 250),
-            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
-            decoration: BoxDecoration(
-              color: isSelected ? Colors.deepOrange : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: isSelected
-                  ? [
-                BoxShadow(
-                  color: Colors.deepOrange.withOpacity(0.3),
-                  blurRadius: 8,
-                  offset: const Offset(0, 4),
-                )
-              ]
-                  : [],
-            ),
-            child: Text(
-              vitamin,
-              style: TextStyle(
-                color: isSelected ? Colors.white : Colors.black87,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
 
   void _applyFilters() {
     // Map meal type index to actual meal type string
@@ -424,10 +321,6 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
         mealType: mealType,
         cookingTime: _selectedTime != -1 ? _selectedTime : null,
         caloriesRange: _caloriesRange,
-        proteinRange: _proteinRange,
-        carbsRange: _carbsRange,
-        fatRange: _fatRange,
-        selectedVitamins: _selectedVitamins.isNotEmpty ? _selectedVitamins : null,
         maxIngredients: _ingredientsSliderValue.round(),
       ),
     );
@@ -442,10 +335,6 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
       _selectedMeal = -1;
       _selectedTime = -1;
       _caloriesRange = const RangeValues(0, 1000);
-      _proteinRange = const RangeValues(0, 100);
-      _carbsRange = const RangeValues(0, 200);
-      _fatRange = const RangeValues(0, 200);
-      _selectedVitamins = [];
       _ingredientsSliderValue = 5;
     });
 

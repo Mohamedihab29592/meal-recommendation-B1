@@ -46,7 +46,7 @@ import '../../features/gemini_integrate/data/RecipeRepository.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
 import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
-import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import '../../features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
 import 'GeminiApiService.dart';
 import 'RecipeApiService.dart';

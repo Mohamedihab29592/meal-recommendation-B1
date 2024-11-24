@@ -5,7 +5,7 @@ import '../../../../core/components/custom_recipes_card.dart';
 import '../../../../core/components/dynamic_notification_widget.dart';
 import '../../../../core/utiles/helper.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 class RecipeCardWidget extends StatelessWidget {
@@ -21,21 +21,11 @@ class RecipeCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String mealId = meal.id ?? "Unknown ID";
-    String mealName = meal.name.isNotEmpty
-        ? meal.name
-        : "Unnamed Meal";
-    String mealType = meal.typeOfMeal.isNotEmpty == true
-        ? meal.typeOfMeal!
-        : "Unknown Type";
-
+    String mealName = meal.name.isNotEmpty ? meal.name : "Unnamed Meal";
+    String mealType = meal.typeOfMeal.isNotEmpty ? meal.typeOfMeal! : "Unknown Type";
     String mealImage = meal.imageUrl;
-
-    // For ingredients, you'll need to modify based on your Recipe model
     String ingredients = "${meal.ingredients.length} Ingredients";
-
-    String time = meal.time != null
-        ? "${meal.time} min"
-        : "N/A";
+    String time = meal.time != null ? "${meal.time} min" : "N/A";
 
     return GestureDetector(
       onTap: onTap,
@@ -45,7 +35,7 @@ class RecipeCardWidget extends StatelessWidget {
         onTapFav: () => _addToFavorites(context, mealId),
         firstText: mealType,
         ingredients: ingredients,
-        isFavorite:isFavorite(context,mealId),
+        isFavorite: BlocProvider.of<HomeBloc>(context).isFavorite(mealId),
         time: time,
         middleText: mealName,
         mealId: mealId,
@@ -66,9 +56,5 @@ class RecipeCardWidget extends StatelessWidget {
 
   void _addToFavorites(BuildContext context, String mealId) {
     BlocProvider.of<HomeBloc>(context).add(ToggleFavoriteEvent(mealId));
-  }
-
-  bool isFavorite(BuildContext context, String mealId){
-    return BlocProvider.of<HomeBloc>(context).isFavorite(mealId);
   }
 }

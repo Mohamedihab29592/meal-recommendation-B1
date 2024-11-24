@@ -11,7 +11,7 @@ import '../../features/gemini_integrate/data/Recipe.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeEvent.dart';
 import '../../features/gemini_integrate/persentation/bloc/RecipeState.dart';
-import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import '../../features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import '../../features/home/persentation/Widgets/filter_bottom_sheet.dart';
 import '../components/dynamic_notification_widget.dart';
 import '../components/loading_dialog.dart';
@@ -176,7 +176,7 @@ void showNotification(BuildContext context, String message,
 }
 
 void showSaveConfirmationDialog(
-    BuildContext parentContext, List<Recipe> recipesToSave) {
+    BuildContext parentContext, List<Recipe> recipesToSave,) {
   showDialog(
     context: parentContext, // Use the parent context
     builder: (context) => AlertDialog(
@@ -351,12 +351,14 @@ String parseSafeString(dynamic value) {
   return value.toString().trim().isEmpty ? 'N/A' : value.toString();
 }
 
-void showFilterBottomSheet(BuildContext context) {
+void showFilterBottomSheet(BuildContext context, HomeBloc homeBloc) {
+
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (context) => BlocProvider.value(
-        value: getIt<HomeBloc>(), child: const FilterBottomSheet()),
+    builder: (_) => BlocProvider.value(
+    value: homeBloc
+    ,child: const FilterBottomSheet()),
   );
 }

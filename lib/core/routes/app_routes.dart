@@ -13,7 +13,7 @@ import '../../features/auth/register/persentation/screens/register/register_scre
 import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/gemini_recipe.dart';
 import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
-import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import '../../features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
 import '../../features/home/persentation/Screens/Details/DetailsPage.dart';
 import '../../features/home/persentation/Screens/HomePage.dart';
@@ -73,10 +73,7 @@ class AppRoutes {
             builder: (_) => const GeminiRecipePage());
       case home:
         return MaterialPageRoute(
-          builder: (_) => BlocProvider(
-            create: (context) => getIt<HomeBloc>(),
-            child: const HomePage(),
-          ),
+          builder: (_) => const HomePage(),
 
         );
       case navBar:
@@ -96,7 +93,7 @@ class AppRoutes {
       case addRecipes:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                create: (context) => getIt<AddIngredientCubit>(), child: AddRecipes()));
+                create: (context) => getIt<AddIngredientCubit>(), child: const AddRecipes()));
       case seeAll:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(

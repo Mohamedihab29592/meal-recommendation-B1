@@ -7,7 +7,7 @@ import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipe
 import '../../../../core/routes/app_routes.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 import 'custom_recipes_card_shimmer.dart';
 import 'empty_state_widget.dart';

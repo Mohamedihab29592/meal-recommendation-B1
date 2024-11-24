@@ -80,17 +80,43 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   }
 
   void _onFilterRecipes(
-    FilterRecipesEvent event,
-    Emitter<HomeState> emit,
-  ) {
+      FilterRecipesEvent event,
+      Emitter<HomeState> emit,
+      ) {
     emit(IsLoadingHome());
     _filteredRecipes = _homeRecipes.where((recipe) {
-      // Comprehensive filtering logic
-      if (event.mealType != null && recipe.typeOfMeal != event.mealType) {
+      // Filter by meal type
+    /*  if (event.mealType != null && recipe.typeOfMeal != event.mealType) {
+        return false;
+      }*/
+
+      // Filter by cooking time
+    /*  if (event.cookingTime != null) {
+        switch (event.cookingTime) {
+          case 0: // "5 min"
+            if (_parseCookingTime(recipe.time) > 5) return false;
+            break;
+          case 1: // "10 min"
+            if (_parseCookingTime(recipe.time) > 10) return false;
+            break;
+          case 2: // "15+ min"
+            if (_parseCookingTime(recipe.time) <= 15) return false;
+            break;
+        }
+      }*/
+
+      // Filter by calories
+      if (event.caloriesRange != null &&
+          (recipe.nutrition.calories < event.caloriesRange!.start ||
+              recipe.nutrition.calories > event.caloriesRange!.end)) {
         return false;
       }
 
-      // Add more comprehensive filtering conditions
+      // Filter by number of ingredients
+     /* if (event.maxIngredients != null && recipe.ingredients.length > event.maxIngredients!) {
+        return false;
+      }*/
+
       return true;
     }).toList();
 
@@ -141,8 +167,8 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         break;
       case 'cookingTime':
         _filteredRecipes.sort((a, b) => event.ascending
-            ? (int.tryParse(a.time) ?? 0).compareTo(int.tryParse(b.time) ?? 0)
-            : (int.tryParse(b.time) ?? 0).compareTo(int.tryParse(a.time) ?? 0));
+            ? (_parseCookingTime(a.time)).compareTo(_parseCookingTime(b.time))
+            : (_parseCookingTime(b.time).compareTo(_parseCookingTime(a.time) )));
         break;
     }
 

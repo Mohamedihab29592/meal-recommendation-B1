@@ -12,7 +12,7 @@ import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipe
 import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../../core/utiles/helper.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 import '../Widgets/error_state_widget.dart';
 import '../Widgets/searchCards.dart';
@@ -160,7 +160,9 @@ class _HomePageState extends State<HomePage> {
                               width: 25,
                             ),
                             onPressed: () {
-                              showFilterBottomSheet(context);
+                              final homeBloc = context.read<HomeBloc>();
+
+                              showFilterBottomSheet(context,homeBloc);
                             },
                           ),
                         ),

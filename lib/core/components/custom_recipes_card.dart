@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 
-import '../../features/home/persentation/Cubits/HomeCubit/HomeCubit.dart';
+import '../../features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import '../utiles/app_colors.dart';
 import '../utiles/assets.dart';
 import '../utiles/helper.dart';
