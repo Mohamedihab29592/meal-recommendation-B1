@@ -60,7 +60,7 @@ class RecipeCardWidget extends StatelessWidget {
       context: context,
       mealId: mealId,
       onSuccess: () {
-        BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
+        BlocProvider.of<HomeBloc>(context).add(DeleteRecipeEvent(mealId));
       },
     );
   }

@@ -49,23 +49,14 @@ Future<void> showDeleteDialog({
     },
     btnOkOnPress: () async {
       try {
-        print("Attempting to delete document with ID: $mealId");
 
-        final homeBloc = BlocProvider.of<HomeBloc>(context);
-
-         homeBloc.add(DeleteRecipeEvent(mealId));
-
-        // Close loading dialog
-        Navigator.of(context).pop();
-
-        await _showSuccessSnackBar(context);
 
         onSuccess();
 
         // Haptic feedback for successful deletion
         HapticFeedback.mediumImpact();
       } catch (e) {
-        Navigator.of(context).pop();
+       // Navigator.of(context).pop();
 
         // Log the error
         print("Error deleting document: $e");

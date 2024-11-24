@@ -32,8 +32,7 @@ class CustomRecipesCard extends StatelessWidget {
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
       confirmDismiss: (direction) async {
-        // Call your existing delete dialog method
-        _showDeleteDialog(context, mealId, context.read<HomeBloc>());
+       onTapDelete();
         return false; // Prevent automatic dismissal
       },
       background: Container(

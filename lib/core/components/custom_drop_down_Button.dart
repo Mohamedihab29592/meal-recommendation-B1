@@ -93,6 +93,7 @@ class CustomDropdownFieldState extends State<CustomDropdownField> {
           ),
           child: DropdownButtonFormField<String>(
             key: ValueKey(widget.hintText),
+            dropdownColor: Colors.black87,
             decoration: InputDecoration(
               filled: true,
               fillColor: defaultFillColor,
@@ -123,7 +124,7 @@ class CustomDropdownFieldState extends State<CustomDropdownField> {
             items: widget.items.map((String value) {
               return DropdownMenuItem<String>(
                 value: value,
-                child: Text(value),
+                child: Text(value,style: const TextStyle(color: Colors.white),),
               );
             }).toList(),
             onChanged: widget.enabled
