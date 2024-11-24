@@ -26,6 +26,7 @@ class RecipeSearchScreen extends StatefulWidget {
 class RecipeSearchScreenState extends State<RecipeSearchScreen> {
   final TextEditingController _controller = TextEditingController();
   bool _showSavedRecipes = false;
+  final ScrollController _scrollController = ScrollController(); // Add this
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose(); // Dispose of the ScrollController
     super.dispose();
   }
 
@@ -83,20 +85,8 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                       iconSize: 30,
                       icon: const Icon(Icons.cleaning_services,
                           color: AppColors.primary),
-                      onPressed: () => {
-                        showCleanupConfirmationDialog(
-                          context,
-                          'Complete Cleanup',
-                          'Perform a complete cleanup of saved recipes?',
-                          () {
-                            context.read<RecipeBloc>().add(CleanupRecipesEvent(
-                              deleteGenerated: true,
-                              archiveOld: true,
-                              daysOld: 30,
-                            ));
-                          },
-                        )
-                      },
+                      onPressed: () => showCleanupOptions(
+                          context, context.read<RecipeBloc>()),
                     ),
                     rightChild: RecipeButtons(
                       recipesCount: newRecipesCount,
@@ -109,9 +99,13 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                         setState(() {
                           _showSavedRecipes = !_showSavedRecipes;
                         });
-                        context.read<RecipeBloc>().add(_showSavedRecipes
-                            ? LoadSavedRecipesEvent()
-                            : CombineRecipesEvent());
+                        if (_showSavedRecipes) {
+                          context
+                              .read<RecipeBloc>()
+                              .add(LoadSavedRecipesEvent());
+                        } else {
+                          context.read<RecipeBloc>().add(CombineRecipesEvent());
+                        }
                       },
                     ),
                     leftImage: Assets.icProfileMenu,
@@ -123,6 +117,7 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                       child: RecipeListView(
                         state: state,
                         showSavedRecipes: _showSavedRecipes,
+                        scrollController: _scrollController,
                       ),
                     ),
                   ),

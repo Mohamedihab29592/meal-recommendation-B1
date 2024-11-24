@@ -64,12 +64,15 @@ class CustomRecipesCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              CircleAvatar(
-                radius: 40,
-                backgroundImage: image != null && image!.isNotEmpty
-                    ? NetworkImage(image!)
-                    : const AssetImage(Assets.icSplash) as ImageProvider,
-                backgroundColor: Colors.grey[200],
+              Hero(
+                tag: mealId,
+                child: CircleAvatar(
+                  radius: 40,
+                  backgroundImage: image != null && image!.isNotEmpty
+                      ? NetworkImage(image!)
+                      : const AssetImage(Assets.icSplash) as ImageProvider,
+                  backgroundColor: Colors.grey[200],
+                ),
               ),
               const SizedBox(width: 16),
               Expanded(

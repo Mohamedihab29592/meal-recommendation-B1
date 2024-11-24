@@ -40,18 +40,22 @@ class RecipesList extends StatelessWidget {
     return AnimatedSwitcher(
       duration: const Duration(milliseconds: 300),
       child: ListView.separated(
+        key: ValueKey<int>(recipesToShow.length),
         shrinkWrap: true,
         physics: const BouncingScrollPhysics(),
         itemCount: recipesToShow.length,
         separatorBuilder: (_, __) => const SizedBox(height: 8.0),
         itemBuilder: (context, index) {
           var recipe = recipesToShow[index];
-          return AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
-            opacity: 1.0,
-            child: RecipeCardWidget(
-              meal: recipe,
-              onTap: () => _navigateToRecipeDetails(context, recipe),
+          return KeyedSubtree(
+            key: ValueKey(recipe.id),
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: 1.0,
+              child: RecipeCardWidget(
+                meal: recipe,
+                onTap: () => _navigateToRecipeDetails(context, recipe),
+              ),
             ),
           );
         },
@@ -77,7 +81,9 @@ class RecipesList extends StatelessWidget {
           ? "Try adjusting your filter settings."
           : "Add your first recipe to get started!",
       onActionPressed: () {
-        if (!showFilteredRecipes) {
+        if (showFilteredRecipes) {
+          context.read<HomeBloc>().add(ResetFiltersEvent());
+        } else {
           Navigator.of(context).pushNamed(AppRoutes.addRecipes);
         }
       },

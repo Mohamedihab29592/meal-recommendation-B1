@@ -21,7 +21,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         super(InitialState()) {
     on<FetchRecipesEvent>(_onFetchRecipes);
     on<FilterRecipesEvent>(_onFilterRecipes);
-    on<SearchRecipesEvent>(_onSearchRecipes);
     on<SortRecipesEvent>(_onSortRecipes);
     on<ResetFiltersEvent>(_onResetFilters);
     on<ToggleFavoriteEvent>(_onToggleFavorite);
@@ -34,12 +33,11 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   List<Recipe> _filteredRecipes = [];
 
 
-  Future<void> _onFetchRecipes(FetchRecipesEvent event,
-      Emitter<HomeState> emit,) async {
-    final favoritesBox = LocalStorageService.getFavoritesBox();
-
+  Future<void> _onFetchRecipes(FetchRecipesEvent event, Emitter<HomeState> emit) async {
+    // Initial loading state
     emit(IsLoadingHome());
     try {
+      // Fetch recipes logic
       final userId = _auth.currentUser?.uid;
       if (userId == null) {
         emit(FailureState(errorMessage: "No user is logged in."));
@@ -56,91 +54,83 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
             Recipe.fromJson(Map<String, dynamic>.from(recipeData as Map)))
             .toList();
 
+        // Initialize filteredRecipes to all recipes
         _filteredRecipes = List.from(_homeRecipes);
+        final favoritesBox = LocalStorageService.getFavoritesBox();
         final favoriteIds = favoritesBox.keys.toSet();
+
         _favoriteRecipes = _homeRecipes.where((recipe) => favoriteIds.contains(recipe.id)).toList();
 
+        // Emit the loaded state
         emit(HomeLoaded(
           homeRecipes: _homeRecipes,
           favoriteRecipes: _favoriteRecipes,
           filteredRecipes: _filteredRecipes,
         ));
       } else {
-        emit(HomeLoaded(
-          homeRecipes: [],
-          favoriteRecipes: [],
-          filteredRecipes: [],
-        ));
+        emit(HomeLoaded(homeRecipes: [], favoriteRecipes: [], filteredRecipes: []));
       }
     } catch (e) {
       emit(FailureState(errorMessage: "Error fetching recipes: $e"));
     }
   }
 
-  void _onFilterRecipes(FilterRecipesEvent event,
-      Emitter<HomeState> emit,) {
+  void _onFilterRecipes(
+      FilterRecipesEvent event,
+      Emitter<HomeState> emit,
+      ) {
     emit(IsLoadingHome());
+
+    // Apply filters
     _filteredRecipes = _homeRecipes.where((recipe) {
       // Filter by meal type
-        if (event.mealType != null && recipe.typeOfMeal != event.mealType) {
+      if (event.mealType != null && recipe.typeOfMeal != event.mealType) {
         return false;
       }
 
-      // Filter by cooking time
-      /*  if (event.cookingTime != null) {
-        switch (event.cookingTime) {
-          case 0: // "5 min"
-            if (_parseCookingTime(recipe.time) > 5) return false;
-            break;
-          case 1: // "10 min"
-            if (_parseCookingTime(recipe.time) > 10) return false;
-            break;
-          case 2: // "15+ min"
-            if (_parseCookingTime(recipe.time) <= 15) return false;
-            break;
-        }
-      }*/
+      /* Uncomment and implement additional filters as needed
+    // Filter by cooking time
+    if (event.cookingTime != null) {
+      switch (event.cookingTime) {
+        case 0: // "5 min"
+          if (_parseCookingTime(recipe.time) > 5) return false;
+          break;
+        case 1: // "10 min"
+          if (_parseCookingTime(recipe.time) > 10) return false;
+          break;
+        case 2: // "15+ min"
+          if (_parseCookingTime(recipe.time) <= 15) return false;
+          break;
+      }
+    }
 
-      // Filter by calories
-    /*  if (event.caloriesRange != null &&
-          (recipe.nutrition.calories < event.caloriesRange!.start ||
-              recipe.nutrition.calories > event.caloriesRange!.end)) {
-        return false;
-      }*/
+    // Filter by calories
+    if (event.caloriesRange != null &&
+        (recipe.nutrition.calories < event.caloriesRange!.start ||
+            recipe.nutrition.calories > event.caloriesRange!.end)) {
+      return false;
+    }
 
-      // Filter by number of ingredients
-      /* if (event.maxIngredients != null && recipe.ingredients.length > event.maxIngredients!) {
-        return false;
-      }*/
+    // Filter by number of ingredients
+    if (event.maxIngredients != null &&
+        recipe.ingredients.length > event.maxIngredients!) {
+      return false;
+    }
+    */
 
       return true;
     }).toList();
 
-    emit(HomeLoaded(
-      homeRecipes: _homeRecipes,
-      favoriteRecipes: _favoriteRecipes,
-      filteredRecipes: _filteredRecipes,
-    ));
-  }
-
-  void _onSearchRecipes(SearchRecipesEvent event,
-      Emitter<HomeState> emit,) {
-    _filteredRecipes = _homeRecipes.where((recipe) {
-      return recipe.name.toLowerCase().contains(event.query.toLowerCase()) ||
-          recipe.summary.toLowerCase().contains(event.query.toLowerCase()) ||
-          recipe.typeOfMeal.toLowerCase().contains(event.query.toLowerCase()) ||
-          (recipe.ingredients.any((ingredient) =>
-              ingredient.name
-                  .toLowerCase()
-                  .contains(event.query.toLowerCase())) ??
-              false);
-    }).toList();
-
-    emit(HomeLoaded(
-      homeRecipes: _homeRecipes,
-      favoriteRecipes: _favoriteRecipes,
-      filteredRecipes: _filteredRecipes,
-    ));
+    // Check if filtered list is empty
+    if (_filteredRecipes.isEmpty) {
+      emit(NoMatchingRecipesState());
+    } else {
+      emit(HomeLoaded(
+        homeRecipes: _homeRecipes,
+        favoriteRecipes: _favoriteRecipes,
+        filteredRecipes: _filteredRecipes,
+      ));
+    }
   }
 
   void _onSortRecipes(SortRecipesEvent event,
@@ -289,6 +279,9 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
   void onTransition(Transition<HomeEvent, HomeState> transition) {
     print('Bloc Transition: ${transition.currentState} -> ${transition
         .nextState}');
+    print('Transition from ${transition.currentState} to ${transition.nextState}');
+    print('_homeRecipes: ${_homeRecipes.length}');
+    print('_filteredRecipes: ${_filteredRecipes.length}');
     super.onTransition(transition);
   }
 }

@@ -7,6 +7,7 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/features/auth/login/persentation/bloc/auth_bloc.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
 import 'core/utiles/local_storage_service.dart';
 import 'firebase_options.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
@@ -38,6 +39,7 @@ class MealApp extends StatelessWidget {
                 providers: [
                   BlocProvider(lazy: true, create: (context) => getIt<RecipeBloc>(),),
                   BlocProvider(lazy: true, create: (context) => getIt<AuthBloc>(),),
+                  BlocProvider(lazy: true, create: (context) => getIt<HomeBloc>(),),
                 ],
                 child: MaterialApp(
                   title: 'Meal - Recommendation',

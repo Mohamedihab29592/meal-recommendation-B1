@@ -10,108 +10,129 @@ import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeEvent.dart';
 
 class FilterBottomSheet extends StatefulWidget {
-
-  const FilterBottomSheet({super.key});
+  const FilterBottomSheet({Key? key}) : super(key: key);
 
   @override
   FilterBottomSheetState createState() => FilterBottomSheetState();
 }
 
 class FilterBottomSheetState extends State<FilterBottomSheet> {
-
-  @override
-  void initState() {
-    super.initState();
-  }
   int _selectedMeal = -1;
   int _selectedTime = -1;
-
-   double _ingredientsSliderValue = 5;
-   RangeValues _caloriesRange =  const RangeValues(0, 1000);
+  double _ingredientsSliderValue = 5;
+  RangeValues _caloriesRange = const RangeValues(0, 1000);
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<HomeBloc,HomeState>(
-      listener: (context, state) {
-
-      },
-      child: Scaffold(
-        body: SingleChildScrollView(
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(
-                top: Radius.circular(24),
+    return DraggableScrollableSheet(
+      initialChildSize: 0.85,
+      minChildSize: 0.5,
+      maxChildSize: 0.95,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(24),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 10,
+                spreadRadius: 5,
               ),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 10,
-                  offset: Offset(0, -4),
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header with Title and Reset Button
-                _buildHeader(),
-
-                // Meal Type Filter
-                _buildSectionWithTitle(
-                  title: "Meal Type",
-                  child: _buildFilterChips(
-                    options: ["Breakfast", "Lunch", "Dinner", "Drink", "Dessert", "Snacks","Appetizer"],
-                    selectedIndex: _selectedMeal,
-                    onSelected: (index) {
-                      setState(() {
-                        _selectedMeal = index;
-                      });
-                    },
-                  ),
-                ),
-
-                _buildSectionWithTitle(
-                  title: "Cooking Time",
-                  child: _buildFilterChips(
-                    options: ["5 min", "10 min", "15+ min"],
-                    selectedIndex: _selectedTime,
-                    onSelected: (index) {
-                      setState(() {
-                        _selectedTime = index;
-                      });
-                    },
-                  ),
-                ),
-
-                _buildNutritionRangeSection(
-                  title: "Calories (kcal)",
-                  rangeValues: _caloriesRange,
-                  min: 0,
-                  max: 1000,
-                  onChanged: (RangeValues values) {
-                    setState(() {
-                      _caloriesRange = values;
-                    });
-                  },
-                ),
-
-                const SizedBox(height: 20),
-                // Number of Ingredients Slider
-                _buildSectionWithTitle(
-                  title: "Number of Ingredients",
-                  child: _buildIngredientsSlider(),
-                ),
-
-                // Apply Filters Button
-                const SizedBox(height: 20),
-                _buildApplyFiltersButton(),
-              ],
-            ),
+            ],
           ),
-        ),
+          child: Column(
+            children: [
+              // Drag Handle
+              _buildDragHandle(),
+
+              // Content
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                  children: [
+                    // Header
+                    _buildHeader(),
+
+                    // Meal Type Filter
+                    _buildSectionWithTitle(
+                      title: "Meal Type",
+                      child: _buildFilterChips(
+                        options: [
+                          "Breakfast",
+                          "Lunch",
+                          "Dinner",
+                          "Drink",
+                          "Dessert",
+                          "Snacks",
+                          "Appetizer"
+                        ],
+                        selectedIndex: _selectedMeal,
+                        onSelected: (index) {
+                          setState(() {
+                            _selectedMeal = index;
+                          });
+                        },
+                      ),
+                    ),
+
+                    // Cooking Time Filter
+                    _buildSectionWithTitle(
+                      title: "Cooking Time",
+                      child: _buildFilterChips(
+                        options: ["5 min", "10 min", "15+ min"],
+                        selectedIndex: _selectedTime,
+                        onSelected: (index) {
+                          setState(() {
+                            _selectedTime = index;
+                          });
+                        },
+                      ),
+                    ),
+
+                    // Calories Range Slider
+                    _buildNutritionRangeSection(
+                      title: "Calories (kcal)",
+                      rangeValues: _caloriesRange,
+                      min: 0,
+                      max: 1000,
+                      onChanged: (RangeValues values) {
+                        setState(() {
+                          _caloriesRange = values;
+                        });
+                      },
+                    ),
+
+                    // Number of Ingredients Slider
+                    _buildSectionWithTitle(
+                      title: "Number of Ingredients",
+                      child: _buildIngredientsSlider(),
+                    ),
+
+                    // Apply Filters Button
+                    const SizedBox(height: 20),
+                    _buildApplyFiltersButton(),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildDragHandle() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      width: 40,
+      height: 5,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(10),
       ),
     );
   }
@@ -135,7 +156,7 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
             child: const Text(
               "Reset",
               style: TextStyle(
-                color:  AppColors.primary,
+                color: AppColors.primary,
                 fontSize: 18,
                 fontWeight: FontWeight.w600,
               ),
@@ -145,7 +166,6 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
       ),
     );
   }
-
   Widget _buildSectionWithTitle({
     required String title,
     required Widget child,
@@ -285,7 +305,7 @@ class FilterBottomSheetState extends State<FilterBottomSheet> {
               rangeValues.end.round().toString(),
             ),
             onChanged: onChanged,
-            activeColor: Colors.deepOrange,
+            activeColor: AppColors.primary,
             inactiveColor: Colors.grey.shade300,
           ),
           Padding(

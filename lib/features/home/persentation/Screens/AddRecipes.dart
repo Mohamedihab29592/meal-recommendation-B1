@@ -455,11 +455,11 @@ class AddRecipesState extends State<AddRecipes> {
                         DynamicNotificationWidget.showNotification(
                           context: context,
                           title: 'Oh Hey!!',
-                          message: 'Failed to send data: $error',
-                          color: Colors.green,
+                          message: 'Fill the Required Fields',
+                          color: Colors.blueAccent,
                           // You can use this color if needed
-                          contentType: ContentType.failure,
-                          inMaterialBanner: true,
+                          contentType: ContentType.help,
+                          inMaterialBanner: false,
                         );
                       });
                     },

@@ -20,9 +20,10 @@ class NavBarPage extends StatelessWidget {
   NavBarPage({super.key});
 
   List<Widget> pages = [
-    BlocProvider.value(value: getIt<HomeBloc>(),child: const HomePage()),
-    BlocProvider.value(value: getIt<HomeBloc>(),child: const FavoritesView()),
-    BlocProvider(create: (context) =>  getIt<UserProfileBloc>(),
+    BlocProvider.value(value: getIt<HomeBloc>(), child: const HomePage()),
+    BlocProvider.value(value: getIt<HomeBloc>(), child: const FavoritesView()),
+    BlocProvider(
+      create: (context) => getIt<UserProfileBloc>(),
       child: const ProfileScreen(),
     ),
   ];
@@ -38,63 +39,60 @@ class NavBarPage extends StatelessWidget {
         } else if (state is UserLoaded) {
           final user = state.user;
           final authBloc = context.read<AuthBloc>();
-          final screenSize = MediaQuery.of(context).size;
           final navBarCubit = BlocProvider.of<NavBarCubit>(context);
 
           return Scaffold(
-              bottomNavigationBar: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                ),
-                margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(30),
-                  child: BottomNavigationBar(
-                    currentIndex: navBarCubit.currentIndex,
-                    items: _buildBottomNavItems(screenSize, navBarCubit),
-                    backgroundColor: Colors.white,
-                    onTap: (value) {
-                      navBarCubit.moveChange(value);
-                    },
-                  ),
+            bottomNavigationBar: Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(30),
+              ),
+              margin: const EdgeInsets.symmetric(vertical: 0, horizontal: 10),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(30),
+                child: BottomNavigationBar(
+                  currentIndex: navBarCubit.currentIndex,
+                  items: _buildBottomNavItems(navBarCubit),
+                  backgroundColor: Colors.white,
+                  onTap: (value) {
+                    navBarCubit.moveChange(value);
+                  },
                 ),
               ),
-              body: pages[navBarCubit.currentIndex],
-              drawer: SideBar(
-                  user: user,
-                  authBloc: authBloc));
+            ),
+            body: pages[navBarCubit.currentIndex],
+            drawer: SideBar(user: user, authBloc: authBloc),
+          );
         } else {
-          return const Center(child: Text('Unexpected state.')); //issue here
+          return const Center(child: Text('Unexpected state.'));
         }
       },
     );
   }
 
-  List<BottomNavigationBarItem> _buildBottomNavItems(
-      Size screenSize, NavBarCubit navBarCubit) {
+  List<BottomNavigationBarItem> _buildBottomNavItems(NavBarCubit navBarCubit) {
     return [
-      _buildBottomNavItem(
-          Assets.icHome, navBarCubit.currentIndex == 0, screenSize),
-      _buildBottomNavItem(
-          Assets.icFavorite, navBarCubit.currentIndex == 1, screenSize),
-      _buildBottomNavItem(
-          Assets.icAccount, navBarCubit.currentIndex == 2, screenSize),
+      _buildBottomNavItem(Assets.icHome, navBarCubit.currentIndex == 0),
+      _buildBottomNavItem(Assets.icFavorite, navBarCubit.currentIndex == 1),
+      _buildBottomNavItem(Assets.icAccount, navBarCubit.currentIndex == 2),
     ];
   }
 
-  BottomNavigationBarItem _buildBottomNavItem(
-      String assetPath, bool isSelected, Size screenSize) {
+  BottomNavigationBarItem _buildBottomNavItem(String assetPath, bool isSelected) {
     return BottomNavigationBarItem(
-      icon: isSelected
-          ? CircleAvatar(
-              radius: screenSize.width < 600 ? 30 : 40,
-              backgroundColor: AppColors.primary,
-              child: Image.asset(
-                assetPath,
-                color: Colors.white,
-              ),
-            )
-          : Image.asset(assetPath),
+      icon: AnimatedContainer(
+        duration: const Duration(milliseconds: 300), // Animation duration
+        curve: Curves.easeInOut, // Animation curve
+        height: isSelected ? 50 : 40, // Height change for animation
+        width: isSelected ? 50 : 40, // Width change for animation
+        child: CircleAvatar(
+          radius: isSelected ? 30 : 20, // Circle size change
+          backgroundColor: isSelected ? AppColors.primary : Colors.transparent,
+          child: Image.asset(
+            assetPath,
+            color: isSelected ? Colors.white : AppColors.primary,
+          ),
+        ),
+      ),
       label: "",
     );
   }

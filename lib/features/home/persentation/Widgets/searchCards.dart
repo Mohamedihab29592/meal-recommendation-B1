@@ -14,34 +14,40 @@ import 'empty_state_widget.dart';
 import 'error_state_widget.dart';
 
 class SearchCards extends SearchDelegate {
-  HomeState homeState;
+  final HomeState homeState;
 
   SearchCards({required this.homeState});
+
+
 
   @override
   List<Widget>? buildActions(BuildContext context) {
     return [
       IconButton(
-          onPressed: () {
-            query = "";
-          },
-          icon: const Icon(Icons.close)),
+        onPressed: () {
+          query = ""; // Clear the search query
+        },
+        icon: const Icon(Icons.close),
+      ),
     ];
   }
 
   @override
   Widget? buildLeading(BuildContext context) {
-    IconButton(
-        onPressed: () {
-          close(context, null);
-        },
-        icon: const Icon(Icons.arrow_back));
+    return IconButton(
+      onPressed: () {
+        close(context,null); // Close the search delegate
+
+
+      },
+      icon: const Icon(Icons.arrow_back),
+    );
   }
 
   @override
   Widget buildResults(BuildContext context) {
-    // TODO: implement buildResults
-    throw UnimplementedError();
+    // This can display detailed search results if needed
+    return buildSuggestions(context);
   }
 
   @override
@@ -50,53 +56,71 @@ class SearchCards extends SearchDelegate {
       final successState = homeState as HomeLoaded;
 
       if (successState.homeRecipes.isEmpty) {
-        return EmptyStateWidget(
-          image: Assets.noFoodFound,
-          title: "No Recipes Found",
-          subtitle: "Add your first recipe and start cooking!",
-          onActionPressed: () {
-            Navigator.of(context).pushNamed(AppRoutes.addRecipes);
-          },
+        return SingleChildScrollView(
+          child: EmptyStateWidget(
+            image: Assets.noFoodFound,
+            title: "No Recipes Found",
+            subtitle: "Add your first recipe and start cooking!",
+            onActionPressed: () {
+              Navigator.of(context).pushNamed(AppRoutes.addRecipes);
+            },
+          ),
         );
       }
-      List<Recipe> filteredRecipeCard = successState.homeRecipes
-          .where((element) => element.name.startsWith(query))
-          .toList();
-      return ListView(
-        children: filteredRecipeCard.map((card) {
-          return RecipeCardWidget(
-            meal: card,
-            onTap: () {
-              // More robust ID handling
-              final recipeId = card.id ?? '';
-              print('Attempting to navigate with ID: $recipeId');
 
+      // Filter recipes based on query
+      final filteredRecipes = successState.homeRecipes.where((recipe) {
+        final lowerQuery = query.toLowerCase();
+        return recipe.name.toLowerCase().contains(lowerQuery) ||
+            recipe.summary.toLowerCase().contains(lowerQuery) ||
+            recipe.ingredients.any((ingredient) =>
+                ingredient.name.toLowerCase().contains(lowerQuery));
+      }).toList();
+
+      if (filteredRecipes.isEmpty) {
+        return Center(
+          child: Text(
+            "No recipes match your search.",
+            style: Theme.of(context).textTheme.headlineLarge,
+          ),
+        );
+      }
+
+      // Display the filtered results
+      return ListView.builder(
+        itemCount: filteredRecipes.length,
+        itemBuilder: (context, index) {
+          final recipe = filteredRecipes[index];
+          return RecipeCardWidget(
+            meal: recipe,
+            onTap: () {
+              final recipeId = recipe.id ?? '';
               if (recipeId.isNotEmpty) {
                 context.pushNamed(AppRoutes.detailsPage, arguments: recipeId);
               } else {
-                // Fallback or error handling
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Invalid recipe ID')),
                 );
               }
             },
           );
-        }).toList(),
+        },
       );
     } else if (homeState is FailureState) {
       final failureState = homeState as FailureState;
       return ErrorStateWidget(
-        errorMessage:
-            failureState.errorMessage ?? "An unexpected error occurred",
+        errorMessage: failureState.errorMessage ?? "An unexpected error occurred",
         onRetry: () {
           BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
         },
       );
     } else {
-      return Column(
-        children: List.generate(
-          5,
-          (_) => const CustomRecipesCardShimmer(),
+      return SingleChildScrollView(
+        child: Column(
+          children: List.generate(
+            5,
+                (_) => const CustomRecipesCardShimmer(),
+          ),
         ),
       );
     }

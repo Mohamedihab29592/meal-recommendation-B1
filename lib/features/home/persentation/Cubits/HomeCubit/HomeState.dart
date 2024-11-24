@@ -11,6 +11,7 @@ class HomeLoaded extends HomeState {
   final List<Recipe> favoriteRecipes;
   final List<Recipe> filteredRecipes;
 
+
   HomeLoaded({
     required this.homeRecipes,
     required this.favoriteRecipes,
@@ -32,5 +33,9 @@ class FailureState extends HomeState {
   FailureState({
     required this.errorMessage,
   });
+
+}
+
+class NoMatchingRecipesState extends HomeState {
 
 }

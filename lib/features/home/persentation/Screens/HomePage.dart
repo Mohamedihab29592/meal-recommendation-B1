@@ -1,4 +1,5 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -25,32 +26,38 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
     context.read<HomeBloc>().add(FetchRecipesEvent());
+    _searchController = TextEditingController();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     context.read<HomeBloc>().add(FetchRecipesEvent());
   }
+
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
 
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
           onRefresh: () async {
-             BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
+            context.read<HomeBloc>().add(FetchRecipesEvent());
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
               padding:
-                  EdgeInsets.symmetric(horizontal: screenSize.width * 0.04),
+              EdgeInsets.symmetric(horizontal: screenSize.width * 0.04),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -87,9 +94,13 @@ class _HomePageState extends State<HomePage> {
                   // Subtitle with Responsive Text
                   Text(
                     "Discover new recipes or add your ingredients to get started.",
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[700],
-                        ),
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(
+                      color: Colors.grey[700],
+                    ),
                   ),
 
                   SizedBox(height: screenSize.height * 0.03),
@@ -98,7 +109,7 @@ class _HomePageState extends State<HomePage> {
                   BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
                     return SearchBar(
                       backgroundColor:
-                          WidgetStateProperty.resolveWith((states) {
+                      WidgetStateProperty.resolveWith((states) {
                         if (states.contains(WidgetState.focused)) {
                           return Colors.white.withOpacity(0.95);
                         }
@@ -111,8 +122,8 @@ class _HomePageState extends State<HomePage> {
                         return 1.0;
                       }),
                       constraints:
-                          const BoxConstraints(minHeight: 55, maxHeight: 55),
-                      shape: MaterialStateProperty.all(
+                      const BoxConstraints(minHeight: 55, maxHeight: 55),
+                      shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
@@ -122,24 +133,34 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       hintText: "Search Recipes",
-                      hintStyle: MaterialStateProperty.all(
+                      hintStyle: WidgetStateProperty.all(
                         TextStyle(
                           color: Colors.grey.shade500,
                           fontSize: 16,
                         ),
                       ),
-                      textStyle: MaterialStateProperty.all(
+                      textStyle: WidgetStateProperty.all(
                         const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                         ),
                       ),
-                      onTap: () {
-                        showSearch(
-                            context: context,
-                            delegate: SearchCards(homeState: state));
+                      controller: _searchController,
+                      onTap: () async {
+                        final searchResult = await showSearch(
+                          context: context,
+                          delegate: SearchCards(homeState: state),
+                        );
+
+                        if (searchResult == null) {
+                          FocusScope.of(context).unfocus();
+
+                          context.read<HomeBloc>().add(FetchRecipesEvent());
+                        }
                       },
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        context.read<HomeBloc>().add(SearchRecipesEvent(value));
+                      },
                       leading: Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Image.asset(
@@ -162,7 +183,7 @@ class _HomePageState extends State<HomePage> {
                             onPressed: () {
                               final homeBloc = context.read<HomeBloc>();
 
-                              showFilterBottomSheet(context,homeBloc);
+                              showFilterBottomSheet(context, homeBloc);
                             },
                           ),
                         ),
@@ -205,9 +226,13 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "Top Recipes",
                         style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        Theme
+                            .of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
@@ -227,31 +252,42 @@ class _HomePageState extends State<HomePage> {
 
                   SizedBox(height: screenSize.height * 0.02),
 
-              BlocBuilder<HomeBloc, HomeState>(
-                builder: (context, state) {
-                  if (state is IsLoadingHome) {
-                    return const CustomRecipesCardShimmer();
-                  }
+                  BlocConsumer<HomeBloc, HomeState>(
+                    listener: (context, state) {
+                      if (state is NoMatchingRecipesState) {
+                        showNotification(
+                            context, "No recipes match your filters.",
+                            ContentType.warning, Colors.orangeAccent);
+                      }
+                    },
+                    builder: (context, state) {
+                      if (state is IsLoadingHome) {
+                        return  Column(
+                            children: List.generate(
+                              5,
+                                  (_) => const CustomRecipesCardShimmer(),
+                            ));
+                      }
 
-                  if (state is FailureState) {
-                    return ErrorStateWidget(
-                      errorMessage: state.errorMessage,
-                      onRetry: () {
-                        context.read<HomeBloc>().add(FetchRecipesEvent());
-                      },
-                    );
-                  }
+                      if (state is FailureState) {
+                        return ErrorStateWidget(
+                          errorMessage: state.errorMessage,
+                          onRetry: () {
+                            context.read<HomeBloc>().add(FetchRecipesEvent());
+                          },
+                        );
+                      }
 
-                  if (state is HomeLoaded) {
-                    return RecipesList(
-                      state: state,
-                      showFilteredRecipes: state.filteredRecipes.isNotEmpty,
-                    );
-                  }
+                      if (state is HomeLoaded) {
+                        return RecipesList(
+                          state: state,
+                          showFilteredRecipes: state.filteredRecipes.isNotEmpty,
+                        );
+                      }
 
-                  return const SizedBox.shrink();
-                },
-              ),
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),
