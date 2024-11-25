@@ -176,7 +176,7 @@ class RecipeBloc extends Bloc<RecipeEvent, RecipeState> {
         archiveOld: event.archiveOld,
         daysOld: event.daysOld,
       );
-
+      emit(RecipeLoading());
       final updatedRecipes = await recipeRepository.fetchSavedRecipes();
       _savedRecipes = _validateRecipes(updatedRecipes);
 

@@ -49,14 +49,12 @@ Future<void> showDeleteDialog({
     },
     btnOkOnPress: () async {
       try {
-
-
         onSuccess();
 
         // Haptic feedback for successful deletion
         HapticFeedback.mediumImpact();
       } catch (e) {
-       // Navigator.of(context).pop();
+        // Navigator.of(context).pop();
 
         // Log the error
         print("Error deleting document: $e");
@@ -167,7 +165,9 @@ void showNotification(BuildContext context, String message,
 }
 
 void showSaveConfirmationDialog(
-    BuildContext parentContext, List<Recipe> recipesToSave,) {
+  BuildContext parentContext,
+  List<Recipe> recipesToSave,
+) {
   showDialog(
     context: parentContext, // Use the parent context
     builder: (context) => AlertDialog(
@@ -226,6 +226,18 @@ void showCleanupOptions(BuildContext context, RecipeBloc recipeBloc) {
               subtitle: const Text('Delete generated and archive old recipes'),
               onTap: () {
                 Navigator.pop(context);
+                showCleanupConfirmationDialog(
+                  context,
+                  'Complete Cleanup',
+                  'Perform a complete cleanup of recipes?',
+                  () {
+                    recipeBloc.add(CleanupRecipesEvent(
+                      deleteGenerated: true,
+                      archiveOld: true,
+                      daysOld: 30,
+                    ));
+                  },
+                );
               },
             ),
           ],
@@ -343,13 +355,11 @@ String parseSafeString(dynamic value) {
 }
 
 void showFilterBottomSheet(BuildContext context, HomeBloc homeBloc) {
-
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
     backgroundColor: Colors.transparent,
-    builder: (_) => BlocProvider.value(
-    value: homeBloc
-    ,child: const FilterBottomSheet()),
+    builder: (_) =>
+        BlocProvider.value(value: homeBloc, child: const FilterBottomSheet()),
   );
 }

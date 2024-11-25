@@ -88,8 +88,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         return false;
       }
 
-      /* Uncomment and implement additional filters as needed
-    // Filter by cooking time
     if (event.cookingTime != null) {
       switch (event.cookingTime) {
         case 0: // "5 min"
@@ -116,7 +114,6 @@ class HomeBloc extends Bloc<HomeEvent, HomeState> {
         recipe.ingredients.length > event.maxIngredients!) {
       return false;
     }
-    */
 
       return true;
     }).toList();

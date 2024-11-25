@@ -25,12 +25,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
   late TextEditingController _searchController;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     context.read<HomeBloc>().add(FetchRecipesEvent());
     _searchController = TextEditingController();
   }
@@ -40,7 +41,13 @@ class _HomePageState extends State<HomePage> {
     super.didChangeDependencies();
     context.read<HomeBloc>().add(FetchRecipesEvent());
   }
-
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Fetch data when the app is resumed
+      context.read<HomeBloc>().add(FetchRecipesEvent());
+    }
+  }
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery
@@ -50,6 +57,8 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
+          backgroundColor: AppColors.primary,
+          color: Colors.white,
           onRefresh: () async {
             context.read<HomeBloc>().add(FetchRecipesEvent());
           },
@@ -151,11 +160,13 @@ class _HomePageState extends State<HomePage> {
                           context: context,
                           delegate: SearchCards(homeState: state),
                         );
-
+                        FocusScope.of(context).unfocus();
                         if (searchResult == null) {
                           FocusScope.of(context).unfocus();
+                          Future.delayed(const Duration(milliseconds: 300),() =>{
+                          context.read<HomeBloc>().add(FetchRecipesEvent())
 
-                          context.read<HomeBloc>().add(FetchRecipesEvent());
+                          });
                         }
                       },
                       onChanged: (value) {

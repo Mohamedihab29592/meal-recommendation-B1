@@ -77,7 +77,7 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                 children: [
                   CustomAppbar(
                     ontapleft: () =>
-                        showCleanupOptions(context, context.read<RecipeBloc>()),
+                        showCleanupOptions(context,context.read<RecipeBloc>()),
                     ontapright: () {
                       context.pushNamed(AppRoutes.geminiRecipe);
                     },
