@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import '../../../../core/components/custom_recipes_card.dart';
 import '../../../../core/components/dynamic_notification_widget.dart';
+import '../../../../core/services/di.dart';
 import '../../../../core/utiles/helper.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
 import '../Cubits/HomeCubit/HomeBloc.dart';
@@ -31,26 +32,29 @@ class RecipeCardWidget extends StatelessWidget {
     String ingredients = "${meal.ingredients.length} Ingredients";
     String time = meal.time != null ? "${meal.time} min" : "N/A";
 
-    return GestureDetector(
-      onTap: onTap,
-      child: BlocBuilder<HomeBloc, HomeState>(
-        builder: (context, state) {
-          // Determine if the meal is a favorite
-          bool isFavorite = BlocProvider.of<HomeBloc>(context).isFavorite(mealId);
+    return BlocProvider.value(
+      value: getIt<HomeBloc>(),
+      child: GestureDetector(
+        onTap: onTap,
+        child: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            // Determine if the meal is a favorite
+            bool isFavorite = BlocProvider.of<HomeBloc>(context).isFavorite(mealId);
 
-          return CustomRecipesCard(
-            key: ValueKey(mealId),
-            onTapDelete: () => _showDeleteDialog(context, mealId),
-            onTapFav: () => _addToFavorites(context, mealId),
-            firstText: mealType,
-            ingredients: ingredients,
-            isFavorite: isFavorite, // Use the isFavorite state here
-            time: time,
-            middleText: mealName,
-            mealId: mealId,
-            image: mealImage,
-          );
-        },
+            return CustomRecipesCard(
+              key: ValueKey(mealId),
+              onTapDelete: () => _showDeleteDialog(context, mealId),
+              onTapFav: () => _addToFavorites(context, mealId),
+              firstText: mealType,
+              ingredients: ingredients,
+              isFavorite: isFavorite, // Use the isFavorite state here
+              time: time,
+              middleText: mealName,
+              mealId: mealId,
+              image: mealImage,
+            );
+          },
+        ),
       ),
     );
   }

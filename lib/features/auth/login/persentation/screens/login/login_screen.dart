@@ -2,7 +2,6 @@ import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_strings.dart';
-import 'package:meal_recommendation_b1/features/auth/login/domain/entity/user_entity.dart';
 import '../../../../../../core/components/custom_button.dart';
 import '../../../../../../core/components/custom_text_field.dart';
 import '../../../../../../core/components/dynamic_notification_widget.dart';
@@ -56,7 +55,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 state.user.id);
              print(state.user.email);
             if (state.isNewUser) {
-              Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+              Navigator.pushReplacementNamed(context, AppRoutes.welcome);
             } else if (state.isFirstLogin) {
               // Returning user, but first time logging in after registration
               Navigator.pushReplacementNamed(context, AppRoutes.welcome);

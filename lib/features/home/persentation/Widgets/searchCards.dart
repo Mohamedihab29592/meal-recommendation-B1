@@ -5,6 +5,7 @@ import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCub
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipe_card_widget.dart';
 
 import '../../../../core/routes/app_routes.dart';
+import '../../../../core/services/di.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
 import '../Cubits/HomeCubit/HomeBloc.dart';
@@ -14,11 +15,9 @@ import 'empty_state_widget.dart';
 import 'error_state_widget.dart';
 
 class SearchCards extends SearchDelegate {
-  final HomeState homeState;
+  final HomeBloc homeBloc;
 
-  SearchCards({required this.homeState});
-
-
+  SearchCards({required this.homeBloc});
 
   @override
   List<Widget>? buildActions(BuildContext context) {
@@ -36,9 +35,7 @@ class SearchCards extends SearchDelegate {
   Widget? buildLeading(BuildContext context) {
     return IconButton(
       onPressed: () {
-        close(context,null); // Close the search delegate
-
-
+        close(context, null); // Close the search delegate
       },
       icon: const Icon(Icons.arrow_back),
     );
@@ -46,83 +43,74 @@ class SearchCards extends SearchDelegate {
 
   @override
   Widget buildResults(BuildContext context) {
-    // This can display detailed search results if needed
-    return buildSuggestions(context);
+    // Display the suggestions for now; adjust if detailed results are needed
+    return BlocProvider.value(value:getIt<HomeBloc>(),child: buildSuggestions(context));
   }
 
   @override
   Widget buildSuggestions(BuildContext context) {
-    if (homeState is HomeLoaded) {
-      final successState = homeState as HomeLoaded;
+    return BlocBuilder<HomeBloc, HomeState>(
+      bloc: homeBloc, // Explicitly provide the HomeBloc
+      builder: (context, state) {
+        if (state is HomeLoaded) {
+          final recipes = state.homeRecipes;
 
-      if (successState.homeRecipes.isEmpty) {
-        return SingleChildScrollView(
-          child: EmptyStateWidget(
-            image: Assets.noFoodFound,
-            title: "No Recipes Found",
-            subtitle: "Add your first recipe and start cooking!",
-            onActionPressed: () {
-              Navigator.of(context).pushNamed(AppRoutes.addRecipes);
-            },
-          ),
-        );
-      }
+          // Filter recipes based on the search query
+          final filteredRecipes = recipes.where((recipe) {
+            final lowerQuery = query.toLowerCase();
+            return recipe.name.toLowerCase().contains(lowerQuery) ||
+                recipe.summary.toLowerCase().contains(lowerQuery) ||
+                recipe.ingredients.any((ingredient) =>
+                    ingredient.name.toLowerCase().contains(lowerQuery));
+          }).toList();
 
-      // Filter recipes based on query
-      final filteredRecipes = successState.homeRecipes.where((recipe) {
-        final lowerQuery = query.toLowerCase();
-        return recipe.name.toLowerCase().contains(lowerQuery) ||
-            recipe.summary.toLowerCase().contains(lowerQuery) ||
-            recipe.ingredients.any((ingredient) =>
-                ingredient.name.toLowerCase().contains(lowerQuery));
-      }).toList();
+          if (filteredRecipes.isEmpty) {
+            return Center(
+              child: Text(
+                "No recipes match your search.",
+                style: Theme.of(context).textTheme.headlineLarge,
+              ),
+            );
+          }
 
-      if (filteredRecipes.isEmpty) {
-        return Center(
-          child: Text(
-            "No recipes match your search.",
-            style: Theme.of(context).textTheme.headlineLarge,
-          ),
-        );
-      }
-
-      // Display the filtered results
-      return ListView.builder(
-        itemCount: filteredRecipes.length,
-        itemBuilder: (context, index) {
-          final recipe = filteredRecipes[index];
-          return RecipeCardWidget(
-            meal: recipe,
-            onTap: () {
-              final recipeId = recipe.id ?? '';
-              if (recipeId.isNotEmpty) {
-                context.pushNamed(AppRoutes.detailsPage, arguments: recipeId);
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Invalid recipe ID')),
-                );
-              }
+          // Display filtered results
+          return ListView.builder(
+            itemCount: filteredRecipes.length,
+            itemBuilder: (context, index) {
+              final recipe = filteredRecipes[index];
+              return RecipeCardWidget(
+                meal: recipe,
+                onTap: () {
+                  final recipeId = recipe.id ?? '';
+                  if (recipeId.isNotEmpty) {
+                    context.pushNamed(AppRoutes.detailsPage, arguments: recipeId);
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Invalid recipe ID')),
+                    );
+                  }
+                },
+              );
             },
           );
-        },
-      );
-    } else if (homeState is FailureState) {
-      final failureState = homeState as FailureState;
-      return ErrorStateWidget(
-        errorMessage: failureState.errorMessage ?? "An unexpected error occurred",
-        onRetry: () {
-          BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
-        },
-      );
-    } else {
-      return SingleChildScrollView(
-        child: Column(
-          children: List.generate(
-            5,
-                (_) => const CustomRecipesCardShimmer(),
-          ),
-        ),
-      );
-    }
+        } else if (state is FailureState) {
+          return ErrorStateWidget(
+            errorMessage: state.errorMessage ?? "An unexpected error occurred",
+            onRetry: () {
+              homeBloc.add(FetchRecipesEvent());
+            },
+          );
+        } else {
+          return SingleChildScrollView(
+            child: Column(
+              children: List.generate(
+                5,
+                    (_) => const CustomRecipesCardShimmer(),
+              ),
+            ),
+          );
+        }
+      },
+    );
   }
 }

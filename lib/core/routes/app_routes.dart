@@ -10,7 +10,6 @@ import '../../features/auth/OTP/presentation/screens/otp.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/screens/login/login_screen.dart';
 import '../../features/auth/register/persentation/screens/register/register_screen.dart';
-import '../../features/gemini_integrate/persentation/bloc/RecipeBloc.dart';
 import '../../features/gemini_integrate/persentation/gemini_recipe.dart';
 import '../../features/home/persentation/Cubits/DetailsCubit/DetailsCubit.dart';
 import '../../features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
@@ -59,7 +58,6 @@ class AppRoutes {
                   BlocProvider(
                     create: (context) => getIt<RegisterBloc>(),
                   ),
-
                   BlocProvider(
                     create: (context) => getIt<PhoneAuthBloc>(),
                   )
@@ -69,19 +67,18 @@ class AppRoutes {
       case welcome:
         return MaterialPageRoute(builder: (_) => const WelcomePage());
       case geminiRecipe:
-        return MaterialPageRoute(
-            builder: (_) => const GeminiRecipePage());
+        return MaterialPageRoute(builder: (_) => const GeminiRecipePage());
       case home:
         return MaterialPageRoute(
           builder: (_) => const HomePage(),
-
         );
       case navBar:
         return MaterialPageRoute(
-            builder: (_) => BlocProvider(
-                  create: (context) => getIt<NavBarCubit>()..fetchCurrentUser(),
-                  child:   NavBarPage(),
-                ));
+            builder: (_) =>  BlocProvider(
+              create: (context) =>
+              getIt<NavBarCubit>()..fetchCurrentUser(),
+              child: NavBarPage(),
+            ));
 
       case detailsPage:
         final String recipeId = settings.arguments as String;
@@ -93,7 +90,8 @@ class AppRoutes {
       case addRecipes:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(
-                create: (context) => getIt<AddIngredientCubit>(), child: const AddRecipes()));
+                create: (context) => getIt<AddIngredientCubit>(),
+                child: const AddRecipes()));
       case seeAll:
         return MaterialPageRoute(
             builder: (_) => BlocProvider(

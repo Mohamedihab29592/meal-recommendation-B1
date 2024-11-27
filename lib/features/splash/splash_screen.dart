@@ -95,11 +95,11 @@ class SplashScreenState extends State<SplashScreen>
     if (mounted) {
       if(await SecureStorageHelper.getSecuredString('uid') == null)
       {
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
       }
       else if (await SecureStorageHelper.getSecuredString('uid') == '')
       {
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
       }
       else 
       {

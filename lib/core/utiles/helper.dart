@@ -170,45 +170,48 @@ void showSaveConfirmationDialog(
 ) {
   showDialog(
     context: parentContext, // Use the parent context
-    builder: (context) => AlertDialog(
-      title: const Text('Save Recipes'),
-      content: const Text('Do you want to save these recipes?'),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.of(context).pop(),
-          child: const Text('Cancel'),
-        ),
-        BlocListener<RecipeBloc, RecipeState>(
-          listener: (context, state) {
-            if (state is RecipesSaved) {
-              Navigator.of(context).pop(); // Close dialog
-              showNotification(context, 'Recipes saved successfully!',
-                  ContentType.success, Colors.greenAccent);
-            } else if (state is RecipeError) {
-              Navigator.of(context).pop(); // Close dialog
-              showNotification(
-                  context,
-                  'Failed to save recipes: ${state.message}',
-                  ContentType.failure,
-                  Colors.redAccent);
-            }
-          },
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-            ),
-            onPressed: () {
-              Navigator.of(context).pop(); // Close dialog
-              print('Attempting to save recipes');
-              parentContext
-                  .read<RecipeBloc>()
-                  .add(SaveRecipesEvent(recipesToSave));
-            },
-            child: const Text('Save'),
+    builder: (context) => BlocProvider.value(
+      value: parentContext.read<RecipeBloc>(),
+      child: AlertDialog(
+        title: const Text('Save Recipes'),
+        content: const Text('Do you want to save these recipes?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Cancel'),
           ),
-        ),
-      ],
+          BlocListener<RecipeBloc, RecipeState>(
+            listener: (context, state) {
+              if (state is RecipesSaved) {
+                Navigator.of(context).pop(); // Close dialog
+                showNotification(context, 'Recipes saved successfully!',
+                    ContentType.success, Colors.greenAccent);
+              } else if (state is RecipeError) {
+                Navigator.of(context).pop(); // Close dialog
+                showNotification(
+                    context,
+                    'Failed to save recipes: ${state.message}',
+                    ContentType.failure,
+                    Colors.redAccent);
+              }
+            },
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () {
+                Navigator.of(context).pop(); // Close dialog
+                print('Attempting to save recipes');
+                parentContext
+                    .read<RecipeBloc>()
+                    .add(SaveRecipesEvent(recipesToSave));
+              },
+              child: const Text('Save'),
+            ),
+          ),
+        ],
+      ),
     ),
   );
 }

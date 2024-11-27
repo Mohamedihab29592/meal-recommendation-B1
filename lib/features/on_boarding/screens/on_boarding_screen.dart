@@ -48,7 +48,7 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   }
 
   void _navigateToLogin() {
-  context.pushReplacementNamed(AppRoutes.welcome);
+  context.pushReplacementNamed(AppRoutes.login);
   }
 
   @override

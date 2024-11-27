@@ -10,7 +10,6 @@ import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/custom_recipes_card_shimmer.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipes_list.dart';
-import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/utiles/assets.dart';
 import '../../../../core/utiles/helper.dart';
 import '../Cubits/HomeCubit/HomeBloc.dart';
@@ -70,20 +69,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 10),
-
-                  // Custom App Bar with Improved Interaction
-                  CustomAppbar(
-                    rightPadding: 0,
-                    leftPadding: 0,
-                    ontapleft: () {
-                      Scaffold.of(context).openDrawer();
-                    },
-                    ontapright: () {
-                      context.pushNamed(AppRoutes.geminiRecipe);
-                    },
-                    leftImage: Assets.icProfileMenu,
-                  ),
 
                   SizedBox(height: screenSize.height * 0.03),
 
@@ -156,11 +141,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
                       ),
                       controller: _searchController,
                       onTap: () async {
+                        final homeBloc = context.read<HomeBloc>();
                         final searchResult = await showSearch(
                           context: context,
-                          delegate: SearchCards(homeState: state),
+                          delegate: SearchCards(homeBloc: homeBloc),
                         );
-                        FocusScope.of(context).unfocus();
                         if (searchResult == null) {
                           FocusScope.of(context).unfocus();
                           Future.delayed(const Duration(milliseconds: 300),() =>{

@@ -25,12 +25,7 @@ class _FavoritesViewState extends State<FavoritesView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('My Favorites', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold,color: Colors.white)),
-        centerTitle: true,
-        backgroundColor: AppColors.primary, // Change color as needed
-      ),
-      body: bodyContent(context),
+          body: bodyContent(context),
     );
   }
 
