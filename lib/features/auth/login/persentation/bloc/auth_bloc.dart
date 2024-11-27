@@ -1,7 +1,12 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:meal_recommendation_b1/core/utiles/assets.dart';
 import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeState.dart';
 
+import '../../../../../core/utiles/app_strings.dart';
+import '../../data/data_source/local/local_data_source_impl.dart';
+import '../../domain/entity/user_entity.dart';
 import '../../domain/use_cases/login_with_email_use_case.dart';
 import '../../domain/use_cases/login_with_google_use_case.dart';
 import '../../domain/use_cases/logout_use_case.dart';
@@ -12,8 +17,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final LoginWithEmailUseCase loginWithEmailUseCase;
   final LoginWithGoogleUseCase loginWithGoogleUseCase;
   final LogoutUseCase logoutUseCase;
+  final LocalDataSource localDataSource;
 
-  AuthBloc({
+  AuthBloc(
+    this.localDataSource, {
     required this.loginWithEmailUseCase,
     required this.loginWithGoogleUseCase,
     required this.logoutUseCase,
@@ -27,14 +34,23 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       LoginWithEmailEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final user = await loginWithEmailUseCase(event.email, event.password);
-      if (user != null) {
-        emit(Authenticated(user));
+      final loginResult =
+          await loginWithEmailUseCase(event.email, event.password);
+
+      if (loginResult.user != null) {
+        emit(Authenticated(
+            user: loginResult.user!,
+            isNewUser: loginResult.isNewUser,
+            isFirstLogin: loginResult.isFirstLogin,
+            authMethod: AuthenticationMethod.email));
       } else {
-        emit(Unauthenticated());
+        emit(Unauthenticated(
+            errorMessage: 'Login failed',
+            lastAttemptedMethod: AuthenticationMethod.email));
       }
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(
+          errorMessage: e.toString(), errorType: AuthErrorType.unknown));
     }
   }
 
@@ -42,14 +58,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       LoginWithGoogleEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
-      final user = await loginWithGoogleUseCase();
-      if (user != null) {
-        emit(Authenticated(user));
+      final loginResult = await loginWithGoogleUseCase();
+
+      if (loginResult.user != null) {
+        emit(Authenticated(
+            user: loginResult.user!,
+            isNewUser: loginResult.isNewUser,
+            isFirstLogin: loginResult.isFirstLogin,
+            authMethod: AuthenticationMethod.email));
       } else {
-        emit(Unauthenticated());
+        emit(Unauthenticated(
+            errorMessage: 'Login failed',
+            lastAttemptedMethod: AuthenticationMethod.email));
       }
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(
+          errorMessage: e.toString(), errorType: AuthErrorType.unknown));
     }
   }
 
@@ -57,10 +81,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLoading());
     try {
       await logoutUseCase();
-      await SecureStorageHelper.setSecuredString('uid', '');
+      await SecureStorageHelper.setSecuredString(AppStrings.uid, '');
       emit(Unauthenticated());
     } catch (e) {
-      emit(AuthError(e.toString()));
+      emit(AuthError(
+          errorMessage: e.toString(), errorType: AuthErrorType.unknown));
     }
   }
+
 }

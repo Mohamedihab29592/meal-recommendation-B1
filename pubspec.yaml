@@ -69,6 +69,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   dartz: ^0.10.1
   awesome_dialog:
+  fancy_bottom_navigation_plus: ^1.0.3
 
 
 
@@ -98,6 +99,7 @@ flutter:
   # Assets Section
   assets:
     - assets/images/
+    - assets/animations/
   # Fonts Section
   #  fonts:
   #    - family: Inter        # Inter font family

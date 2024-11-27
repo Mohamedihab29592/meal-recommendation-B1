@@ -4,7 +4,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
 import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
 import '../Widgets/recommended_recipes.dart';
 import '../Widgets/trending_recipes.dart';
@@ -17,12 +18,12 @@ class SeeAllScreen extends StatelessWidget {
     final screenSize = MediaQuery.of(context).size;
 
     return BlocProvider(
-      create: (context) => getIt<HomeCubit>()..getdata(),
+      create: (context) => getIt<HomeBloc>()..add(FetchRecipesEvent()),
       child: Scaffold(
         body: SafeArea(
           child: RefreshIndicator(
             onRefresh: () async {
-              await context.read<HomeCubit>().getdata();
+               context.read<HomeBloc>().add(FetchRecipesEvent());
             },
             child: CustomScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -52,7 +53,7 @@ class SeeAllScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                BlocBuilder<HomeCubit, HomeState>(
+                BlocBuilder<HomeBloc, HomeState>(
                   builder: (context, state) {
                     if (state is IsLoadingHome) {
                       return SliverFillRemaining(
@@ -97,7 +98,7 @@ class SeeAllScreen extends StatelessWidget {
                               SizedBox(height: screenSize.height * 0.02),
                               ElevatedButton(
                                 onPressed: () {
-                                  context.read<HomeCubit>().getdata();
+                                  context.read<HomeBloc>().add(FetchRecipesEvent());
                                 },
                                 child: const Text('Retry'),
                               ),
@@ -107,9 +108,9 @@ class SeeAllScreen extends StatelessWidget {
                       );
                     }
 
-                    if (state is SuccessState) {
+                    if (state is HomeLoaded) {
                       // Check if data is empty
-                      if (state.data.isEmpty) {
+                      if (state.homeRecipes.isEmpty) {
                         return SliverFillRemaining(
                           child: Center(
                             child: Column(
@@ -152,11 +153,11 @@ class SeeAllScreen extends StatelessWidget {
                               padding: EdgeInsets.symmetric(
                                 horizontal: screenSize.width * 0.025,
                               ),
-                              itemCount: state.data.length,
+                              itemCount: state.homeRecipes.length,
                               separatorBuilder: (context, index) =>
                                   SizedBox(width: screenSize.width * 0.02),
                               itemBuilder: (context, index) {
-                                final recipe = state.data[index];
+                                final recipe = state.homeRecipes[index];
                                 return TrendingRecipeCard(
                                   recipeId: recipe.id ?? "",
                                   duration: "${recipe.time} min",
@@ -173,9 +174,9 @@ class SeeAllScreen extends StatelessWidget {
                           ListView.builder(
                             physics: const NeverScrollableScrollPhysics(),
                             shrinkWrap: true,
-                            itemCount: state.data.length,
+                            itemCount: state.homeRecipes.length,
                             itemBuilder: (context, index) {
-                              final recipe = state.data[index];
+                              final recipe = state.homeRecipes[index];
                               return Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: screenSize.width * 0.025,

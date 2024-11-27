@@ -203,7 +203,6 @@ class RecipeRepository {
             'recipesGemini': FieldValue.arrayUnion([
               {
                 ...recipe,
-                'savedAt': FieldValue.serverTimestamp(),
               }
             ]),
           });

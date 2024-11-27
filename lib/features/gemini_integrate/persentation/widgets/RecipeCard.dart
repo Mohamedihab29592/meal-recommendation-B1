@@ -1,21 +1,11 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
-import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/quick_stats_row.dart';
 import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_card_content.dart';
-import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_delete_button.dart';
-import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_header.dart';
-import 'package:meal_recommendation_b1/features/gemini_integrate/persentation/widgets/recipe_image.dart';
-import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
 import '../../../../core/components/dynamic_notification_widget.dart';
-import '../../../../core/services/di.dart';
-import '../../../../core/utiles/app_colors.dart';
 import '../../data/Recipe.dart';
-import '../bloc/RecipeBloc.dart';
-import '../bloc/RecipeEvent.dart';
-import 'add_ingredients_button.dart';
+
 
 class RecipeCard extends StatelessWidget {
   final Recipe recipe;

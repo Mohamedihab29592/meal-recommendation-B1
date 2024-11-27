@@ -33,8 +33,8 @@ class SplashScreenState extends State<SplashScreen>
     // Initialize animation controller
     _initializeAnimationController();
 
-    // Navigate after animation completes
-    _navigateToNextScreen();
+
+    _navigateAfterDelay();
   }
 
   void _setSystemUIStyle() {
@@ -88,16 +88,10 @@ class SplashScreenState extends State<SplashScreen>
   }
 
 
-  Future<void> _navigateToNextScreen() async {
-    await Future.delayed(const Duration(seconds: 4), () {
-      if (mounted) {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.onboarding);
-      }
-    });
-  }
+
 
   Future<void> _navigateAfterDelay() async {
-    await Future.delayed(const Duration(milliseconds: 500));
+    await Future.delayed(const Duration(milliseconds: 4000));
     if (mounted) {
       if(await SecureStorageHelper.getSecuredString('uid') == null)
       {
@@ -105,11 +99,10 @@ class SplashScreenState extends State<SplashScreen>
       }
       else if (await SecureStorageHelper.getSecuredString('uid') == '')
       {
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
       }
       else 
       {
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
         Navigator.pushReplacementNamed(context, AppRoutes.navBar);
 
       }

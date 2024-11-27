@@ -105,12 +105,6 @@ import 'package:meal_recommendation_b1/core/utiles/assets.dart';
                textAlign: TextAlign.center,
              ),
              const SizedBox(height: 10.0),
-             LinearProgressIndicator(
-               backgroundColor: Colors.grey[300],
-               valueColor: AlwaysStoppedAnimation<Color>(
-                 Theme.of(context).primaryColor,
-               ),
-             ),
            ],
          ),
        ),

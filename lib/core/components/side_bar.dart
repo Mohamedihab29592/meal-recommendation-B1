@@ -3,172 +3,189 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meal_recommendation_b1/core/components/side_bar_items.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
-import 'package:meal_recommendation_b1/core/services/di.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
-import 'package:meal_recommendation_b1/features/auth/login/domain/use_cases/logout_use_case.dart';
+import 'package:meal_recommendation_b1/features/Profile/data/Model/UserModel.dart';
+import 'package:meal_recommendation_b1/features/auth/login/domain/entity/user_entity.dart';
 import '../../features/auth/login/persentation/bloc/auth_bloc.dart';
 import '../../features/auth/login/persentation/bloc/auth_event.dart';
+import '../../features/auth/login/persentation/bloc/auth_state.dart';
+import '../../features/home/persentation/Cubits/NavBarCubits/NavBarCubit.dart';
 import '../utiles/app_strings.dart';
 import '../utiles/assets.dart';
+class SideBar extends StatelessWidget {
+  final UserModel user;
+  final AuthBloc authBloc;
 
-class SideBar extends StatefulWidget {
-  final int oldIndex;
-  final Function returnedIndex;
-  const SideBar({super.key, required this.oldIndex, required this.returnedIndex});
+   SideBar({
+    super.key,
+    required this.user,
+    required this.authBloc,
+  });
 
-  @override
-  State<SideBar> createState() => _SideBarState();
-}
-
-class _SideBarState extends State<SideBar> {
-  double spaceBetweenItems = 30.h;
-
-  List items = [
-    AppStrings.home,
-    AppStrings.favorites,
-    AppStrings.profile,
-    AppStrings.settings
+  // Sidebar Menu Items Configuration
+  final List<SidebarMenuItem> _menuItems = [
+    SidebarMenuItem(
+      title: AppStrings.home,
+      activeIcon: Icons.home_rounded,
+      inactiveIcon: Icons.home_outlined,
+      route: AppRoutes.home,
+    ),
+     SidebarMenuItem(
+      title: AppStrings.favorites,
+      activeIcon: Icons.favorite_rounded,
+      inactiveIcon: Icons.favorite_border_rounded,
+      route: AppRoutes.favorites,
+    ),
+     SidebarMenuItem(
+      title: AppStrings.profile,
+      activeIcon: Icons.person_rounded,
+      inactiveIcon: Icons.person_outline_rounded,
+      route: AppRoutes.profile,
+    ),
   ];
-  List selected = [true, false, false, false];
-  int selectItem = 0;
-
-  void toggleItem(int index) {
-    setState(() {
-      for (int i = 0; i < selected.length; i++) {
-        selected[i] = false;
-      }
-      selected[index] = true;
-      selectItem = index;
-    });
-  }
-
-  @override
-  void initState() {
-    selectItem = widget.oldIndex;
-    toggleItem(selectItem);
-    super.initState();
-  }
 
   @override
   Widget build(BuildContext context) {
+    final navBarCubit = context.watch<NavBarCubit>();
+
     return Drawer(
       backgroundColor: AppColors.white,
-      child: ListView(
-        padding: EdgeInsets.zero,
-        children: [
-          Container(
-            height: MediaQuery.sizeOf(context).height / 4,
-            padding: EdgeInsets.all(20.w),
-            color: AppColors.primary,
-            child: Center(
-              child: Row(
-                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  CircleAvatar(
-                      radius: 50.r,
-                      foregroundImage: const AssetImage(
-                        Assets.icSplash,
-                      )),
-                  SizedBox(
-                    width: 20.w,
-                  ),
-                  Text('User name',
-                      style: TextStyle(
-                          color: AppColors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.sp)),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(
-            height: spaceBetweenItems,
-          ),
-          Container(
-            padding: EdgeInsets.only(right: 40.w),
-            child: Column(
-              children: [
-                SideBarItems(
-                    blueIcon: Assets.home,
-                    whiteIcon: Assets.homeWhite,
-                    index: 0,
-                    items: items,
-                    selected: selected,
-                    iconSize: 40.w,
-                    returnedIndex: (int index) {
-                      widget.returnedIndex(index);
-                      Navigator.pop(context);
-                    },
-                    toggleItem: toggleItem),
-                SizedBox(
-                  height: spaceBetweenItems,
-                ),
-                SideBarItems(
-                    blueIcon: Assets.favorite,
-                    whiteIcon: Assets.favoriteWhite,
-                    index: 1,
-                    items: items,
-                    selected: selected,
-                    iconSize: 30.w,
-                    returnedIndex: (int index) {
-                      widget.returnedIndex(index);
-                      Navigator.pop(context);
-                    },
-                    toggleItem: toggleItem),
-                SizedBox(
-                  height: spaceBetweenItems,
-                ),
-                SideBarItems(
-                    blueIcon: Assets.profile,
-                    whiteIcon: Assets.profileWhite,
-                    index: 2,
-                    items: items,
-                    selected: selected,
-                    iconSize: 30.w,
-                    returnedIndex: (int index) {
-                      widget.returnedIndex(index);
-                      Navigator.pop(context);
-                    },
-                    toggleItem: toggleItem),
-                SizedBox(
-                  height: spaceBetweenItems,
-                ),
-                SideBarItems(
-                    blueIcon: Assets.settings,
-                    whiteIcon: Assets.settingsWhite,
-                    index: 3,
-                    items: items,
-                    selected: selected,
-                    iconSize: 30.w,
-                    returnedIndex: (int index) {},
-                    toggleItem: toggleItem),
-                SizedBox(
-                  height: spaceBetweenItems,
-                ),
-                const Divider(),
-                SizedBox(
-                  height: spaceBetweenItems,
-                ),
-                ListTile(
-                  leading: Image.asset(
-                    Assets.icSend,
-                  ),
-                  title: Text(AppStrings.logout,
-                      style: TextStyle(
-                          color: AppColors.primary,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 18.sp)),
-                  onTap: () {
-                    context.read<AuthBloc>().add(LogoutEvent());
-                    Navigator.pushReplacementNamed(context, AppRoutes.login);
+      child: SafeArea(
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // User Profile Header
+              _buildUserProfileHeader(context),
 
-                  },
-                ),
-              ],
-            ),
-          )
+              // Menu Items
+              _buildMenuSection(context, navBarCubit),
+
+              // Divider
+              const Divider(indent: 20, endIndent: 20),
+
+              // Logout Section
+              _buildLogoutTile(context),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildUserProfileHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      color: AppColors.primary,
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            foregroundImage: NetworkImage(user.profilePhotoUrl ?? ""),
+          ),
+          const SizedBox(width: 20),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                user.name ?? "",
+                style: const TextStyle(
+                    color: AppColors.white, fontWeight: FontWeight.bold),
+              ),
+              Text(
+               user.email,
+                style: TextStyle(color: AppColors.white.withOpacity(0.7)),
+              ),
+            ],
+          ),
         ],
       ),
     );
   }
+
+  Widget _buildMenuSection(BuildContext context, NavBarCubit navBarCubit) {
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 10.h, horizontal: 8.w),
+      child: Column(
+        children: _menuItems.map((item) {
+          final index = _menuItems.indexOf(item);
+          final isSelected = navBarCubit.currentIndex == index;
+
+          return SideBarItem(
+            index: index,
+            title: item.title,
+            activeIcon: item.activeIcon,
+            inactiveIcon: item.inactiveIcon,
+            isSelected: isSelected,
+            onTap: () {
+              // Close drawer and update navigation state
+              Navigator.of(context).pop();
+              navBarCubit.moveChange(index);
+            },
+            activeColor: AppColors.primary,
+            inactiveColor: Colors.grey,
+            iconSize: 24.w,
+            fontSize: 14.sp,
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildLogoutTile(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
+      child: SideBarItem(
+        index: -1, // Special index for logout
+        title: AppStrings.logout,
+        activeIcon: Icons.logout_rounded,
+        inactiveIcon: Icons.logout_outlined,
+        isSelected: false,
+        onTap: () => _showLogoutConfirmDialog(context),
+        activeColor: Colors.red,
+        inactiveColor: Colors.red.shade300,
+        iconSize: 24.w,
+        fontSize: 14.sp,
+      ),
+    );
+  }
+
+  void _showLogoutConfirmDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Logout'),
+        content: const Text('Are you sure you want to logout?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel', style: TextStyle(color: Colors.black)),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              authBloc.add(LogoutEvent());
+              Navigator.pushReplacementNamed(context, AppRoutes.login);
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+            child: const Text('Logout', style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Updated Menu Item Model
+class SidebarMenuItem {
+  final String title;
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+  final String route;
+
+  SidebarMenuItem({
+    required this.title,
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.route,
+  });
 }

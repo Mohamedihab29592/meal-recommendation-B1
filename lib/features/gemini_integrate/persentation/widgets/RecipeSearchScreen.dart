@@ -26,6 +26,7 @@ class RecipeSearchScreen extends StatefulWidget {
 class RecipeSearchScreenState extends State<RecipeSearchScreen> {
   final TextEditingController _controller = TextEditingController();
   bool _showSavedRecipes = false;
+  final ScrollController _scrollController = ScrollController(); // Add this
 
   @override
   void initState() {
@@ -40,6 +41,7 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose(); // Dispose of the ScrollController
     super.dispose();
   }
 
@@ -50,15 +52,23 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
         body: BlocConsumer<RecipeBloc, RecipeState>(
           listener: (context, state) {
             if (state is SavedRecipesLoaded) {
-              showNotification(context, 'Operation completed successfully!',
-                  ContentType.success, Colors.greenAccent);
+              showNotification(
+                context,
+                'Operation completed successfully!',
+                ContentType.success,
+                Colors.greenAccent,
+              );
             } else if (state is RecipeError) {
-              showNotification(context, state.message, ContentType.failure,
-                  Colors.redAccent);
+              showNotification(
+                context,
+                state.message,
+                ContentType.failure,
+                Colors.redAccent,
+              );
             }
           },
           builder: (context, state) {
-            int newRecipesCount =
+            final newRecipesCount =
                 _getNewRecipesCount(context.read<RecipeBloc>());
 
             return Padding(
@@ -67,7 +77,7 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                 children: [
                   CustomAppbar(
                     ontapleft: () =>
-                        showCleanupOptions(context, context.read<RecipeBloc>()),
+                        showCleanupOptions(context,context.read<RecipeBloc>()),
                     ontapright: () {
                       context.pushNamed(AppRoutes.geminiRecipe);
                     },
@@ -107,6 +117,7 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                       child: RecipeListView(
                         state: state,
                         showSavedRecipes: _showSavedRecipes,
+                        scrollController: _scrollController,
                       ),
                     ),
                   ),
@@ -119,10 +130,11 @@ class RecipeSearchScreenState extends State<RecipeSearchScreen> {
                             .add(FetchRecipesEvent(query));
                       } else {
                         showNotification(
-                            context,
-                            "You Must add food name in other section",
-                            ContentType.warning,
-                            Colors.orangeAccent);
+                          context,
+                          "Please enter a valid food name.",
+                          ContentType.warning,
+                          Colors.orangeAccent,
+                        );
                       }
                     },
                   ),

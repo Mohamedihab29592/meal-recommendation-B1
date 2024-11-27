@@ -1,25 +1,16 @@
+sealed class AuthEvent {}
 
- import '../../domain/entity/user_entity.dart';
+ class LoginWithEmailEvent extends AuthEvent {
+   final String email;
+   final String password;
 
-abstract class AuthEvent {}
+   LoginWithEmailEvent({required this.email, required this.password});
+ }
 
-class LoginWithEmailEvent extends AuthEvent {
-  final String email;
-  final String password;
+ class LoginWithGoogleEvent extends AuthEvent {}
 
-  LoginWithEmailEvent(this.email, this.password);
-}
-class LoginWithGoogleEvent extends AuthEvent {}
+ class LogoutEvent extends AuthEvent {}
 
-class GetSavedUserEvent extends AuthEvent {}
 
-class LogoutEvent extends AuthEvent {}
 
- class SaveUserEvent extends AuthEvent {
-   final UserEntity user;
-   final bool rememberMe;
-
-   SaveUserEvent({
-     required this.user,
-     this.rememberMe = false,
-   });}
+ class CheckAuthStatusEvent extends AuthEvent {}

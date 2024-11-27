@@ -26,6 +26,7 @@ class AddIngredientCubit extends Cubit<AddIngredientState> {
 
   Future<bool> checkIngredientsAdded(Recipe recipe) async {
     try {
+       emit(AddIngredientLoading());
        emit(AddIngredientAlreadyAdded());
       return await homeRepo.checkRecipeIngredientsAdded(recipe.imageUrl);
     } catch (error) {
