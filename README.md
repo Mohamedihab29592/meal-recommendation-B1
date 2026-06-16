@@ -138,22 +138,7 @@ CulinaryCanvas is a cutting-edge mobile app that redefines how you explore, crea
 
 ---
 
-## 🤝 Contributing
-Contributions are welcome! Please refer to the **Contributing Guidelines** for more details.
 
----
-
-## 📸 Screenshots
-<p align="center">
-  <img src="screenshot1.png" width="200" alt="Screenshot 1">
-  <img src="screenshot2.png" width="200" alt="Screenshot 2">
-  <img src="screenshot3.png" width="200" alt="Screenshot 3">
-</p>
-
----
-
-## 📄 License
-This project is licensed under the **MIT License**. See the LICENSE file for details.
 
 ---
 
