@@ -14,11 +14,12 @@ import 'loading_chat_widget.dart';
 class RecipeListView extends StatelessWidget {
   final RecipeState state;
   final bool showSavedRecipes;
+  final ScrollController scrollController;
 
   const RecipeListView({
     super.key,
     required this.state,
-    required this.showSavedRecipes,
+    required this.showSavedRecipes, required this.scrollController,
   });
 
   @override
@@ -48,6 +49,7 @@ class RecipeListView extends StatelessWidget {
     // Display recipes
     return ListView.builder(
       itemCount: recipes.length,
+      controller: scrollController, // Use the ScrollController here
       padding: const EdgeInsets.only(bottom: 16),
       itemBuilder: (context, index) {
         final recipe = recipes[index];

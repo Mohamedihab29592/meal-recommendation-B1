@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
 import '../../../../core/components/custom_recipes_card.dart';
 import '../../../../core/components/dynamic_notification_widget.dart';
+import '../../../../core/services/di.dart';
 import '../../../../core/utiles/helper.dart';
 import '../../../gemini_integrate/data/Recipe.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
+
+import '../Cubits/HomeCubit/HomeState.dart';
 
 class RecipeCardWidget extends StatelessWidget {
   final Recipe meal;
@@ -20,34 +24,37 @@ class RecipeCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String mealId = meal.id ?? "Unknown ID";
-    String mealName = meal.name.isNotEmpty
-        ? meal.name
-        : "Unnamed Meal";
-    String mealType = meal.typeOfMeal.isNotEmpty == true
-        ? meal.typeOfMeal!
-        : "Unknown Type";
-
+    String mealName = meal.name.isNotEmpty ? meal.name : "Unnamed Meal";
+    String mealType = meal.typeOfMeal.isNotEmpty ? meal.typeOfMeal! : "Unknown Type";
     String mealImage = meal.imageUrl;
 
     // For ingredients, you'll need to modify based on your Recipe model
     String ingredients = "${meal.ingredients.length} Ingredients";
+    String time = meal.time != null ? "${meal.time} min" : "N/A";
 
-    String time = meal.time != null
-        ? "${meal.time} min"
-        : "N/A";
+    return BlocProvider.value(
+      value: getIt<HomeBloc>(),
+      child: GestureDetector(
+        onTap: onTap,
+        child: BlocBuilder<HomeBloc, HomeState>(
+          builder: (context, state) {
+            // Determine if the meal is a favorite
+            bool isFavorite = BlocProvider.of<HomeBloc>(context).isFavorite(mealId);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: CustomRecipesCard(
-        key: ValueKey(mealId),
-        onTapDelete: () => _showDeleteDialog(context, mealId),
-        onTapFav: () => _addToFavorites(context, mealId),
-        firstText: mealType,
-        ingredients: ingredients,
-        time: time,
-        middleText: mealName,
-        mealId: mealId,
-        image: mealImage,
+            return CustomRecipesCard(
+              key: ValueKey(mealId),
+              onTapDelete: () => _showDeleteDialog(context, mealId),
+              onTapFav: () => _addToFavorites(context, mealId),
+              firstText: mealType,
+              ingredients: ingredients,
+              isFavorite: isFavorite, // Use the isFavorite state here
+              time: time,
+              middleText: mealName,
+              mealId: mealId,
+              image: mealImage,
+            );
+          },
+        ),
       ),
     );
   }
@@ -57,22 +64,12 @@ class RecipeCardWidget extends StatelessWidget {
       context: context,
       mealId: mealId,
       onSuccess: () {
-        BlocProvider.of<HomeCubit>(context).getdata();
+        BlocProvider.of<HomeBloc>(context).add(DeleteRecipeEvent(mealId));
       },
     );
   }
 
   void _addToFavorites(BuildContext context, String mealId) {
-
-    //Logic to Add it
-    DynamicNotificationWidget.showNotification(
-      context: context,
-      title: 'Oh Hey!!',
-      message: 'Added $mealId to favorites',
-      color: Colors.green, // You can use this color if needed
-      contentType: ContentType.success,
-      inMaterialBanner: false,
-    );
-
+    BlocProvider.of<HomeBloc>(context).add(ToggleFavoriteEvent(mealId));
   }
 }

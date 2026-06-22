@@ -1,40 +1,29 @@
 import 'package:flutter/material.dart';
 
-
-class CustomTextField extends StatefulWidget {
+class CustomDropdownField extends StatefulWidget {
   final String hintText;
   final String? prefixIcon;
-  final Widget? suffixIcon;
-  final bool isPassword;
-  final TextInputType inputType;
   final TextEditingController controller;
+  final List<String> items;
   final String? errorText;
   final Function(String)? onChanged;
   final String? Function(String? value)? validator;
   final bool enabled;
-  final TextInputAction? textInputAction;
-  final FocusNode? focusNode;
-  final VoidCallback? onEditingComplete;
   final Color? fillColor;
   final Color? textColor;
   final Color? hintColor;
   final Color? iconColor;
 
-  const CustomTextField({
+  const CustomDropdownField({
     super.key,
     required this.hintText,
     this.prefixIcon,
-    this.suffixIcon,
-    this.isPassword = false,
-    required this.inputType,
     required this.controller,
+    required this.items,
     this.errorText,
     this.onChanged,
     this.validator,
     this.enabled = true,
-    this.textInputAction,
-    this.focusNode,
-    this.onEditingComplete,
     this.fillColor,
     this.textColor,
     this.hintColor,
@@ -42,19 +31,17 @@ class CustomTextField extends StatefulWidget {
   });
 
   @override
-  CustomTextFieldState createState() => CustomTextFieldState();
+  CustomDropdownFieldState createState() => CustomDropdownFieldState();
 }
 
-class CustomTextFieldState extends State<CustomTextField> {
-  late bool _isObscure;
+class CustomDropdownFieldState extends State<CustomDropdownField> {
   late FocusNode _focusNode;
   bool _isFocused = false;
 
   @override
   void initState() {
     super.initState();
-    _isObscure = widget.isPassword;
-    _focusNode = widget.focusNode ?? FocusNode();
+    _focusNode = FocusNode();
     _focusNode.addListener(_onFocusChange);
   }
 
@@ -66,23 +53,9 @@ class CustomTextFieldState extends State<CustomTextField> {
 
   @override
   void dispose() {
-    if (widget.focusNode == null) {
-      _focusNode.dispose();
-    }
     _focusNode.removeListener(_onFocusChange);
+    _focusNode.dispose();
     super.dispose();
-  }
-
-  @override
-  void didUpdateWidget(CustomTextField oldWidget) {
-    super.didUpdateWidget(oldWidget);
-
-    // Handle focus node changes
-    if (widget.focusNode != oldWidget.focusNode) {
-      _focusNode.removeListener(_onFocusChange);
-      _focusNode = widget.focusNode ?? FocusNode();
-      _focusNode.addListener(_onFocusChange);
-    }
   }
 
   @override
@@ -118,26 +91,9 @@ class CustomTextFieldState extends State<CustomTextField> {
               )
             ],
           ),
-          child: TextFormField(
-            key: ValueKey(widget.hintText), // Unique key to prevent unnecessary rebuilds
-            controller: widget.controller,
-            focusNode: _focusNode,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            validator: widget.validator,
-            cursorColor: defaultTextColor,
-            obscureText: _isObscure,
-            keyboardType: widget.inputType,
-            style: TextStyle(color: defaultTextColor),
-            onChanged: widget.onChanged,
-            enabled: widget.enabled,
-            textInputAction: widget.textInputAction,
-            onEditingComplete: widget.onEditingComplete,
-
-            // Keyboard interaction improvements
-            onTapOutside: (event) {
-              FocusScope.of(context).unfocus();
-            },
-
+          child: DropdownButtonFormField<String>(
+            key: ValueKey(widget.hintText),
+            dropdownColor: Colors.black87,
             decoration: InputDecoration(
               filled: true,
               fillColor: defaultFillColor,
@@ -152,19 +108,6 @@ class CustomTextFieldState extends State<CustomTextField> {
                 ),
               )
                   : null,
-              suffixIcon: widget.isPassword
-                  ? IconButton(
-                icon: Icon(
-                  _isObscure ? Icons.visibility : Icons.visibility_off,
-                  color: defaultIconColor,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _isObscure = !_isObscure;
-                  });
-                },
-              )
-                  : widget.suffixIcon,
               hintText: widget.hintText,
               hintStyle: TextStyle(color: defaultHintColor),
               border: _buildOutlineInputBorder(Colors.transparent),
@@ -178,6 +121,21 @@ class CustomTextFieldState extends State<CustomTextField> {
               ),
               errorStyle: const TextStyle(color: Colors.red, fontSize: 12),
             ),
+            items: widget.items.map((String value) {
+              return DropdownMenuItem<String>(
+                value: value,
+                child: Text(value,style: const TextStyle(color: Colors.white),),
+              );
+            }).toList(),
+            onChanged: widget.enabled
+                ? (String? newValue) {
+              widget.controller.text = newValue!;
+              if (widget.onChanged != null) {
+                widget.onChanged!(newValue);
+              }
+            }
+                : null,
+            validator: widget.validator,
           ),
         ),
         if (widget.errorText != null || widget.validator != null)

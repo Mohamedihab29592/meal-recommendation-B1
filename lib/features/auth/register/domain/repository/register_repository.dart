@@ -1,7 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:meal_recommendation_b1/core/networking/firebase_error_model.dart';
+import '../../../../../core/networking/firebase_error_model.dart';
+import '../../../login/domain/entity/user_entity.dart';
+import '../../data/repository_impl/register_repository_impl.dart';
 
-import '../entity/user_entity.dart';
 
 abstract class RegisterRepository {
   Future<void> registerWithEmail({
@@ -14,6 +15,7 @@ abstract class RegisterRepository {
 
   Future<UserEntity?> loginWithGoogle();
 
-  Future<Either<FirebaseErrorModel, Unit>> addNewUser(
-      {required UserEntity user});
+  Future<Either<FirebaseErrorModel, Unit>> addNewUser({
+    required UserEntity user
+  });
 }

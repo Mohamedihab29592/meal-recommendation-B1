@@ -1,4 +1,5 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,11 +7,14 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/core/routes/app_routes.dart';
 import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
 import 'package:meal_recommendation_b1/core/utiles/extentions.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Widgets/custom_recipes_card_shimmer.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Widgets/recipes_list.dart';
-import '../../../../core/components/Custome_Appbar.dart';
 import '../../../../core/utiles/assets.dart';
-import '../Cubits/HomeCubit/HomeCubit.dart';
+import '../../../../core/utiles/helper.dart';
+import '../Cubits/HomeCubit/HomeBloc.dart';
 import '../Cubits/HomeCubit/HomeState.dart';
+import '../Widgets/error_state_widget.dart';
 import '../Widgets/searchCards.dart';
 
 class HomePage extends StatefulWidget {
@@ -20,46 +24,51 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with WidgetsBindingObserver{
+  late TextEditingController _searchController;
+
   @override
   void initState() {
     super.initState();
-    context.read<HomeCubit>().getdata();
+    WidgetsBinding.instance.addObserver(this);
+    context.read<HomeBloc>().add(FetchRecipesEvent());
+    _searchController = TextEditingController();
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    context.read<HomeBloc>().add(FetchRecipesEvent());
+  }
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Fetch data when the app is resumed
+      context.read<HomeBloc>().add(FetchRecipesEvent());
+    }
+  }
+  @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery
+        .of(context)
+        .size;
 
     return Scaffold(
       body: SafeArea(
         child: RefreshIndicator(
+          backgroundColor: AppColors.primary,
+          color: Colors.white,
           onRefresh: () async {
-            // Implement refresh logic
-            await BlocProvider.of<HomeCubit>(context).getdata();
+            context.read<HomeBloc>().add(FetchRecipesEvent());
           },
           child: SingleChildScrollView(
             physics: const AlwaysScrollableScrollPhysics(),
             child: Padding(
               padding:
-                  EdgeInsets.symmetric(horizontal: screenSize.width * 0.04),
+              EdgeInsets.symmetric(horizontal: screenSize.width * 0.04),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 10),
-
-                  // Custom App Bar with Improved Interaction
-                  CustomAppbar(
-                    rightPadding: 0,
-                    leftPadding: 0,
-                    ontapleft: () {
-                      // Add profile or menu functionality
-                    },
-                    ontapright: () {
-                      context.pushNamed(AppRoutes.geminiRecipe);
-                    },
-                    leftImage: Assets.icProfileMenu,
-                  ),
 
                   SizedBox(height: screenSize.height * 0.03),
 
@@ -79,18 +88,22 @@ class _HomePageState extends State<HomePage> {
                   // Subtitle with Responsive Text
                   Text(
                     "Discover new recipes or add your ingredients to get started.",
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[700],
-                        ),
+                    style: Theme
+                        .of(context)
+                        .textTheme
+                        .bodyMedium
+                        ?.copyWith(
+                      color: Colors.grey[700],
+                    ),
                   ),
 
                   SizedBox(height: screenSize.height * 0.03),
 
                   // Enhanced Search Bar with Functionality
-                  BlocBuilder<HomeCubit, HomeState>(builder: (context, state) {
+                  BlocBuilder<HomeBloc, HomeState>(builder: (context, state) {
                     return SearchBar(
                       backgroundColor:
-                          WidgetStateProperty.resolveWith((states) {
+                      WidgetStateProperty.resolveWith((states) {
                         if (states.contains(WidgetState.focused)) {
                           return Colors.white.withOpacity(0.95);
                         }
@@ -103,8 +116,8 @@ class _HomePageState extends State<HomePage> {
                         return 1.0;
                       }),
                       constraints:
-                          const BoxConstraints(minHeight: 55, maxHeight: 55),
-                      shape: MaterialStateProperty.all(
+                      const BoxConstraints(minHeight: 55, maxHeight: 55),
+                      shape: WidgetStateProperty.all(
                         RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12),
                           side: BorderSide(
@@ -114,24 +127,36 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
                       hintText: "Search Recipes",
-                      hintStyle: MaterialStateProperty.all(
+                      hintStyle: WidgetStateProperty.all(
                         TextStyle(
                           color: Colors.grey.shade500,
                           fontSize: 16,
                         ),
                       ),
-                      textStyle: MaterialStateProperty.all(
+                      textStyle: WidgetStateProperty.all(
                         const TextStyle(
                           color: Colors.black,
                           fontSize: 16,
                         ),
                       ),
-                      onTap: () {
-                        showSearch(
-                            context: context,
-                            delegate: SearchCards(homeState: state));
+                      controller: _searchController,
+                      onTap: () async {
+                        final homeBloc = context.read<HomeBloc>();
+                        final searchResult = await showSearch(
+                          context: context,
+                          delegate: SearchCards(homeBloc: homeBloc),
+                        );
+                        if (searchResult == null) {
+                          FocusScope.of(context).unfocus();
+                          Future.delayed(const Duration(milliseconds: 300),() =>{
+                          context.read<HomeBloc>().add(FetchRecipesEvent())
+
+                          });
+                        }
                       },
-                      onChanged: (value) {},
+                      onChanged: (value) {
+                        context.read<HomeBloc>().add(SearchRecipesEvent(value));
+                      },
                       leading: Padding(
                         padding: const EdgeInsets.only(left: 10),
                         child: Image.asset(
@@ -152,7 +177,9 @@ class _HomePageState extends State<HomePage> {
                               width: 25,
                             ),
                             onPressed: () {
-                              // Show filter bottom sheet or dialog
+                              final homeBloc = context.read<HomeBloc>();
+
+                              showFilterBottomSheet(context, homeBloc);
                             },
                           ),
                         ),
@@ -195,9 +222,13 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "Top Recipes",
                         style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        Theme
+                            .of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       TextButton(
                         onPressed: () {
@@ -217,14 +248,42 @@ class _HomePageState extends State<HomePage> {
 
                   SizedBox(height: screenSize.height * 0.02),
 
-                  BlocBuilder<HomeCubit, HomeState>(
-                    builder: (context, state) {
-                      return AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 300),
-                        child: RecipesList(state: state),
-                      );
+                  BlocConsumer<HomeBloc, HomeState>(
+                    listener: (context, state) {
+                      if (state is NoMatchingRecipesState) {
+                        showNotification(
+                            context, "No recipes match your filters.",
+                            ContentType.warning, Colors.orangeAccent);
+                      }
                     },
-                  )
+                    builder: (context, state) {
+                      if (state is IsLoadingHome) {
+                        return  Column(
+                            children: List.generate(
+                              5,
+                                  (_) => const CustomRecipesCardShimmer(),
+                            ));
+                      }
+
+                      if (state is FailureState) {
+                        return ErrorStateWidget(
+                          errorMessage: state.errorMessage,
+                          onRetry: () {
+                            context.read<HomeBloc>().add(FetchRecipesEvent());
+                          },
+                        );
+                      }
+
+                      if (state is HomeLoaded) {
+                        return RecipesList(
+                          state: state,
+                          showFilteredRecipes: state.filteredRecipes.isNotEmpty,
+                        );
+                      }
+
+                      return const SizedBox.shrink();
+                    },
+                  ),
                 ],
               ),
             ),

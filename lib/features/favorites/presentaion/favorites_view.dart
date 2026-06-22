@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:meal_recommendation_b1/core/components/my_loading_dialog.dart';
-import 'package:meal_recommendation_b1/core/services/di.dart';
+import 'package:meal_recommendation_b1/core/components/loading_dialog.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_colors.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeBloc.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeEvent.dart';
+import 'package:meal_recommendation_b1/features/home/persentation/Cubits/HomeCubit/HomeState.dart';
 import '../../../../core/components/custom_recipes_card.dart';
-import '../data/models/favorites.dart';
-import 'bloc/favorites_bloc.dart';
-import 'bloc/favorites_event.dart';
-import 'bloc/favorites_state.dart';
+import '../../../core/services/di.dart';
+
 class FavoritesView extends StatefulWidget {
   const FavoritesView({super.key});
 
@@ -16,76 +16,66 @@ class FavoritesView extends StatefulWidget {
 }
 
 class _FavoritesViewState extends State<FavoritesView> {
-  List<Favorites> favorites = [];
-  String selectedId = "";
-
-  void removeFromFavorite(String id) {
-    favorites.removeWhere((element) {
-      return element.id == selectedId;
-    });
+  @override
+  void initState() {
+    super.initState();
+    BlocProvider.of<HomeBloc>(context).add(FetchRecipesEvent());
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: bodyContent(context),
+          body: bodyContent(context),
     );
   }
 
   Widget bodyContent(BuildContext context) {
-    return BlocProvider(
-      create: (context) => getIt<FavoritesBloc>()..add(GetAllFavoritesEvent()),
-      child: BlocConsumer<FavoritesBloc, FavoritesState>(
-        listener: (context, state) {
-          if (state is FavoritesLoading) {
-            MyLoadingDialog.show(context);
-          } else if (state is DeleteFavoriteDone) {
-            MyLoadingDialog.hide(context);
-            removeFromFavorite(selectedId);
-          } else if (state is DeleteFavoriteError) {
-            MyLoadingDialog.hide(context);
-          } else if (state is GetAllFavoritesDone) {
-            MyLoadingDialog.hide(context);
-            favorites = state.favorites;
-          } else if (state is GetAllFavoritesError) {
-            MyLoadingDialog.hide(context);
-          }
-        },
-        builder: (context, state) {
-          return Padding(
-            padding: EdgeInsets.only(top: 75.h),
-            child: SingleChildScrollView(
-              child: SizedBox(
-                height: MediaQuery.sizeOf(context).height - 230.h,
-                width: MediaQuery.sizeOf(context).width,
-                child: ListView.separated(
-                    shrinkWrap: true,
-                    itemBuilder: (context, index) {
-                      return CustomRecipesCard(
-                        onTapFav: () {
-                          selectedId = favorites[index].id;
-                          BlocProvider.of<FavoritesBloc>(context).add(
-                              DeleteFavoriteEvent(selectedId));
-                        },
-                        time: favorites[index].timing,
-                        middleText: favorites[index].subTitle,
-                        firstText: favorites[index].title,
-                        ingredients: favorites[index].ingredients,
-                        image: favorites[index].image,
-                        onTapDelete: () {}, mealId: '',
-                      );
-                    },
-                    separatorBuilder: (context, index) {
-                      return SizedBox(
-                        height: 10.h,
-                      );
-                    },
-                    itemCount: favorites.length),
+    return BlocConsumer<HomeBloc, HomeState>(
+      listener: (context, state) {},
+      builder: (context, state) {
+        if (state is HomeLoaded) {
+          var favoriteList = state.favoriteRecipes;
+
+          if (favoriteList.isEmpty) {
+            return const Center(
+              child: Text(
+                "No Favorites Yet!",
+                style: TextStyle(fontSize: 20, color: Colors.grey),
               ),
+            );
+          }
+
+          return Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ListView.separated(
+              itemBuilder: (context, index) {
+                var recipe = favoriteList[index];
+                var isFavorite = BlocProvider.of<HomeBloc>(context).isFavorite(recipe.id ?? "");
+
+                return CustomRecipesCard(
+                  onTapFav: () {
+                    BlocProvider.of<HomeBloc>(context).add(ToggleFavoriteEvent(recipe.id ?? ""));
+                  },
+                  time: recipe.time,
+                  middleText: recipe.summary,
+                  firstText: recipe.name,
+                  ingredients: recipe.ingredients[index].quantity,
+                  image: recipe.imageUrl,
+                  onTapDelete: () {},
+                  mealId: '',
+                  isFavorite: isFavorite,
+                );
+              },
+              separatorBuilder: (context, index) => const SizedBox(height: 10),
+              itemCount: favoriteList.length,
             ),
           );
-        },
-      ),
+        } else if (state is IsLoadingFavorites) {
+          return const LoadingDialog();
+        } else {
+          return const LoadingDialog();
+        }
+      },
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:meal_recommendation_b1/core/utiles/app_strings.dart';
 import '../../../../../../core/components/custom_button.dart';
 import '../../../../../../core/components/custom_text_field.dart';
 import '../../../../../../core/components/dynamic_notification_widget.dart';
@@ -14,8 +15,28 @@ import '../../bloc/auth_bloc.dart';
 import '../../bloc/auth_event.dart';
 import '../../bloc/auth_state.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
+
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  late TextEditingController _emailController;
+  late TextEditingController _passwordController;
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers in initState
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+
+    // Load saved user data
+    _loadSavedUserData(_emailController,_passwordController);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,10 +50,40 @@ class LoginScreen extends StatelessWidget {
       body: BlocConsumer<AuthBloc, AuthState>(
         listener: (context, state) async {
           if (state is Authenticated) {
-            await SecureStorageHelper.setSecuredString('uid', state.user.uid!);
-            Navigator.pushReplacementNamed(context, AppRoutes.navBar);
+            await SecureStorageHelper.setSecuredString(
+                AppStrings.uid,
+                state.user.id);
+             print(state.user.email);
+            if (state.isNewUser) {
+              Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+            } else if (state.isFirstLogin) {
+              // Returning user, but first time logging in after registration
+              Navigator.pushReplacementNamed(context, AppRoutes.welcome);
+            } else {
+              Navigator.pushReplacementNamed(context, AppRoutes.navBar);
+            }
           } else if (state is AuthError) {
-            _showErrorNotification(context, state.message);
+            String errorMessage = state.errorMessage;
+
+            switch (state.errorType) {
+              case AuthErrorType.invalidCredentials:
+                errorMessage = 'Invalid email or password';
+                break;
+              case AuthErrorType.networkError:
+                errorMessage = 'No internet connection';
+                break;
+              case AuthErrorType.userNotFound:
+                errorMessage = 'User not found';
+                break;
+              default:
+                errorMessage = 'An unexpected error occurred';
+            }
+
+            _showErrorNotification(context, errorMessage);
+          } else if (state is Unauthenticated) {
+            // Optional: Handle unauthenticated state with a specific message
+            _showErrorNotification(
+                context, state.errorMessage ?? 'Login failed');
           }
         },
         builder: (context, state) {
@@ -40,77 +91,65 @@ class LoginScreen extends StatelessWidget {
             return const LoadingDialog();
           }
 
-          return _buildLoginContent(
-              context, screenWidth, screenHeight, isMobile);
+
+          return Stack(
+            children: [
+              // Background Image
+              Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: Image.asset(Assets.authLayoutFoodImage),
+              ),
+
+              // Login Content
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isMobile ? 20 : screenWidth * 0.1,
+                    vertical: isMobile ? 40 : screenHeight * 0.1,
+                  ),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // App Logo
+                        Image.asset(Assets.icSplash),
+                        SizedBox(height: screenHeight * 0.05),
+
+                        _buildEmailTextField(_emailController, screenHeight),
+
+                        _buildPasswordTextField(_passwordController, screenHeight),
+
+                        /*RememberMeWidget(
+                      emailController: emailController,
+                      passwordController: passwordController)*/
+
+                        SizedBox(height: screenHeight * 0.03),
+
+                        _buildLoginButton(
+                            context, _emailController, _passwordController),
+
+                        const LoginDividerWidget(),
+
+                        const GoogleLoginButton(),
+
+                        SizedBox(height: screenHeight * 0.02),
+
+                        // Register Option
+                        const RegisterOptionWidget(),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
         },
       ),
     );
   }
 
-  Widget _buildLoginContent(BuildContext context, double screenWidth,
-      double screenHeight, bool isMobile) {
-    final emailController = TextEditingController();
-    final passwordController = TextEditingController();
-
-    // Load saved user data
-    _loadSavedUserData(emailController, passwordController);
-
-    return Stack(
-      children: [
-        // Background Image
-        Padding(
-          padding: const EdgeInsets.only(top: 20.0),
-          child: Image.asset(Assets.authLayoutFoodImage),
-        ),
-
-        // Login Content
-        Center(
-          child: Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: isMobile ? 20 : screenWidth * 0.1,
-              vertical: isMobile ? 40 : screenHeight * 0.1,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // App Logo
-                  Image.asset(Assets.icSplash),
-                  SizedBox(height: screenHeight * 0.05),
-
-                  _buildEmailTextField(emailController, screenHeight),
-
-                  _buildPasswordTextField(passwordController, screenHeight),
-
-                  RememberMeWidget(
-                      emailController: emailController,
-                      passwordController: passwordController
-                  ),
-
-                  SizedBox(height: screenHeight * 0.03),
-
-                  _buildLoginButton(
-                      context, emailController, passwordController),
-
-                  const LoginDividerWidget(),
-
-                  const GoogleLoginButton(),
-
-                  SizedBox(height: screenHeight * 0.02),
-
-                  // Register Option
-                  const RegisterOptionWidget(),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildEmailTextField(TextEditingController emailController,
-      double screenHeight) {
+  Widget _buildEmailTextField(
+      TextEditingController emailController, double screenHeight) {
     return Column(
       children: [
         CustomTextField(
@@ -133,8 +172,8 @@ class LoginScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPasswordTextField(TextEditingController passwordController,
-      double screenHeight) {
+  Widget _buildPasswordTextField(
+      TextEditingController passwordController, double screenHeight) {
     return Column(
       children: [
         CustomTextField(
@@ -159,7 +198,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   // Build Login Button
-  Widget _buildLoginButton(BuildContext context,
+  Widget _buildLoginButton(
+      BuildContext context,
       TextEditingController emailController,
       TextEditingController passwordController) {
     return CustomButton(
@@ -170,7 +210,8 @@ class LoginScreen extends StatelessWidget {
   }
 
   // Perform Login
-  void _performLogin(BuildContext context,
+  void _performLogin(
+      BuildContext context,
       TextEditingController emailController,
       TextEditingController passwordController) {
     final email = emailController.text.trim();
@@ -180,7 +221,7 @@ class LoginScreen extends StatelessWidget {
     if (_validateInputs(context, email, password)) {
       // Attempt login
       BlocProvider.of<AuthBloc>(context).add(
-        LoginWithEmailEvent(email, password),
+        LoginWithEmailEvent(email: email, password: password),
       );
     }
   }
@@ -241,6 +282,7 @@ class LoginScreen extends StatelessWidget {
     );
   }
 }
+
 class RememberMeWidget extends StatelessWidget {
   final TextEditingController emailController;
   final TextEditingController passwordController;
@@ -354,7 +396,7 @@ class RegisterOptionWidget extends StatelessWidget {
           },
           child: const Text(
             'Register now',
-            style: TextStyle(color: AppColors.white),
+            style: TextStyle(color: AppColors.white,fontWeight: FontWeight.bold),
           ),
         ),
       ],

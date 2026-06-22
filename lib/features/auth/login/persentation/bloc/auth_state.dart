@@ -1,7 +1,6 @@
+import '../../domain/entity/user_entity.dart';
 
- import '../../domain/entity/user_entity.dart';
-
-abstract class AuthState {}
+sealed class AuthState {}
 
 class AuthInitial extends AuthState {}
 
@@ -9,22 +8,50 @@ class AuthLoading extends AuthState {}
 
 class Authenticated extends AuthState {
   final UserEntity user;
+  final bool isNewUser;
+  final bool isFirstLogin;
+  final AuthenticationMethod authMethod;
 
-  Authenticated(this.user);
+  Authenticated({
+    required this.user,
+    this.isNewUser = false,
+    this.isFirstLogin = false,
+    required this.authMethod,
+  });
 }
 
-class Unauthenticated extends AuthState {}
+class Unauthenticated extends AuthState {
+  final String? errorMessage;
+  final AuthenticationMethod? lastAttemptedMethod;
+
+  Unauthenticated({
+    this.errorMessage,
+    this.lastAttemptedMethod,
+  });
+}
 
 class AuthError extends AuthState {
-  final String message;
+  final String errorMessage;
+  final AuthErrorType errorType;
 
-  AuthError(this.message);
+  AuthError({
+    required this.errorMessage,
+    required this.errorType,
+  });
 }
 
- class SavedUserLoaded extends AuthState {
-   final UserEntity user;
+// Enums
+enum AuthenticationMethod {
+  email,
+  google,
+  apple,
+  phone
+}
 
-    SavedUserLoaded(this.user);
-
-   List<Object?> get props => [user];
- }
+enum AuthErrorType {
+  networkError,
+  invalidCredentials,
+  userNotFound,
+  accountDisabled,
+  unknown
+}

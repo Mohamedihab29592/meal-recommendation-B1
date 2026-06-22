@@ -15,8 +15,11 @@ class Recipe {
   final List<Ingredient> ingredients;
   final Nutrition nutrition;
   final Directions directions;
+   bool? isFavorite; // Nullable to handle missing values gracefully
 
-  Recipe({
+
+  Recipe( {
+    this.isFavorite,
     this.id,
     this.generatedAt,
     this.isGenerated = false,
@@ -31,9 +34,21 @@ class Recipe {
     required this.nutrition,
     required this.directions,
   }) : ingredients = List.unmodifiable(ingredients) {
-    _validate();
   }
-
+  Recipe copyWith({bool? isFavorite}) {
+    return Recipe(
+      id: id,
+      name: name,
+      summary: summary,
+      typeOfMeal: typeOfMeal,
+      time: time,
+      ingredients: ingredients,
+      nutrition: nutrition,
+      imageUrl: imageUrl,
+      isFavorite: isFavorite ?? this.isFavorite,
+      directions: Directions.defaultValues(),
+    );
+  }
   // Enhanced factory constructor with detailed error handling and logging
   factory Recipe.fromJson(Map<String, dynamic> json) {
     try {
@@ -43,6 +58,7 @@ class Recipe {
       // Detailed type checking and conversion
       return Recipe(
         id: _safeParseString(json['id']),
+        isFavorite: json['isFavorite'],
         name: _safeParseString(json['name'], defaultValue: 'Unnamed Recipe'),
         summary: _safeParseString(json['summary'], defaultValue: 'No summary available'),
         typeOfMeal: _safeParseString(json['typeOfMeal'], defaultValue: 'Unknown Meal Type'),
@@ -136,13 +152,6 @@ class Recipe {
       'nutrition': nutrition.toJson(),
       'directions': directions.toJson(),
     };
-  }
-
-  // Validation method to ensure required fields are not empty
-  void _validate() {
-    if (name.isEmpty || summary.isEmpty || typeOfMeal.isEmpty) {
-      throw ArgumentError('Name, summary, and typeOfMeal cannot be empty.');
-    }
   }
 
   @override

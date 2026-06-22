@@ -3,8 +3,8 @@ import '../../domain/entity/entity.dart';
 
 part 'UserModel.g.dart'; // Make sure this matches the exact file name
 
-@HiveType(typeId: 32)
-class UserModel extends User  {
+@HiveType(typeId: 0)
+class UserModel extends User {
   @HiveField(0)
   final String id;
 
@@ -39,10 +39,10 @@ class UserModel extends User  {
   factory UserModel.fromFirestore(Map<String, dynamic> json, String id) {
     return UserModel(
       id: id,
-      name: json['name'] ?? '',
-      email: json['email'] ?? '',
-      phone: json['phone'] ?? '',
-      profilePhotoUrl: json['profilePhoto'] ?? null, // Properly handle nullability
+      name: json['name'] as String? ?? '', // Default to empty string if null
+      email: json['email'] as String? ?? '',
+      phone: json['phone'] as String? ?? '',
+      profilePhotoUrl: json['profilePhoto'] as String?, // Safely cast and handle null
     );
   }
 
@@ -52,7 +52,18 @@ class UserModel extends User  {
       'name': name,
       'email': email,
       'phone': phone,
-      'profilePhoto': profilePhotoUrl,
+      if (profilePhotoUrl != null) 'profilePhoto': profilePhotoUrl, // Include only if not null
+    };
+  }
+
+  // Convert the model to JSON (useful for APIs or other uses)
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'email': email,
+      'phone': phone,
+      'profilePhotoUrl': profilePhotoUrl,
     };
   }
 

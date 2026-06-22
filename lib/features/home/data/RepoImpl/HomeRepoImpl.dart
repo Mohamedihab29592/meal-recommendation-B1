@@ -81,6 +81,14 @@ class HomeRepoImpl extends HomeRepo {
     if (recipe.name.trim().isEmpty) {
       throw ArgumentError("Recipe name cannot be empty");
     }
+    if (recipe.imageUrl.trim().isEmpty) {
+      throw ArgumentError("Recipe Image cannot be empty");
+    }
+
+
+    if (recipe.typeOfMeal.trim().isEmpty) {
+      throw ArgumentError("Recipe Type cannot be empty");
+    }
 
     if (recipe.ingredients.isEmpty) {
       throw ArgumentError("Recipe must have at least one ingredient");

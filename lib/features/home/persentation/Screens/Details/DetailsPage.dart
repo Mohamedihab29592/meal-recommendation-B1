@@ -76,7 +76,7 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
           }
 
           // Success State
-          else if (state is LoadedState) {
+           if (state is LoadedState) {
             final Recipe recipe = state.recipe;
 
             return DefaultTabController(
@@ -93,14 +93,6 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
                   icon: const Icon(Icons.arrow_back, color: Colors.white),
                   onPressed: () => Navigator.pop(context),
                 ),
-                actions: [
-                  IconButton(
-                    icon: const Icon(Icons.favorite_border, color: Colors.white),
-                    onPressed: () {
-                      // Add to favorites logic
-                    },
-                  ),
-                ],
                 title: _buildScrolledTitleWidget(recipe, screenSize),
                 centerTitle: false,
                 flexibleSpace: FlexibleSpaceBar(
@@ -226,33 +218,36 @@ class DetailsPageState extends State<DetailsPage> with SingleTickerProviderState
 
   Widget _buildRecipeImage(String imageUrl) {
     return imageUrl.isNotEmpty
-        ? Image.network(
-      imageUrl,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          color: Colors.grey[300],
-          child: const Center(
-            child: Icon(
-              Icons.image_not_supported,
-              size: 50,
-              color: Colors.white,
+        ? Hero(
+        tag: widget.recipeId,
+          child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) {
+          return Container(
+            color: Colors.grey[300],
+            child: const Center(
+              child: Icon(
+                Icons.image_not_supported,
+                size: 50,
+                color: Colors.white,
+              ),
             ),
-          ),
-        );
-      },
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Center(
-          child: CircularProgressIndicator(
-            value: loadingProgress.expectedTotalBytes != null
-                ? loadingProgress.cumulativeBytesLoaded /
-                loadingProgress.expectedTotalBytes!
-                : null,
-          ),
-        );
-      },
-    )
+          );
+                },
+                loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                  loadingProgress.expectedTotalBytes!
+                  : null,
+            ),
+          );
+                },
+              ),
+        )
         : Container(
       color: Colors.grey[300],
       child: const Center(

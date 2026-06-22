@@ -1,52 +1,111 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import '../utiles/app_colors.dart';
 
-class SideBarItems extends StatefulWidget {
+
+class SideBarItem extends StatelessWidget {
   final int index;
-  final String whiteIcon;
-  final String blueIcon;
-  final Function toggleItem;
-  final Function returnedIndex;
-  final List selected;
-  final List items;
-  final double iconSize;
-  const SideBarItems({super.key, required this.index, required this.whiteIcon, required this.blueIcon, required this.toggleItem, required this.returnedIndex, required this.selected, required this.items, required this.iconSize});
+  final String title;
+  final IconData activeIcon;
+  final IconData inactiveIcon;
+  final bool isSelected;
+  final VoidCallback onTap;
+  final Color activeColor;
+  final Color inactiveColor;
 
-  @override
-  State<SideBarItems> createState() => _SideBarItemsState();
-}
-
-class _SideBarItemsState extends State<SideBarItems> {
-
+  const SideBarItem({
+    super.key,
+    required this.index,
+    required this.title,
+    required this.activeIcon,
+    required this.inactiveIcon,
+    required this.isSelected,
+    required this.onTap,
+    this.activeColor = Colors.blue,
+    this.inactiveColor = Colors.grey, required double iconSize, required double fontSize,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 60.h,
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+      margin: EdgeInsets.symmetric(vertical: 8.h, horizontal: 8.w),
       decoration: BoxDecoration(
-        color: widget.selected[widget.index] ? AppColors.primary : AppColors.white,
-        borderRadius: BorderRadius.only(
-          topRight: Radius.circular(50.w),
-          bottomRight: Radius.circular(50.w),
-        ),
+        color: isSelected
+            ? activeColor.withOpacity(0.1)
+            : Colors.transparent,
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: isSelected
+            ? [
+          BoxShadow(
+            color: activeColor.withOpacity(0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ]
+            : [],
       ),
-      child: Center(
-        child: ListTile(
-          leading: SvgPicture.asset(
-            widget.selected[widget.index] ? widget.whiteIcon : widget.blueIcon,
-            width: widget.iconSize,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(12),
+          onTap: onTap,
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: 12.h,
+              horizontal: 16.w,
+            ),
+            child: Row(
+              children: [
+                // Animated Icon
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 300),
+                  transitionBuilder: (child, animation) {
+                    return ScaleTransition(
+                      scale: animation,
+                      child: child,
+                    );
+                  },
+                  child: Icon(
+                    isSelected ? activeIcon : inactiveIcon,
+                    key: ValueKey(isSelected),
+                    color: isSelected ? activeColor : inactiveColor,
+                    size: 24.w,
+                  ),
+                ),
+
+                // Spacer
+                SizedBox(width: 16.w),
+
+                // Title
+                Expanded(
+                  child: AnimatedDefaultTextStyle(
+                    duration: const Duration(milliseconds: 300),
+                    style: TextStyle(
+                      color: isSelected ? activeColor : inactiveColor,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      fontSize: 16.sp,
+                    ),
+                    child: Text(title),
+                  ),
+                ),
+
+                // Selection Indicator
+                if (isSelected)
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 6.w,
+                    height: 6.w,
+                    decoration: BoxDecoration(
+                      color: activeColor,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+              ],
+            ),
           ),
-          title: Text(widget.items[widget.index],
-              style: TextStyle(
-                  color: widget.selected[widget.index] ? AppColors.white : AppColors.primary,fontWeight: FontWeight.bold,fontSize: 18.sp)),
-          onTap: () {
-            widget.returnedIndex(widget.index);
-            setState(() {
-              widget.toggleItem(widget.index);
-            });
-          },
         ),
       ),
     );

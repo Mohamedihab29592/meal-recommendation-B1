@@ -1,13 +1,14 @@
-  class UserEntity {
-  final String ?uid;
-  final String ?name;
-  final String ?email;
-  final String ?phone;
+class UserEntity {
+  final String id;
+  final String email;
+  final String? name;
+  final String? profilePhoto;
+  final String? phone;
 
   UserEntity({
-    required this.uid,
-    required this.name,
+    required this.id,
     required this.email,
-    required this.phone,
+    this.name,
+    this.profilePhoto, required this.phone,
   });
 }

@@ -14,6 +14,6 @@ class UpdateUserProfileUseCase {
         email: user.email,
         phone: user.phone,
         profilePhotoUrl: user.profilePhotoUrl);
-    await repository.updateUserProfile(userModel);
+    await repository.updateUserProfile(userModel as User);
   }
 }

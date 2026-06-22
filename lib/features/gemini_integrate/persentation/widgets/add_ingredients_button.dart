@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_cubit.dart';
 import 'package:meal_recommendation_b1/features/home/persentation/Cubits/AddRecipesCubit/add_ingredient_state.dart';
 import '../../../../core/components/dynamic_notification_widget.dart';
-import '../../../../core/services/di.dart';
 import '../../../../core/utiles/app_colors.dart';
 import '../../data/Recipe.dart';
 

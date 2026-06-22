@@ -15,11 +15,13 @@ class DynamicNotificationWidget {
         elevation: 0,
         backgroundColor: Colors.transparent,
         forceActionsBelow: true,
-        content: AwesomeSnackbarContent(
-          title: title,
-          message: message,
-          contentType: contentType,
-          inMaterialBanner: true,
+        content: SingleChildScrollView(
+          child: AwesomeSnackbarContent(
+            title: title,
+            message: message,
+            contentType: contentType,
+            inMaterialBanner: true,
+          ),
         ),
         actions: [
           TextButton(
