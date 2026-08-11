@@ -1,0 +1,49 @@
+OTP Verification System Document
+
+Overview
+The OTP verification feature allows users to sign in with their email, password, and phone number, ensuring their phone
+number is valid via OTP verification. The authentication process leverages Firebase for phone number verification and
+OTP handling, with Bloc used to manage the state of the authentication flow in the presentation layer.
+
+Features
+   1- Verify Number: Users sign in using email, password, and phone number. Firebase validates the phone number through OTP.
+   2- OTP Handling: An OTP is sent to the provided phone number. The user then enters the OTP, which is verified. Upon successful
+      verification, the user is navigated to the home screen; otherwise, an error message is shown.
+
+# data layer
+- data source
+  Uses Firebase as a remote data source for phone authentication.
+  1- verifyPhoneNumber: Initiates phone number verification through Firebase.
+  2- signInWithCredential: Authenticates the user with the OTP provided.
+- network
+  Contains error handling for Firebase-specific exceptions.
+  1-handleSignInWithCredentialException: Handles errors encountered during OTP verification.
+  2-handleFirebasePhoneException: Manages exceptions during phone number verification.
+- repository
+  Interfaces with Firebase to handle phone number verification and OTP submission.
+  signInWithCredential , verifyPhoneNumber
+
+# domain layer
+- entities
+  PhoneNumberEntities: Contains the data needed for Firebase to initiate the phone verification process,
+  including:
+  1-phoneNumber: The user's phone number.
+  2-codeAutoRetrievalTimeout, codeSent, verificationCompleted, verificationFailed: Callbacks for handling the different
+  phases of phone verification.
+
+- useCase
+  Each core function in phone authentication has its own use case, providing a single responsibility for each operation:
+  1-PhoneAuthenticationUseCase: Triggers Firebase phone verification.
+  2-SubmitOTPUseCase: Verifies the OTP entered by the user.
+
+# presentation layer
+- controller
+  Bloc (PhoneAuthBloc): Manages the state of the phone authentication process. It handles events such as submitting
+  the phone number and OTP verification, along with Firebase’s phone verification callbacks.
+
+- screens
+  OTPScreen: UI where users enter the OTP sent to their phone. This screen listens to PhoneAuthBloc states
+  to update the UI based on the verification process.
+
+
+

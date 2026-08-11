@@ -17,7 +17,7 @@ class SecureStorageHelper {
   static getSecuredString(String key) async {
     const flutterSecureStorage = FlutterSecureStorage();
     debugPrint('FlutterSecureStorage : getSecuredString with key :');
-    return await flutterSecureStorage.read(key: key) ?? '';
+    return await flutterSecureStorage.read(key: key) ;
   }
 
   /// Removes all keys and values in the FlutterSecureStorage

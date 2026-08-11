@@ -54,7 +54,6 @@ class AuthRemoteDataSource{
 
   Future<void> logout() async {
     await _firebaseAuth.signOut();
-    await _googleSignIn.signOut();
   }
 
   Map<String, dynamic>? _getUserData(User? user) {

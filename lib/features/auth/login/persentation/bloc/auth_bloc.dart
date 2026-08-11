@@ -1,4 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:meal_recommendation_b1/core/utiles/secure_storage_helper.dart';
 
 import '../../domain/use_cases/login_with_email_use_case.dart';
 import '../../domain/use_cases/login_with_google_use_case.dart';
@@ -51,15 +53,14 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
-
   Future<void> _onLogout(LogoutEvent event, Emitter<AuthState> emit) async {
     emit(AuthLoading());
     try {
       await logoutUseCase();
+      await SecureStorageHelper.setSecuredString('uid', '');
       emit(Unauthenticated());
     } catch (e) {
       emit(AuthError(e.toString()));
     }
   }
-
 }

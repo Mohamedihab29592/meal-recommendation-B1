@@ -1,0 +1,39 @@
+Features : 
+-----------
+    - Authentication (Auth) Feature  (Ola Mohammed -- > Register View )
+
+    *  in Auth Feature I added Register View :
+        --> Presentation Layer 
+            Which Contains :
+                -- Screens : Register Screen 
+                -- widgets : Extracted Widgets to Improve Code Rebuildeing 
+                -- view Model : we have Here Bloc as a State Managment and I used Bloc to Handle The Whole Auth Feature ,
+                                as all views were Related To each other 
+            
+        
+        --> Data Layer :  
+                -- Data Source (Abstract): we Have 2 Data Source 
+                                    // one for auth local data source which responsible for save user , get user and clear user 
+                                    // another for auth remote data source which responible for the process of login and registration
+
+                -- Data Source Impl : we Have 2 Files for the Implementation of the Previous Abstract Data Source 
+                
+                
+                -- mappers : we have one mapper called UserMapper ,just to extract UserEntity from a map 
+                
+                -- Repositories (as Implementation) : Implemented all Abstract Methods That i inherit from  
+                                                      Repositories in Domain Layer Folder .
+
+        
+        --> Domain Layer : 
+
+            -- Entities : we have one Entity and it was User Entity to use in Presentation Layer and Domain 
+                            Layer 
+            
+            -- Use Cases  : we have 5 Use Cases  For Login with email and password  , For Register with email and password , for login with google , for logout and the last one For 
+                            get saved user 
+                            Bloc will Use them 
+                
+            -- Repositories (as Abstracted) : we added all Abstract Methods That we will need to implement it in Data 
+                                            Layer and use to to deal with Data Sources ...
+                                            for making authentication with Firebase

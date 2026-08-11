@@ -1,0 +1,40 @@
+Features : 
+-----------
+    - Profile Feature  
+
+    *  in Profile Feature we added :
+        --> Presentation Layer 
+            Which Contains :
+                -- Screens : Profile Screen 
+                -- widgets : Extracted Widgets to Improve Code Rebuildeing 
+                -- Bloc : we have Here Bloc as a State Managment and we used Bloc to Handle UpdateUserProfile 
+                        , UpdateUserProfileImage and LoadUserProfile From Firebase if it was the First Time 
+                          to use this account but if it was the second time it will get user information 
+                          from Local Database (Hive) not from Firebase   
+            
+        
+        --> Data Layer :  
+                -- Data Source : we Have only one Local Data Source 
+                                 we have HiveLocalUserDataSource which save , get and delete user
+                                 information locally if it was the second time to use this account 
+                                 on this device
+            
+                -- Repositories (as Implementation) : Implemented all Abstract Methods That i inherit from  
+                                                      Repositories in Domain Layer Folder .
+                                                      which deals with Firebase FireStore and Hive Local Database
+                                                      to get , save , update , delete user information
+
+
+                -- Model : we Have UserModel and there was auto generated user model file 
+                           it was implemented automatic when we use build_runner to generate User Model Adaptor  
+        --> Domain Layer : 
+
+            -- Entities : we have one Entity and it was User Entity to use in Presentation Layer and Domain 
+                            Layer 
+            
+            -- Use Cases  : we have 3 Use Cases UpdateUserProfileUseCase , GetUserProfileUseCase and UploadUserProfileImageUseCase 
+                            Bloc will Use them 
+                
+            -- Repositories (as Abstracted) : we added all Abstract Methods That we will need to implement it in Data 
+                                            Layer and use to to deal with Data Sources ...
+                                            for dealing with Firebase FireStore and Hive (getUserProfile , updateUserProfile and uploadUserImage)
