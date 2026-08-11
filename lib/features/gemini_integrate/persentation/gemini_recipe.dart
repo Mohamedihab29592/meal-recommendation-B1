@@ -17,8 +17,8 @@ class GeminiRecipeState extends State<GeminiRecipe> {
   final _formKey = GlobalKey<FormState>();
   String _searchQuery = "";
   List<Recipe> _recipes = [];
-  static const apiGeminiKey = ""; // Replace with your actual API key
-  static const spoonacularApiKey = "";
+  static const apiGeminiKey = "";  // Replace with your actual API key
+  static const spoonacularApiKey = ""; 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
